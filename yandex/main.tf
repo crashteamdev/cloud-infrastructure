@@ -70,7 +70,7 @@ resource "yandex_vpc_subnet" "mongo-a" {
 resource "yandex_kms_symmetric_key_iam_binding" "viewer" {
   symmetric_key_id = yandex_kms_symmetric_key.kms-key.id
   role             = "viewer"
-  members          = [
+  members = [
     "serviceAccount:${yandex_iam_service_account.marketdb-tf.id}",
   ]
 }
@@ -133,7 +133,7 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
   }
   service_account_id      = yandex_iam_service_account.marketdb-tf.id
   node_service_account_id = yandex_iam_service_account.marketdb-tf.id
-  depends_on              = [
+  depends_on = [
     yandex_resourcemanager_folder_iam_member.editor,
     yandex_resourcemanager_folder_iam_member.images-puller
   ]
@@ -245,7 +245,7 @@ resource "yandex_mdb_postgresql_user" "pg_user" {
   name       = "dbuser"
   password   = random_password.passwords[0].result
   conn_limit = 50
-  settings   = {
+  settings = {
     default_transaction_isolation = "read committed"
     log_min_duration_statement    = 5000
   }
