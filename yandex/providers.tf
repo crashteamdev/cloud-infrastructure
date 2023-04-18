@@ -16,7 +16,6 @@ terraform {
     skip_credentials_validation = true
   }
 }
-
 provider "yandex" {
   zone      = var.ya_region
   cloud_id  = var.ya_cloud_id
