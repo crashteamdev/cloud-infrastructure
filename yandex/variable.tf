@@ -25,3 +25,9 @@ variable "pg_dbs" {
 variable "mongo_dbs" {
   description = ""
 }
+
+variable "db_password" {
+  description = "Database administrator password"
+  type        = string
+  sensitive   = true
+}

@@ -198,12 +198,6 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
   }
 }
 
-resource "random_password" "passwords" {
-  count   = 1
-  length  = 16
-  special = true
-}
-
 resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   name        = "pg_prod"
   description = "main database"
@@ -243,7 +237,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
 resource "yandex_mdb_postgresql_user" "pg_user" {
   cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
   name       = "dbuser"
-  password   = random_password.passwords[0].result
+  password   = var.db_password
   conn_limit = 50
   settings = {
     default_transaction_isolation = "read committed"
@@ -276,7 +270,7 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
   folder_id   = var.yc_folder_id
 
   config {
-    password = random_password.passwords[0].result
+    password = var.db_password
     version  = "7.0"
   }
 
@@ -313,7 +307,7 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
 
   user {
     name     = "dbuser"
-    password = random_password.passwords[0].result
+    password = var.db_password
     dynamic "permission" {
       for_each = var.mongo_dbs
       content {

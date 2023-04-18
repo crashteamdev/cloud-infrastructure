@@ -5,3 +5,4 @@ mongo_dbs = [
   "kazanex",
   "uzum",
 ]
+db_password = "Str0ngPasswd"
