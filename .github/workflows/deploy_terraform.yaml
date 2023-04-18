@@ -9,7 +9,7 @@ on:
 
 jobs:
   terraform_validate_and_deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -18,8 +18,6 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_wrapper: false
 
       - name: Setup Terraform Mirror
         uses: actions/github-script@v6
