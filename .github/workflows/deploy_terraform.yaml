@@ -1,0 +1,83 @@
+name: Validate and Deploy terraform
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'yandex/**'
+  workflow_dispatch:
+
+jobs:
+  terraform_validate_and_deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          lfs: 'true'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Setup Terraform Mirror
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const os = require('os');
+            
+            const osPlatform = os.platform();
+            let terraformFileConfig = osPlatform === 'win32'
+              ? `${process.env.APPDATA}/terraform.rc` : `${process.env.HOME}/.terraformrc`;
+            const mirror = `
+              provider_installation {
+                network_mirror {
+                  url = "https://terraform-mirror.yandexcloud.net/"
+                  include = ["registry.terraform.io/*/*"]
+                }
+                direct {
+                  exclude = ["registry.terraform.io/*/*"]
+                }
+              }
+            `;
+            core.debug(`Adding provider mirror to ${terraformFileConfig}`);
+            fs.appendFileSync(terraformFileConfig, mirror);
+
+      - name: Setup access token
+        run: |
+          echo $YC_KEY >> $YC_SERVICE_ACCOUNT_KEY_FILE
+          echo "YC_SERVICE_ACCOUNT_KEY_FILE=$YC_SERVICE_ACCOUNT_KEY_FILE" >> $GITHUB_ENV
+        env:
+          YC_KEY: ${{ secrets.YC_KEY }}
+          YC_SERVICE_ACCOUNT_KEY_FILE: /tmp/sa-key.json
+
+#      - name: Get IAM token
+#        id: iam_token
+#        run: |
+#          response = $(curl -d "{\"yandexPassportOauthToken\":\"${{ secrets.YC_OAUTH_TOKEN }}\"}" 'https://iam.api.cloud.yandex.net/iam/v1/tokens')
+#          echo '::set-output YC_IAM_TOKEN=$response'
+
+      - name: Terraform Init
+        run: |
+          cd yandex
+          terraform init -backend-config="access_key=$AWS_ACCESS_KEY_ID" -backend-config="secret_key=$AWS_SECRET_ACCESS_KEY"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform Validate
+        run: |
+          cd yandex
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          cd yandex
+          terraform plan
+
+      - name: Terraform Apply
+        if: ${{ github.ref_name == 'main' && github.event_name == 'workflow_dispatch' }}
+        run: |
+          cd yandex
+          terraform apply -auto-approve
