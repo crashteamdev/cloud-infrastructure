@@ -6,8 +6,8 @@ resource "yandex_vpc_network" "network-1" { name = "analytics" }
 
 resource "yandex_vpc_subnet" "subnet-1" {
   v4_cidr_blocks = ["10.1.2.0/24"]
-  name           = "non-pcidss"
-  zone           = var.ya_region
+  name           = "analytics-subnet"
+  zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
 }
 
@@ -17,25 +17,25 @@ resource "yandex_iam_service_account" "marketdb-tf" {
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "editor" {
-  folder_id = var.ya_folder_id
+  folder_id = var.yc_folder_id
   role      = "editor"
   member    = "serviceAccount:${yandex_iam_service_account.marketdb-tf.id}"
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "k8s-clusters-agent" {
-  folder_id = var.ya_folder_id
+  folder_id = var.yc_folder_id
   role      = "k8s.clusters.agent"
   member    = "serviceAccount:${yandex_iam_service_account.marketdb-tf.id}"
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "vpc-public-admin" {
-  folder_id = var.ya_folder_id
+  folder_id = var.yc_folder_id
   role      = "vpc.publicAdmin"
   member    = "serviceAccount:${yandex_iam_service_account.marketdb-tf.id}"
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "images-puller" {
-  folder_id = var.ya_folder_id
+  folder_id = var.yc_folder_id
   role      = "container-registry.images.puller"
   member    = "serviceAccount:${yandex_iam_service_account.marketdb-tf.id}"
 }
@@ -48,21 +48,21 @@ resource "yandex_kms_symmetric_key" "kms-key" {
 
 resource "yandex_vpc_subnet" "pg-a" {
   name           = "pgnet-a"
-  zone           = var.ya_region
+  zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
   v4_cidr_blocks = ["10.1.0.0/24"]
 }
 
 resource "yandex_vpc_subnet" "redis-a" {
   name           = "redisnet-a"
-  zone           = var.ya_region
+  zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
   v4_cidr_blocks = ["10.2.0.0/24"]
 }
 
 resource "yandex_vpc_subnet" "mongo-a" {
   name           = "mongonet-a"
-  zone           = var.ya_region
+  zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
   v4_cidr_blocks = ["10.3.0.0/24"]
 }
@@ -176,7 +176,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
 
   allocation_policy {
     location {
-      zone = var.ya_region
+      zone = var.yc_region
     }
   }
 
@@ -209,7 +209,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   description = "main database"
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
-  folder_id   = var.ya_folder_id
+  folder_id   = var.yc_folder_id
 
   config {
     version = "14"
@@ -235,7 +235,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   }
 
   host {
-    zone      = var.ya_region
+    zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.pg-a.id
   }
 }
@@ -273,7 +273,7 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
   name        = "redis_prod"
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
-  folder_id   = var.ya_folder_id
+  folder_id   = var.yc_folder_id
 
   config {
     password = random_password.passwords[0].result
@@ -286,7 +286,7 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
   }
 
   host {
-    zone      = var.ya_region
+    zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.redis-a.id
   }
 
