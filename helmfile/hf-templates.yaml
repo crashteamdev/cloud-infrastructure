@@ -1,0 +1,21 @@
+templates:
+  default: &default
+    namespace: '{{ .Namespace | default "default" }}'
+    missingFileHandler: Warn
+    timeout: 200
+    values:
+      - envfiles/{{ .Environment.Name }}.yaml
+      - config/{{ .Release.Name }}/values.yaml
+      - config/{{ .Release.Name }}/values.yaml.gotmpl
+
+  infra: &infra_default
+    missingFileHandler: Warn
+    timeout: 900
+    values:
+      - envfiles/{{ .Environment.Name }}.yaml
+      - config-infrastructure/{{ .Release.Name }}/values.yaml
+      - config-infrastructure/{{ .Release.Name }}/values.yaml.gotmpl
+
+  default_generic: &generic_stateless
+    <<: *default
+    chart: crashteamdev/stateless

@@ -1,0 +1,55 @@
+controller:
+
+  replicaCount: 1
+  nodeSelector:
+    ingress: "true"
+  podAnnotations:
+    co.elastic.logs/enabled: "true"
+    co.elastic.logs/json.keys_under_root: "true"
+    co.elastic.logs/json.overwrite_keys: "true"
+    co.elastic.logs/json.add_error_key: "true"
+    co.elastic.logs/processors.1.decode_json_fields.fields: "log"
+    co.elastic.logs/processors.1.decode_json_fields.max_depth: "5"
+    co.elastic.logs/processors.1.decode_json_fields.target: ""
+    co.elastic.logs/processors.1.decode_json_fields.overwrite_keys: "true"
+    co.elastic.logs/processors.1.decode_json_fields.add_error_key: "true"
+  service:
+    externalTrafficPolicy: "Local"
+    annotations:
+      # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+      # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+      service.beta.kubernetes.io/aws-load-balancer-type: "external"
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+      service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: preserve_client_ip.enabled=true
+    internal:
+      enabled: true
+      annotations:
+        # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+        # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internal
+        service.beta.kubernetes.io/aws-load-balancer-type: "external"
+        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+        service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: preserve_client_ip.enabled=true
+  volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 512M
+  config:
+    # worker-processes: 4
+    ignore-invalid-headers: false
+    proxy-buffer-size: "16k"
+    log-format-escape-json: true
+    log-format-upstream: '{"@timestamp": "$time_iso8601", "@version": 1, "remote_addr": "$remote_addr", "request": "$request",
+      "status": $status, "http_host": "$host", "tls_protocol": "$ssl_protocol", "tls_cipher": "$ssl_cipher",
+      "request_time": $request_time, "request_length": $request_length, "request_method": "$request_method",
+      "body_bytes_sent": $body_bytes_sent, "upstream_cache_status": "$upstream_cache_status", "remote_user": "$remote_user",
+      "http_x-request-id": "$http_x_request_id", "http_referrer": "$http_referer", "http_user_agent": "$http_user_agent",
+      "http_x-forwarded-for": "$http_x_forwarded_for"}'
+    limit-req-status-code: "429"
+    # use-proxy-protocol: "true"
+    # real-ip-header: "proxy_protocol"
+  ingressClassResource:
+    enabled: true

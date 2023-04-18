@@ -1,0 +1,19 @@
+helmDefaults:
+  createNamespace: true
+  historyMax: 3
+environments:
+  default:
+    values:
+      - envfiles/gh.yaml
+  gh:
+    values:
+      - envfiles/gh.yaml
+  stage:
+    values:
+      - envfiles/stage.yaml
+  empayre:
+    values:
+      - envfiles/empayre.yaml
+  minimal:
+    values:
+      - envfiles/minimal.example.yaml

@@ -1,0 +1,51 @@
+netpolicy:
+  enabled: true
+prometheus:
+  enabled: true
+  grafana:
+    password: prom-operator
+  pagerduty:
+    key: perfectkeyword
+ingresscontroller:
+  enabled: false
+
+services:
+  global:
+    java:
+      apiPort: 8022
+      managementPort: 8023
+      adapterCallbackPort: 8080
+    ipv6only: false
+    metrics:
+      enabled: true
+    registry:
+      repository: docker.io/crashteamdev
+      imagePullSecret: { }
+    statelessReplicas: 2
+
+  postgres:
+    external: true
+    # Values below uses only if postgres.external is true
+    endpoint: { }
+    uniUser: { }
+    uniPassword: { }
+
+  postgresReplica:
+    endpoint: { }
+
+  ingress:
+    class: "nginx"
+    rootDomain: marketdb.ru
+    namespacedDomain: false
+    tls:
+      enabled: true
+      letsEncrypt:
+        enabled: true
+        issuer: "letsencrypt-prod"
+        internalIssuer: "letsencrypt-production-dns-cf"
+      secretName: tlssecret-marketdb
+
+  grafana:
+    openid:
+      client_id: some-id
+      client_secret: somepasswordhere
