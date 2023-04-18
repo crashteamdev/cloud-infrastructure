@@ -74,6 +74,7 @@ jobs:
       - name: Terraform Plan
         run: |
           cd yandex
+          echo "$TF_LOG=DEBUG" >> $GITHUB_ENV
           terraform plan
 
       - name: Terraform Apply
