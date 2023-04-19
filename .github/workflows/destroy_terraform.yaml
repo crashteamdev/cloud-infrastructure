@@ -1,0 +1,32 @@
+name: Destroy terraform
+
+on:
+  pull_request:
+    types: [ labeled ]
+  workflow_dispatch:
+
+jobs:
+  terraform_validate_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          lfs: 'true'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Setup access token
+        run: |
+          echo $YC_KEY >> $YC_SERVICE_ACCOUNT_KEY_FILE
+          echo "YC_SERVICE_ACCOUNT_KEY_FILE=$YC_SERVICE_ACCOUNT_KEY_FILE" >> $GITHUB_ENV
+        env:
+          YC_KEY: ${{ secrets.YC_KEY }}
+          YC_SERVICE_ACCOUNT_KEY_FILE: /tmp/sa-key.json
+
+      - name: Terraform Destroy
+        if:  ${{ github.event.label.name == 'destroy' && github.event_name == 'workflow_dispatch' }}
+        run: |
+          cd yandex
+          terraform destroy -auto-approve
