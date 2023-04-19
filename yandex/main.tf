@@ -145,7 +145,7 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
 resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name       = "analytics"
-  version    = "1.20"
+  version    = "1.22"
 
   instance_template {
     platform_id = "standard-v1"
@@ -328,6 +328,8 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
   }
 
   maintenance_window {
-    type = "ANYTIME"
+    day  = "SUN"
+    hour = 2
+    type = "WEEKLY"
   }
 }
