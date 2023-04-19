@@ -48,6 +48,7 @@ jobs:
         run: |
           echo $YC_KEY >> $YC_SERVICE_ACCOUNT_KEY_FILE
           echo "YC_SERVICE_ACCOUNT_KEY_FILE=$YC_SERVICE_ACCOUNT_KEY_FILE" >> $GITHUB_ENV
+          echo "TF_LOG=1" >> $GITHUB_ENV
         env:
           YC_KEY: ${{ secrets.YC_KEY }}
           YC_SERVICE_ACCOUNT_KEY_FILE: /tmp/sa-key.json
@@ -76,7 +77,6 @@ jobs:
       - name: Terraform Plan
         run: |
           cd yandex
-          echo "TF_LOG=1" >> $GITHUB_ENV
           terraform plan
 
       - name: Terraform Apply
