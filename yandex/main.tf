@@ -276,7 +276,7 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
 
   resources {
     resource_preset_id = "hm1.nano"
-    disk_size          = 8
+    disk_size          = 16
   }
 
   host {
