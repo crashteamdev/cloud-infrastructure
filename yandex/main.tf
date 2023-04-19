@@ -285,7 +285,9 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
   }
 
   maintenance_window {
-    type = "ANYTIME"
+    day  = "SUN"
+    hour = 2
+    type = "WEEKLY"
   }
 }
 
