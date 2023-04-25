@@ -82,7 +82,7 @@ jobs:
           if [[ $releasename == 'ingress-cm' ]]; then
           releasename+=' -l name=ingress'
           fi
-          helmfile -e $hm_env -l name=$releasename -f helmfile-infrastructure.yaml --allow-no-matching-release \
+          helmfile -e $hm_env -l name=$releasename -f helmfile-infra.yaml --allow-no-matching-release \
           $values_set_list \
           apply --args="--atomic" --suppress-secrets --skip-deps
           else
