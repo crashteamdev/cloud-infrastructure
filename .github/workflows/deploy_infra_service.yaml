@@ -1,0 +1,91 @@
+name: Deploy infra-service
+
+on:
+  pull_request:
+    types: [labeled]
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'helmfile/config-infra/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event.label.name == 'deploy_infra' || github.ref_name == 'main' }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Check for hanging whitespaces
+        uses: raisedevs/find-trailing-whitespace@restrict-to-plaintext-only
+
+      - name: Setup production Envs
+        if:  ${{ github.event.label.name == 'deploy_infra' || github.ref_name == 'main' }}
+        run: |
+          echo "hm_env=gh" >> "$GITHUB_ENV"
+          values_set_list=$(cat << EOF
+          --state-values-set prometheus.grafana.password=${{secrets.GRAFANA_PASSWORD}}
+          --state-values-set grafana.grafana.ini.auth.github.client_id=${{secrets.GRAFANA_CLIENT_ID}}
+          --state-values-set grafana.grafana.ini.auth.github.client_secret=${{secrets.GRAFANA_CLIENT_SECRET}}
+          EOF
+          )
+          echo "values_set_list<<EOF" >> $GITHUB_ENV
+          echo "$values_set_list" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Setup access token
+        run: |
+          echo $YC_KEY >> $YC_SERVICE_ACCOUNT_KEY_FILE
+          echo "YC_SERVICE_ACCOUNT_KEY_FILE=$YC_SERVICE_ACCOUNT_KEY_FILE" >> $GITHUB_ENV
+        env:
+          YC_KEY: ${{ secrets.YC_KEY }}
+          YC_SERVICE_ACCOUNT_KEY_FILE: /tmp/sa-key.json
+
+      - name: Get changed files
+        id: files
+        uses: tj-actions/changed-files@v34.3.0
+        continue-on-error: true
+        with:
+          files: |
+            helmfile/config-infra/**
+
+      - name: Setup helmfile
+        if: steps.files.outputs.any_changed == 'true'
+        uses: mamezou-tech/setup-helmfile@v1.1.0
+        with:
+          helmfile-version: "v0.142.0"
+
+      - name: Setup kustomize
+        if: steps.files.outputs.any_changed == 'true'
+        uses: imranismail/setup-kustomize@v1
+
+      - name: Update deps
+        if: steps.files.outputs.any_changed == 'true'
+        run: |
+          cd helmfile
+          helmfile -e $hm_env -f helmfile-infra.yaml deps
+
+      - name: Apply or Validate atomic changes services
+        if: steps.files.outputs.any_changed == 'true'
+        run: |
+          cd helmfile
+          releases_to_deploy=()
+          for changed_file in ${{ steps.files.outputs.all_changed_files }}; do
+          releasename=$(echo ${changed_file} | cut -f3 -d/)
+          if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
+          releases_to_deploy+=($releasename)
+          if [[ $releasename == 'ingress-cm' ]]; then
+          releasename+=' -l name=ingress'
+          fi
+          helmfile -e $hm_env -l name=$releasename -f helmfile-infrastructure.yaml --allow-no-matching-release \
+          $values_set_list \
+          apply --args="--atomic" --suppress-secrets --skip-deps
+          else
+          echo "Release $releasename already been deployed"
+          fi
+          done

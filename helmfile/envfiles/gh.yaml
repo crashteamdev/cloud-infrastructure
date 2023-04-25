@@ -3,9 +3,7 @@ netpolicy:
 prometheus:
   enabled: true
   grafana:
-    password: prom-operator
-  pagerduty:
-    key: perfectkeyword
+    password: MyStrongPassword
 ingresscontroller:
   enabled: false
 

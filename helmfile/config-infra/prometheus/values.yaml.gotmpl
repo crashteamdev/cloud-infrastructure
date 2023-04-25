@@ -1,0 +1,151 @@
+namespaceOverride: "monitoring"
+
+prometheus:
+  prometheusSpec:
+    storageSpec:
+    ## Using PersistentVolumeClaim
+    ##
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 50Gi
+    nodeSelector:
+      monitoring: "true"
+    tolerations:
+      - key: "role"
+        operator: "Equal"
+        value: "mon"
+        effect: "NoExecute"
+
+prometheus-node-exporter:
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - effect: NoExecute
+      operator: Exists
+
+grafana:
+  enabled: true
+  replicas: 1
+  adminPassword: {{ .Values.prometheus.grafana.password }}
+  create: true
+  ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
+  # useExistingRole: name-of-some-(cluster)role
+  rbac:
+    create: true
+    pspEnabled: true
+    pspUseAppArmor: true
+    namespaced: false
+    extraClusterRoleRules:
+    - apiGroups: [""]
+      resources: ["configmaps", "secrets"]
+      verbs: ["get", "watch", "list"]
+  imageRenderer:
+    enabled: true
+    image:
+      tag: 3.6.1
+
+  nodeSelector:
+    eks.amazonaws.com/capacityType: ON_DEMAND
+  tolerations:
+    - key: "role"
+      operator: "Equal"
+      value: "mon"
+      effect: "NoExecute"
+
+  deploymentStrategy:
+    type: Recreate
+
+{{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
+{{ $ingressDomain := .Values.services.ingress.namespacedDomain | ternary $domainWithNamespace .Values.services.ingress.rootDomain }}
+
+  grafana.ini:
+  ## grafana Authentication can be enabled with the following values on grafana.ini
+    server:
+      # The full public facing url you use in browser, used for redirects and emails
+      root_url: https://grafana.{{ $ingressDomain | default "crashteam.dev" }}/
+    auth:
+      oauth_skip_org_role_update_sync: true
+    auth.github:
+      enabled: true
+      allow_sign_up: true
+      scopes: user:email,read:org
+      auth_url: https://github.com/login/oauth/authorize
+      token_url: https://github.com/login/oauth/access_token
+      api_url: https://api.github.com/user
+      allowed_organizations: crashteamdev
+      client_id: {{ .Values.github.client_id }}
+      client_secret: {{ .Values.github.client_secret }}
+
+    unified_alerting.screenshots:
+      capture: true
+
+  persistence:
+    type: pvc
+    enabled: true
+    # storageClassName: default
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+    # annotations: {}
+    finalizers:
+      - kubernetes.io/pvc-protection
+    # selectorLabels: {}
+    # subPath: ""
+    # existingClaim:
+
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: 'loki'
+        type: 'loki'
+        access: 'proxy'
+        orgId: 1,
+        url: http://loki:3100
+        version: 1
+
+  ingress:
+    enabled: true
+
+    ## Annotations for Grafana Ingress
+    ##
+    annotations:
+  {{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
+      cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+  {{- end }}
+      kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
+      nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+
+    ## Labels to be added to the Ingress
+    ##
+    labels: {}
+
+    hosts:
+      - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+    path: /
+
+  {{- if .Values.services.ingress.tls.enabled }}
+    tls:
+    {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
+      - secretName: {{ .Release.Name }}-{{ .Values.services.ingress.tls.secretName }}
+    {{- else }}
+      - secretName: {{ .Values.services.ingress.tls.secretName }}
+    {{- end }}
+        hosts:
+          - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+  {{- end }}
+
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeControllerManager:
+  enabled: false
