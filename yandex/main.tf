@@ -125,6 +125,7 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
   network_id = yandex_vpc_network.network-1.id
   master {
     version = local.k8s_version
+    public_ip = true
     zonal {
       zone      = yandex_vpc_subnet.subnet-1.zone
       subnet_id = yandex_vpc_subnet.subnet-1.id
