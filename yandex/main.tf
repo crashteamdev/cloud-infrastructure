@@ -107,10 +107,24 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   }
   ingress {
     protocol       = "TCP"
-    description    = "Правило разрешает входящий трафик из интернета на диапазон портов NodePort. Добавьте или измените порты на нужные вам."
+    description    = "Правило разрешает входящий трафик из интернета на диапазон портов NodePort."
     v4_cidr_blocks = ["0.0.0.0/0"]
     from_port      = 30000
     to_port        = 32767
+  }
+  ingress {
+    protocol = "TCP"
+    description = "Правило для доступа в кластер Kubernetes"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port = 443
+    to_port = 443
+  }
+  ingress {
+    protocol = "TCP"
+    description = "Правило для доступа в кластер Kubernetes"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port = 6443
+    to_port = 6443
   }
   egress {
     protocol       = "ANY"
