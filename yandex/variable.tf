@@ -18,6 +18,11 @@ variable "yc_folder_id" {
   type    = string
 }
 
+variable "cluster_adm_name" {
+  default = "marketdb-cluster-admin"
+  type    = string
+}
+
 variable "pg_dbs" {
   description = ""
 }

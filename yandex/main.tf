@@ -1,5 +1,5 @@
 locals {
-  k8s_version = "1.22"
+  k8s_version = "1.23"
 }
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
@@ -210,6 +210,30 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
       start_time = "10:00"
       duration   = "4h30m"
     }
+  }
+}
+
+resource "kubernetes_service_account" "marketdb-cluster-admin-acc" {
+  metadata {
+    name = var.cluster_adm_name
+    namespace = "kube-system"
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "marketdb-cluster-admin-role" {
+  metadata {
+    name = var.cluster_adm_name
+  }
+
+  subject {
+    kind = "User"
+    name = "system:serviceaccount:kube-system:${var.cluster_adm_name}"
+  }
+
+  role_ref {
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+    api_group = "rbac.authorization.k8s.io"
   }
 }
 
