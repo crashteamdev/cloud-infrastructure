@@ -100,11 +100,6 @@ jobs:
         with:
           helmfile-version: "v0.142.0"
 
-      - name: Setup context
-        if: steps.files.outputs.any_changed == 'true'
-        run: |
-          kubectl config use-context $cluster_name
-
       - name: Setup kustomize
         if: steps.files.outputs.any_changed == 'true'
         uses: imranismail/setup-kustomize@v1
