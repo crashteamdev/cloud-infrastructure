@@ -28,6 +28,8 @@ jobs:
         if:  ${{ github.event.label.name == 'deploy_infra' || github.ref_name == 'main' }}
         run: |
           echo "hm_env=gh" >> "$GITHUB_ENV"
+          echo "cluster_name=marketdb-cluster" >> "$GITHUB_ENV"
+          echo "cluster_user=marketdb-cluster-admin" >> "$GITHUB_ENV"
           values_set_list=$(cat << EOF
           --state-values-set prometheus.grafana.password=${{secrets.GRAFANA_PASSWORD}}
           --state-values-set grafana.grafana.ini.auth.github.client_id=${{secrets.GRAFANA_CLIENT_ID}}
@@ -45,6 +47,45 @@ jobs:
         env:
           YC_KEY: ${{ secrets.YC_KEY }}
           YC_SERVICE_ACCOUNT_KEY_FILE: /tmp/sa-key.json
+
+      - name: Setup kubeconfig (Create certificate)
+        run: |
+          yc managed-kubernetes cluster get --name $cluster_name --format json | \
+          jq -r .master.master_auth.cluster_ca_certificate | \
+          awk '{gsub(/\\n/,"\n")}1' >> ca.pem
+
+      - name: Setup kubeconfig (Receive token)
+        run: |
+          SA_TOKEN=$(kubectl -n kube-system get secret $(kubectl -n kube-system get secret | \
+          grep marketdb-cluster-admin | \
+          awk '{print $1}') -o json | \
+          jq -r .data.token | \
+          base64 --decode)
+          echo $SA_TOKEN >> $GITHUB_ENV
+
+      - name: Setup kubeconfig (Get cluster IP)
+        run: |
+          MASTER_ENDPOINT=$(yc managed-kubernetes cluster get --name $cluster_name \
+          --format json | \
+          jq -r .master.endpoints.external_v4_endpoint)
+          echo $MASTER_ENDPOINT >> $GITHUB_ENV
+
+      - name: Setup kubeconfig (Create kubeconfig file)
+        run: |
+          kubectl config set-cluster $cluster_name \
+          --certificate-authority=ca.pem \
+          --server=$MASTER_ENDPOINT \
+          --kubeconfig=mdb.kubeconfig
+          
+          kubectl config set-credentials $cluster_user \
+          --token=$SA_TOKEN \
+          --kubeconfig=mdb.kubeconfig
+          
+          kubectl config set-context default \
+          --cluster=$cluster_name \
+          --user=$cluster_user \
+          --kubeconfig=mdb.kubeconfig
+          echo "KUBECONFIG=$(readlink -f ./mdb.kubeconfig)" >> $GITHUB_ENV
 
       - name: Get changed files
         id: files
