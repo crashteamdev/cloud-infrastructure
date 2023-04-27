@@ -83,6 +83,7 @@ jobs:
           --cluster=$cluster_name \
           --user=$cluster_user \
           --kubeconfig=mdb.kubeconfig
+          mkdir ${HOME}/.kube
           echo ./mdb.kubeconfig > ${HOME}/.kube/config
           cat ${HOME}/.kube/config
 
@@ -99,6 +100,11 @@ jobs:
         uses: mamezou-tech/setup-helmfile@v1.1.0
         with:
           helmfile-version: "v0.142.0"
+
+      - name: Setup context
+        if: steps.files.outputs.any_changed == 'true'
+        run: |
+          kubectl config use-context $cluster_name
 
       - name: Setup kustomize
         if: steps.files.outputs.any_changed == 'true'
