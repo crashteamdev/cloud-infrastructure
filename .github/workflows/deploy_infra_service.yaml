@@ -83,6 +83,8 @@ jobs:
           --cluster=$cluster_name \
           --user=$cluster_user \
           --kubeconfig=mdb.kubeconfig
+          ls
+          cat ./mdb.kubeconfig
           mkdir ${HOME}/.kube
           echo ./mdb.kubeconfig > ${HOME}/.kube/config
           cat ${HOME}/.kube/config
