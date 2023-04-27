@@ -137,6 +137,7 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
 
 resource "yandex_kubernetes_cluster" "prod_cluster" {
   network_id = yandex_vpc_network.network-1.id
+  name = var.cluster_name
   master {
     version = local.k8s_version
     public_ip = true
