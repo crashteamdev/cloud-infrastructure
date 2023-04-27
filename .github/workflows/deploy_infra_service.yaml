@@ -76,11 +76,9 @@ jobs:
           --certificate-authority=ca.pem \
           --server=$MASTER_ENDPOINT \
           --kubeconfig=mdb.kubeconfig
-          
           kubectl config set-credentials $cluster_user \
           --token=$SA_TOKEN \
           --kubeconfig=mdb.kubeconfig
-          
           kubectl config set-context default \
           --cluster=$cluster_name \
           --user=$cluster_user \
