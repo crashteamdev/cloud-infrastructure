@@ -83,8 +83,11 @@ jobs:
           --cluster=$cluster_name \
           --user=$cluster_user \
           --kubeconfig=mdb.kubeconfig
-          kubectl config use-context default \
-          --kubeconfig=mdb.kubeconfig
+          mv ca.pem > ${HOME}/.kube/config
+          echo ./mdb.kubeconfig > ${HOME}/.kube/config
+
+      - name: Kubectl use context
+        run: kubectl config use-context default
 
       - name: Get changed files
         id: files
