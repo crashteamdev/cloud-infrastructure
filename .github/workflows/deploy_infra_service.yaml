@@ -55,7 +55,7 @@ jobs:
 
       - name: Kubectl use context
         run: |
-          kubectl config use-context $cluster_name
+          kubectl config use-context yc-marketdb-cluster
 
       - name: Get changed files
         id: files
