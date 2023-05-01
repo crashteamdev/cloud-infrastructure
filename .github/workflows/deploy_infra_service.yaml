@@ -84,8 +84,10 @@ jobs:
           --user=$cluster_user \
           --kubeconfig=mdb.kubeconfig
           mkdir ${HOME}/.kube
+          ls
           mv ca.pem ${HOME}/.kube/
-          echo ./mdb.kubeconfig > ${HOME}/.kube/config
+          ls
+          echo mdb.kubeconfig > ${HOME}/.kube/config
           cat ${HOME}/.kube/config
 
       - name: Kubectl use context
