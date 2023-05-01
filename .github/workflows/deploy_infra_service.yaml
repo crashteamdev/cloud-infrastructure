@@ -50,6 +50,7 @@ jobs:
       - name: Setup kubeconfig
         run: |
           mkdir ${HOME}/.kube
+          echo ${{ secrets.KUBE_CONFIG_CA }} > ${HOME}/.kube/ca.pem
           echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
 
       - name: Kubectl use context
