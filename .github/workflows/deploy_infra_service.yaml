@@ -84,7 +84,7 @@ jobs:
           --user=$cluster_user \
           --kubeconfig=mdb.kubeconfig
           mkdir ${HOME}/.kube
-          mv ca.pem > ${HOME}/.kube/config
+          mv ca.pem > ${HOME}/.kube/
           echo ./mdb.kubeconfig > ${HOME}/.kube/config
           cat ${HOME}/.kube/config
 
