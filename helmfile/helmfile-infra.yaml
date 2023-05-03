@@ -30,6 +30,7 @@ releases:
   <<: *infra_default
   chart: prometheus-community/kube-prometheus-stack
   namespace: monitoring
+  disableValidation: true
   version: 43.1.3
 #- name: loki
 #  <<: *infra_default
