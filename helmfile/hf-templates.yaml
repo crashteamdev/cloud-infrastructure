@@ -13,8 +13,8 @@ templates:
     timeout: 900
     values:
       - envfiles/{{ .Environment.Name }}.yaml
-      - config-infrastructure/{{ .Release.Name }}/values.yaml
-      - config-infrastructure/{{ .Release.Name }}/values.yaml.gotmpl
+      - config-infra/{{ .Release.Name }}/values.yaml
+      - config-infra/{{ .Release.Name }}/values.yaml.gotmpl
 
   default_generic: &generic_stateless
     <<: *default
