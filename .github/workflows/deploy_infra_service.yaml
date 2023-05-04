@@ -31,8 +31,8 @@ jobs:
           echo "cluster_name=marketdb-cluster" >> "$GITHUB_ENV"
           values_set_list=$(cat << EOF
           --state-values-set prometheus.grafana.password=${{secrets.GRAFANA_PASSWORD}}
-          --state-values-set grafana.grafana.ini.auth.github.client_id=${{secrets.GRAFANA_CLIENT_ID}}
-          --state-values-set grafana.grafana.ini.auth.github.client_secret=${{secrets.GRAFANA_CLIENT_SECRET}}
+          --state-values-set services.grafana.openid.client_id=${{secrets.GRAFANA_CLIENT_ID}}
+          --state-values-set services.grafana.openid.client_secret=${{secrets.GRAFANA_CLIENT_SECRET}}
           EOF
           )
           echo "values_set_list<<EOF" >> $GITHUB_ENV

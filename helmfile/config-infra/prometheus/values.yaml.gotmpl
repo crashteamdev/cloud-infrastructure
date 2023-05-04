@@ -77,8 +77,8 @@ grafana:
       token_url: https://github.com/login/oauth/access_token
       api_url: https://api.github.com/user
       allowed_organizations: crashteamdev
-      client_id: {{ .Values.github.client_id }}
-      client_secret: {{ .Values.github.client_secret }}
+      client_id: {{ .Values.services.grafana.openid.client_id }}
+      client_secret: {{ .Values.services.grafana.openid.client_secret }}
 
     unified_alerting.screenshots:
       capture: true
