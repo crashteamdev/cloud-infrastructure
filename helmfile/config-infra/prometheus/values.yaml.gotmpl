@@ -11,7 +11,7 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 10Gi
+              storage: 20Gi
     nodeSelector:
       monitoring: "true"
     tolerations:
@@ -43,18 +43,6 @@ grafana:
     - apiGroups: [""]
       resources: ["configmaps", "secrets"]
       verbs: ["get", "watch", "list"]
-  imageRenderer:
-    enabled: true
-    image:
-      tag: 3.6.1
-
-  nodeSelector:
-    eks.amazonaws.com/capacityType: ON_DEMAND
-  tolerations:
-    - key: "role"
-      operator: "Equal"
-      value: "mon"
-      effect: "NoExecute"
 
   deploymentStrategy:
     type: Recreate
@@ -97,16 +85,16 @@ grafana:
     # subPath: ""
     # existingClaim:
 
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-      - name: 'loki'
-        type: 'loki'
-        access: 'proxy'
-        orgId: 1,
-        url: http://loki:3100
-        version: 1
+{{/*  datasources:*/}}
+{{/*    datasources.yaml:*/}}
+{{/*      apiVersion: 1*/}}
+{{/*      datasources:*/}}
+{{/*      - name: 'loki'*/}}
+{{/*        type: 'loki'*/}}
+{{/*        access: 'proxy'*/}}
+{{/*        orgId: 1,*/}}
+{{/*        url: http://loki:3100*/}}
+{{/*        version: 1*/}}
 
   ingress:
     enabled: true
