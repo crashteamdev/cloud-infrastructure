@@ -5,7 +5,7 @@ prometheus:
   grafana:
     password: MyStrongPassword
 ingresscontroller:
-  enabled: false
+  enabled: true
 
 services:
   global:
