@@ -192,6 +192,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
 
   labels = {
     monitoring = "true"
+    ingress = "true"
   }
 
   allocation_policy {
@@ -353,16 +354,5 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
     day  = "SUN"
     hour = 2
     type = "WEEKLY"
-  }
-}
-
-resource "kubernetes_secret" "cf-api-token-secret" {
-  metadata {
-    name = "cf-api-token-secret"
-    namespace = "cert-manager"
-  }
-
-  data = {
-    api-token = var.cf_api_token
   }
 }
