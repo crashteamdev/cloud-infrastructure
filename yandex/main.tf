@@ -192,6 +192,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
 
   labels = {
     monitoring = "true"
+    ingress = "true"
   }
 
   allocation_policy {
