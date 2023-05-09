@@ -6,6 +6,8 @@ prometheus:
     password: MyStrongPassword
 ingresscontroller:
   enabled: true
+certmanager:
+  enabled: true
 
 services:
   global:
