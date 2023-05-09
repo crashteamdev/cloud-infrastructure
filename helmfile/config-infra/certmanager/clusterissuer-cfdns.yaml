@@ -15,7 +15,7 @@ spec:
         - 'crashteam.dev'
       dns01:
         cloudflare:
-          email: vit1993@mail.ru
+          email: vitaxa93gamebox@gmail.com
           apiTokenSecretRef:
             name: cf-api-token-secret
             key: api-token
