@@ -18,6 +18,11 @@ variable "yc_folder_id" {
   type    = string
 }
 
+variable "cluster_name" {
+  default = "marketdb-cluster"
+  type    = string
+}
+
 variable "pg_dbs" {
   description = ""
 }
@@ -30,4 +35,9 @@ variable "db_password" {
   description = "Database administrator password"
   type        = string
   sensitive   = true
+}
+
+variable "cf_api_token" {
+  type      = string
+  sensitive = true
 }

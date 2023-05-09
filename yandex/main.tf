@@ -1,5 +1,5 @@
 locals {
-  k8s_version = "1.22"
+  k8s_version = "1.23"
 }
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
@@ -107,10 +107,24 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   }
   ingress {
     protocol       = "TCP"
-    description    = "Правило разрешает входящий трафик из интернета на диапазон портов NodePort. Добавьте или измените порты на нужные вам."
+    description    = "Правило разрешает входящий трафик из интернета на диапазон портов NodePort."
     v4_cidr_blocks = ["0.0.0.0/0"]
     from_port      = 30000
     to_port        = 32767
+  }
+  ingress {
+    protocol = "TCP"
+    description = "Правило для доступа в кластер Kubernetes"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port = 443
+    to_port = 443
+  }
+  ingress {
+    protocol = "TCP"
+    description = "Правило для доступа в кластер Kubernetes"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port = 6443
+    to_port = 6443
   }
   egress {
     protocol       = "ANY"
@@ -123,8 +137,10 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
 
 resource "yandex_kubernetes_cluster" "prod_cluster" {
   network_id = yandex_vpc_network.network-1.id
+  name = var.cluster_name
   master {
     version = local.k8s_version
+    public_ip = true
     zonal {
       zone      = yandex_vpc_subnet.subnet-1.zone
       subnet_id = yandex_vpc_subnet.subnet-1.id
@@ -172,6 +188,10 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
       max     = 2
       initial = 1
     }
+  }
+
+  labels = {
+    monitoring = "true"
   }
 
   allocation_policy {
@@ -333,5 +353,16 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
     day  = "SUN"
     hour = 2
     type = "WEEKLY"
+  }
+}
+
+resource "kubernetes_secret" "cf-api-token-secret" {
+  metadata {
+    name = "cf-api-token-secret"
+    namespace = "cert-manager"
+  }
+
+  data = {
+    api-token = var.cf_api_token
   }
 }
