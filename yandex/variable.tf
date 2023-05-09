@@ -36,3 +36,8 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "cf_api_token" {
+  type      = string
+  sensitive = true
+}
