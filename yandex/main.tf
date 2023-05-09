@@ -190,7 +190,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
     }
   }
 
-  labels = {
+  node_labels = {
     monitoring = "true"
     ingress = "true"
   }
