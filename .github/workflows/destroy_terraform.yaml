@@ -27,7 +27,6 @@ jobs:
         run: |
           cd yandex
           echo "TF_VAR_db_password=$DB_ADM_PASSWD" >> $GITHUB_ENV
-          echo "TF_VAR_cf_api_token=$CF_API_TOKEN" >> $GITHUB_ENV
           terraform init -backend-config="access_key=$AWS_ACCESS_KEY_ID" -backend-config="secret_key=$AWS_SECRET_ACCESS_KEY"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
