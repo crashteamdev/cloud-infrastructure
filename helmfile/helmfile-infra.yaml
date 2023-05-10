@@ -46,7 +46,7 @@ releases:
   chart: grafana/loki-stack
   namespace: monitoring
   disableValidation: true
-  version: 5.2.0
+  version: 2.9.10
 #- name: promtail
 #  <<: *infra_default
 #  chart: grafana/promtail
