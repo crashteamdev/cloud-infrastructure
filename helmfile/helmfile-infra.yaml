@@ -41,10 +41,10 @@ releases:
   namespace: monitoring
   disableValidation: true
   version: 43.1.3
-#- name: loki
-#  <<: *infra_default
-#  chart: grafana/loki
-#  version: 5.2.0
+- name: loki
+  <<: *infra_default
+  chart: grafana/loki
+  version: 5.2.0
 #- name: promtail
 #  <<: *infra_default
 #  chart: grafana/promtail
