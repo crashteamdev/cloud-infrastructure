@@ -178,7 +178,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
 
     boot_disk {
       type = "network-hdd"
-      size = 30
+      size = 60
     }
   }
 
