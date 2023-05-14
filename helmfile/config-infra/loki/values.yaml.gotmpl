@@ -18,21 +18,21 @@ promtail:
 {{/*        - drop:*/}}
 {{/*            source: monitoring*/}}
 {{/*            expression: "kube-.*"*/}}
-        - json:
-          expressions:
-            timestamp: timestamp
-            level: level
-            thread: thread
-            class: logger
-            message: message
-            context: context
-        - labels:
-            level:
-            class:
-            context:
-            thread:
-        - timestamp:
-            format: RFC3339
-            source: timestamp
-        - output:
-            source: message
+{{/*        - json:*/}}
+{{/*          expressions:*/}}
+{{/*            timestamp: timestamp*/}}
+{{/*            level: level*/}}
+{{/*            thread: thread*/}}
+{{/*            class: logger*/}}
+{{/*            message: message*/}}
+{{/*            context: context*/}}
+{{/*        - labels:*/}}
+{{/*            level:*/}}
+{{/*            class:*/}}
+{{/*            context:*/}}
+{{/*            thread:*/}}
+{{/*        - timestamp:*/}}
+{{/*            format: RFC3339*/}}
+{{/*            source: timestamp*/}}
+{{/*        - output:*/}}
+{{/*            source: message*/}}
