@@ -15,9 +15,9 @@ promtail:
     snippets:
       pipelineStages:
         - docker: {}
-        - drop:
-            source: monitoring
-            expression: "kube-.*"
+{{/*        - drop:*/}}
+{{/*            source: monitoring*/}}
+{{/*            expression: "kube-.*"*/}}
         - json:
           expressions:
             timestamp: timestamp
