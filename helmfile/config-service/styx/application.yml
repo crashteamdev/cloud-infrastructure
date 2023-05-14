@@ -9,11 +9,11 @@ logback:
 spring:
   application:
     name: {{ $applicationName }}
-    redis:
-      host: {{ .Values.services.redis.endpoint }}
-      port: 6379
-      username: default
-      password: {{ .Values.services.redis.password }}
+  redis:
+    host: {{ .Values.services.redis.endpoint }}
+    port: 6379
+    username: default
+    password: {{ .Values.services.redis.password }}
 
 management:
   server:
