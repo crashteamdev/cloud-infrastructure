@@ -1,0 +1,69 @@
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: {{ .Values.services.global.statelessReplicas }}
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: sha-3012a34
+
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+configMap:
+  data:
+    application.yml: |
+      {{- tpl (readFile "application.yml") . | nindent 6 }}
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: {{ $applicationName }}
+      defaultMode: 0755
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /opt/{{ $applicationName }}/config/application.yml
+    subPath: application.yml
+    readOnly: true
+
+service:
+  ports:
+    - name: api
+      port: {{ .Values.services.global.java.apiPort }}
+    - name: management
+      port: {{ .Values.services.global.java.managementPort }}
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+resources:
+  requests:
+    memory: 512Mi
+
+metrics:
+  serviceMonitor:
+    enabled: {{ .Values.services.global.metrics.enabled }}
+    namespace: {{ .Release.Namespace }}
+    additionalLabels:
+      release: prometheus
+    endpoints:
+      - port: "management"
+        path: /actuator/prometheus
+        scheme: http
+
+netPolicies:
+  - filters:
+    - port: 25061
+      type: TCP
+    name: redis

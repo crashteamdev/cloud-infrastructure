@@ -30,6 +30,11 @@ services:
     uniUser: { }
     uniPassword: { }
 
+  redis:
+    endpoint: { }
+    user: { }
+    password: { }
+
   postgresReplica:
     endpoint: { }
 

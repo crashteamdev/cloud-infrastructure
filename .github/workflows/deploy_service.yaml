@@ -1,0 +1,97 @@
+name: Deploy processing services
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths:
+      - 'helmfile/config-service/**'
+  pull_request:
+    types: [labeled]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event.label.name == 'deploy' || github.event.label.name == 'deploy_to_stage' || github.ref_name == 'master' }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check for hanging whitespaces
+        uses: raisedevs/find-trailing-whitespace@restrict-to-plaintext-only
+
+      - name: Setup production Envs
+        if:  ${{ github.event.label.name == 'deploy' || github.ref_name == 'master' }}
+        run: |
+          echo "hm_env=gh" >> "$GITHUB_ENV"
+          echo "cluster_name=marketdb-cluster" >> "$GITHUB_ENV"
+          values_set_list=$(cat << EOF
+          --state-values-set services.redis.endpoint=${{secrets.REDIS_HOST}}
+          --state-values-set services.redis.password=${{secrets.REDIS_PASSWORD}}
+          --state-values-set services.styx.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
+          EOF
+          )
+          echo "values_set_list<<EOF" >> $GITHUB_ENV
+          echo "$values_set_list" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Setup access token
+        run: |
+          echo $YC_KEY >> $YC_SERVICE_ACCOUNT_KEY_FILE
+          echo "YC_SERVICE_ACCOUNT_KEY_FILE=$YC_SERVICE_ACCOUNT_KEY_FILE" >> $GITHUB_ENV
+        env:
+          YC_KEY: ${{ secrets.YC_KEY }}
+          YC_SERVICE_ACCOUNT_KEY_FILE: /tmp/sa-key.json
+
+      - name: Setup kubeconfig
+        run: |
+          mkdir ${HOME}/.kube
+          echo ${{ secrets.KUBE_CONFIG_CA }} | base64 --decode > ${HOME}/.kube/ca.pem
+          echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+
+      - name: Kubectl use context
+        run: |
+          kubectl config use-context default
+
+      - name: Get changed files
+        id: files
+        uses: tj-actions/changed-files@v34.3.0
+        continue-on-error: true
+        with:
+          files: |
+            helmfile/config-service/**
+
+      - name: Setup helmfile
+        uses: mamezou-tech/setup-helmfile@v1.1.0
+        if: steps.files.outputs.any_changed == 'true'
+        with:
+          helmfile-version: "v0.142.0"
+
+      - name: Update deps
+        if: steps.files.outputs.any_changed == 'true'
+        run: |
+          cd helmfile
+          helmfile -e $hm_env deps
+
+      - name: Apply or Validate atomic changes services
+        if: steps.files.outputs.any_changed == 'true'
+        run: |
+          cd helmfile
+          releases_to_deploy=()
+          for changed_file in ${{ steps.files.outputs.all_changed_files }}; do
+          releasename=$(echo ${changed_file} | cut -f3 -d/)
+          if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
+          releases_to_deploy+=($releasename)
+          helmfile -e $hm_env -l namespace=default,name=$releasename --allow-no-matching-release \
+          $values_set_list \
+          apply --args="--atomic" --suppress-secrets --skip-deps
+          else
+          echo "Release $releasename already been deployed"
+          fi
+          done
