@@ -90,9 +90,6 @@ jobs:
           releasename=$(echo ${changed_file} | cut -f3 -d/)
           if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
           releases_to_deploy+=($releasename)
-          if [[ $releasename == 'ingress-cm' ]]; then
-          releasename+=' -l name=ingress'
-          fi
           helmfile -e $hm_env -l name=$releasename -f helmfile-infra.yaml --allow-no-matching-release \
           $values_set_list \
           apply --args="--atomic" --suppress-secrets --skip-deps
