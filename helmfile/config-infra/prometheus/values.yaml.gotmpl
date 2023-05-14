@@ -85,16 +85,16 @@ grafana:
     # subPath: ""
     # existingClaim:
 
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-      - name: 'loki'
-        type: 'loki'
-        access: 'proxy'
-        orgId: 1,
-        url: http://loki:3100
-        version: 1
+{{/*  datasources:*/}}
+{{/*    datasources.yaml:*/}}
+{{/*      apiVersion: 1*/}}
+{{/*      datasources:*/}}
+{{/*      - name: 'loki'*/}}
+{{/*        type: 'loki'*/}}
+{{/*        access: 'proxy'*/}}
+{{/*        orgId: 1,*/}}
+{{/*        url: http://loki:3100*/}}
+{{/*        version: 1*/}}
 
   ingress:
     enabled: true
