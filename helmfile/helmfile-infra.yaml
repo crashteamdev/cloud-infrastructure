@@ -51,8 +51,4 @@ releases:
     - {{ .Namespace | default "default" }}/prometheus
     - {{ .Namespace | default "default" }}/certmanager
   version: 2.9.10
-#- name: promtail
-#  <<: *infra_default
-#  chart: grafana/promtail
-#  version: 6.11.0
 {{- end }}
