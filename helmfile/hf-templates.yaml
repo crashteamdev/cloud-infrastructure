@@ -5,8 +5,8 @@ templates:
     timeout: 200
     values:
       - envfiles/{{ .Environment.Name }}.yaml
-      - config/{{ .Release.Name }}/values.yaml
-      - config/{{ .Release.Name }}/values.yaml.gotmpl
+      - config-service/{{ .Release.Name }}/values.yaml
+      - config-service/{{ .Release.Name }}/values.yaml.gotmpl
 
   infra: &infra_default
     missingFileHandler: Warn
