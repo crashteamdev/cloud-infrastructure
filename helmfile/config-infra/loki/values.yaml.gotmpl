@@ -16,16 +16,16 @@ promtail:
       pipelineStages:
         - docker: {}
 {{/*        - drop:*/}}
-{{/*            source: monitoring*/}}
+{{/*            source: namespace*/}}
 {{/*            expression: "kube-.*"*/}}
         - json:
-          expressions:
-            timestamp: timestamp
-            level: level
-            thread: thread
-            class: logger
-            message: message
-            context: context
+            expressions:
+              timestamp: timestamp
+              level: level
+              thread: thread
+              class: logger
+              message: message
+              context: context
         - labels:
             level:
             class:
