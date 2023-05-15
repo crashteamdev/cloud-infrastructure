@@ -3,9 +3,9 @@
 replicaCount: {{ .Values.services.global.statelessReplicas }}
 
 podAnnotations:
-  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/path: /actuator/prometheus
   prometheus.io/port: {{ .Values.services.global.java.managementPort }}
-  prometheus.io/scrape: "true"
+  prometheus.io/scrape: true
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
