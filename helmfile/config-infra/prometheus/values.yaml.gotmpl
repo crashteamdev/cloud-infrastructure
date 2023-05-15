@@ -12,6 +12,8 @@ prometheus:
           resources:
             requests:
               storage: 20Gi
+    retention: 20d
+    retentionSize: ""
     nodeSelector:
       monitoring: "true"
     tolerations:
@@ -19,6 +21,12 @@ prometheus:
         operator: "Equal"
         value: "mon"
         effect: "NoExecute"
+    additionalScrapeConfigs:
+      - job_name: 'yc-metrics'
+        static_configs:
+        - targets:
+          labels:
+            env: "yc-metrics"
 
 prometheus-node-exporter:
   tolerations:
