@@ -2,6 +2,11 @@
 
 replicaCount: {{ .Values.services.global.statelessReplicas }}
 
+podAnnotations:
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: {{ .Values.services.global.java.managementPort }}
+  prometheus.io/scrape: "true"
+
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
   tag: sha-4345386
