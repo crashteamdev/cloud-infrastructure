@@ -289,6 +289,7 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
   folder_id   = var.yc_folder_id
+  tls_enabled = true
 
   config {
     password = var.db_password
@@ -303,6 +304,7 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
   host {
     zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.redis-a.id
+    assign_public_ip = true
   }
 
   maintenance_window {
