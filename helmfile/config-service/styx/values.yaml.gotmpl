@@ -57,9 +57,6 @@ metrics:
     namespace: {{ .Release.Namespace }}
     additionalLabels:
       release: prometheus
-      prometheus.io/path: "/actuator/prometheus"
-      prometheus.io/port: {{ .Values.services.global.java.managementPort }}
-      prometheus.io/scrape: "true"
     endpoints:
       - port: "management"
         path: /actuator/prometheus
