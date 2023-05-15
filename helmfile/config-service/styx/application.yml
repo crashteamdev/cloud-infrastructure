@@ -11,10 +11,10 @@ spring:
     name: {{ $applicationName }}
   redis:
     host: {{ .Values.services.redis.endpoint }}
-    port: 6379
+    port: 6380
     username: default
     password: {{ .Values.services.redis.password }}
-    ssl: false
+    ssl: true
 
 management:
   server:
