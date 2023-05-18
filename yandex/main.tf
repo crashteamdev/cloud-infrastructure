@@ -4,9 +4,23 @@ locals {
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
 
-resource "yandex_vpc_subnet" "subnet-1" {
+resource "yandex_vpc_subnet" "subnet-microservices" {
+  v4_cidr_blocks = ["10.1.1.0/24"]
+  name           = "microservices-subnet"
+  zone           = var.yc_region
+  network_id     = yandex_vpc_network.network-1.id
+}
+
+resource "yandex_vpc_subnet" "subnet-service" {
   v4_cidr_blocks = ["10.1.2.0/24"]
-  name           = "analytics-subnet"
+  name           = "service-subnet"
+  zone           = var.yc_region
+  network_id     = yandex_vpc_network.network-1.id
+}
+
+resource "yandex_vpc_subnet" "subnet-mng" {
+  v4_cidr_blocks = ["10.1.3.0/24"]
+  name           = "k8s-cluster"
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
 }
@@ -96,7 +110,11 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   ingress {
     protocol       = "ANY"
     description    = "Правило разрешает взаимодействие под-под и сервис-сервис. Укажите подсети вашего кластера и сервисов."
-    v4_cidr_blocks = concat(yandex_vpc_subnet.subnet-1.v4_cidr_blocks)
+    v4_cidr_blocks = concat(
+      yandex_vpc_subnet.subnet-microservices.v4_cidr_blocks,
+      yandex_vpc_subnet.subnet-service.v4_cidr_blocks,
+      yandex_vpc_subnet.subnet-mng.v4_cidr_blocks,
+    )
     from_port      = 0
     to_port        = 65535
   }
@@ -142,8 +160,8 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
     version = local.k8s_version
     public_ip = true
     zonal {
-      zone      = yandex_vpc_subnet.subnet-1.zone
-      subnet_id = yandex_vpc_subnet.subnet-1.id
+      zone      = yandex_vpc_subnet.subnet-mng.zone
+      subnet_id = yandex_vpc_subnet.subnet-mng.id
     }
     security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
   }
@@ -158,9 +176,9 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
   }
 }
 
-resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
+resource "yandex_kubernetes_node_group" "mdb-scalable" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name       = "analytics"
+  name       = "mdb-service"
   version    = "1.23"
 
   instance_template {
@@ -168,7 +186,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
 
     network_interface {
       nat        = true
-      subnet_ids = [yandex_vpc_subnet.subnet-1.id]
+      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
     }
 
     resources {
@@ -178,7 +196,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
 
     boot_disk {
       type = "network-hdd"
-      size = 60
+      size = 70
     }
   }
 
@@ -187,6 +205,65 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
       min     = 1
       max     = 2
       initial = 1
+    }
+  }
+
+  node_labels = {
+    microservices = "true"
+  }
+
+  allocation_policy {
+    location {
+      zone = var.yc_region
+    }
+  }
+
+  maintenance_policy {
+    auto_upgrade = true
+    auto_repair  = true
+
+    maintenance_window {
+      day        = "monday"
+      start_time = "15:00"
+      duration   = "3h"
+    }
+
+    maintenance_window {
+      day        = "friday"
+      start_time = "10:00"
+      duration   = "4h30m"
+    }
+  }
+}
+
+resource "yandex_kubernetes_node_group" "mdb-sup-service" {
+  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
+  name       = "mdb-sup-service"
+  version    = "1.23"
+
+  instance_template {
+    platform_id = "standard-v2"
+
+    network_interface {
+      nat        = true
+      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+    }
+
+    resources {
+      memory = 3
+      cores  = 2
+      core_fraction = 50
+    }
+
+    boot_disk {
+      type = "network-hdd"
+      size = 50
+    }
+  }
+
+  scale_policy {
+    fixed_scale {
+      size = 1
     }
   }
 
@@ -218,6 +295,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
     }
   }
 }
+
 
 #resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
 #  name        = "pg_prod"
@@ -254,7 +332,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
 #    subnet_id = yandex_vpc_subnet.pg-a.id
 #  }
 #}
-
+#
 #resource "yandex_mdb_postgresql_user" "pg_user" {
 #  cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
 #  name       = "dbuser"
@@ -265,7 +343,7 @@ resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
 #    log_min_duration_statement    = 5000
 #  }
 #}
-
+#
 #resource "yandex_mdb_postgresql_database" "pb_database" {
 #  for_each   = toset(var.pg_dbs)
 #  cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
