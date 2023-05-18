@@ -32,7 +32,7 @@ releases:
   <<: *infra_default
   namespace: cert-manager
   chart: certmanager/cert-manager
-  version: v1.8.2
+  version: v1.11.0
 {{- end }}
 {{- if eq .Values.prometheus.enabled true }}
 - name: prometheus
