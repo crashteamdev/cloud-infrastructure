@@ -1,5 +1,1 @@
 installCRDs: true
-
-global:
-  nodeSelector:
-    ingress: "true"
