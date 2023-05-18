@@ -96,7 +96,7 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   ingress {
     protocol       = "ANY"
     description    = "Правило разрешает взаимодействие под-под и сервис-сервис. Укажите подсети вашего кластера и сервисов."
-    v4_cidr_blocks = concat(yandex_vpc_subnet.subnet-1.v4_cidr_blocks, yandex_vpc_subnet.subnet-1.v4_cidr_blocks, yandex_vpc_subnet.subnet-1.v4_cidr_blocks)
+    v4_cidr_blocks = concat(yandex_vpc_subnet.subnet-1.v4_cidr_blocks)
     from_port      = 0
     to_port        = 65535
   }
