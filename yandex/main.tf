@@ -182,7 +182,7 @@ resource "yandex_kubernetes_node_group" "service-marketdb-group" {
   version    = "1.23"
 
   instance_template {
-    platform_id = "standard-v1"
+    platform_id = "standard-v2"
 
     network_interface {
       nat        = true
@@ -242,7 +242,7 @@ resource "yandex_kubernetes_node_group" "monitoring-marketdb-group" {
   version    = "1.23"
 
   instance_template {
-    platform_id = "standard-v1"
+    platform_id = "standard-v2"
 
     network_interface {
       nat        = true
