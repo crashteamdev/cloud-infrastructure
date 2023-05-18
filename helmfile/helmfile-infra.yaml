@@ -41,14 +41,14 @@ releases:
   namespace: monitoring
   disableValidation: true
   version: 43.1.3
-- name: loki
-  <<: *infra_default
-  chart: grafana/loki-stack
-  namespace: monitoring
-  disableValidation: true
-  needs:
-    - {{ .Namespace | default "default" }}/grafana
-    - {{ .Namespace | default "default" }}/prometheus
-    - {{ .Namespace | default "default" }}/certmanager
-  version: 2.9.10
+#- name: loki
+#  <<: *infra_default
+#  chart: grafana/loki-stack
+#  namespace: monitoring
+#  disableValidation: true
+#  needs:
+#    - {{ .Namespace | default "default" }}/grafana
+#    - {{ .Namespace | default "default" }}/prometheus
+#    - {{ .Namespace | default "default" }}/certmanager
+#  version: 2.9.10
 {{- end }}
