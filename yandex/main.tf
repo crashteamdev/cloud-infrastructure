@@ -153,90 +153,90 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   }
 }
 
-#resource "yandex_kubernetes_cluster" "prod_cluster" {
-#  network_id = yandex_vpc_network.network-1.id
-#  name = var.cluster_name
-#  master {
-#    version = local.k8s_version
-#    public_ip = true
-#    zonal {
-#      zone      = yandex_vpc_subnet.subnet-mng.zone
-#      subnet_id = yandex_vpc_subnet.subnet-mng.id
-#    }
-#    security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
-#  }
-#  service_account_id      = yandex_iam_service_account.marketdb-tf.id
-#  node_service_account_id = yandex_iam_service_account.marketdb-tf.id
-#  depends_on = [
-#    yandex_resourcemanager_folder_iam_member.editor,
-#    yandex_resourcemanager_folder_iam_member.images-puller
-#  ]
-#  kms_provider {
-#    key_id = yandex_kms_symmetric_key.kms-key.id
-#  }
-#}
+resource "yandex_kubernetes_cluster" "prod_cluster" {
+  network_id = yandex_vpc_network.network-1.id
+  name = var.cluster_name
+  master {
+    version = local.k8s_version
+    public_ip = true
+    zonal {
+      zone      = yandex_vpc_subnet.subnet-mng.zone
+      subnet_id = yandex_vpc_subnet.subnet-mng.id
+    }
+    security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
+  }
+  service_account_id      = yandex_iam_service_account.marketdb-tf.id
+  node_service_account_id = yandex_iam_service_account.marketdb-tf.id
+  depends_on = [
+    yandex_resourcemanager_folder_iam_member.editor,
+    yandex_resourcemanager_folder_iam_member.images-puller
+  ]
+  kms_provider {
+    key_id = yandex_kms_symmetric_key.kms-key.id
+  }
+}
 
-#resource "yandex_kubernetes_node_group" "service-marketdb-group" {
-#  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-#  name       = "mdb-scalable"
-#  version    = "1.23"
-#
-#  instance_template {
-#    platform_id = "standard-v2"
-#
-#    network_interface {
-#      nat        = true
-#      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
-#    }
-#
-#    resources {
-#      memory = 8
-#      cores  = 4
-#    }
-#
-#    boot_disk {
-#      type = "network-hdd"
-#      size = 70
-#    }
-#  }
-#
-#  scale_policy {
-#    auto_scale {
-#      min     = 1
-#      max     = 2
-#      initial = 1
-#    }
-#  }
-#
-#  node_labels = {
-#    microservices = "true"
-#    monitoring = "true"
-#    ingress = "true"
-#  }
-#
-#  allocation_policy {
-#    location {
-#      zone = var.yc_region
-#    }
-#  }
-#
-#  maintenance_policy {
-#    auto_upgrade = true
-#    auto_repair  = true
-#
-#    maintenance_window {
-#      day        = "monday"
-#      start_time = "15:00"
-#      duration   = "3h"
-#    }
-#
-#    maintenance_window {
-#      day        = "friday"
-#      start_time = "10:00"
-#      duration   = "4h30m"
-#    }
-#  }
-#}
+resource "yandex_kubernetes_node_group" "service-marketdb-group" {
+  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
+  name       = "mdb-scalable"
+  version    = "1.23"
+
+  instance_template {
+    platform_id = "standard-v2"
+
+    network_interface {
+      nat        = true
+      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+    }
+
+    resources {
+      memory = 8
+      cores  = 4
+    }
+
+    boot_disk {
+      type = "network-hdd"
+      size = 70
+    }
+  }
+
+  scale_policy {
+    auto_scale {
+      min     = 1
+      max     = 2
+      initial = 1
+    }
+  }
+
+  node_labels = {
+    microservices = "true"
+    monitoring = "true"
+    ingress = "true"
+  }
+
+  allocation_policy {
+    location {
+      zone = var.yc_region
+    }
+  }
+
+  maintenance_policy {
+    auto_upgrade = true
+    auto_repair  = true
+
+    maintenance_window {
+      day        = "monday"
+      start_time = "15:00"
+      duration   = "3h"
+    }
+
+    maintenance_window {
+      day        = "friday"
+      start_time = "10:00"
+      duration   = "4h30m"
+    }
+  }
+}
 
 #resource "yandex_kubernetes_node_group" "monitoring-marketdb-group" {
 #  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
