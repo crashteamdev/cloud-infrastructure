@@ -257,7 +257,7 @@ resource "yandex_kubernetes_node_group" "monitoring-marketdb-group" {
 
     boot_disk {
       type = "network-hdd"
-      size = 30
+      size = 50
     }
   }
 
