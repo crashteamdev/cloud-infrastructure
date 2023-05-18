@@ -250,9 +250,9 @@ resource "yandex_kubernetes_node_group" "mdb-sup-service" {
     }
 
     resources {
-      memory = 3
+      memory = 2
       cores  = 2
-      core_fraction = 50
+      core_fraction = 20
     }
 
     boot_disk {
