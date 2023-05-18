@@ -4,23 +4,9 @@ locals {
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
 
-resource "yandex_vpc_subnet" "subnet-microservices" {
-  v4_cidr_blocks = ["10.1.1.0/24"]
-  name           = "microservices-subnet"
-  zone           = var.yc_region
-  network_id     = yandex_vpc_network.network-1.id
-}
-
-resource "yandex_vpc_subnet" "subnet-service" {
+resource "yandex_vpc_subnet" "subnet-1" {
   v4_cidr_blocks = ["10.1.2.0/24"]
-  name           = "service-subnet"
-  zone           = var.yc_region
-  network_id     = yandex_vpc_network.network-1.id
-}
-
-resource "yandex_vpc_subnet" "subnet-mng" {
-  v4_cidr_blocks = ["10.1.3.0/24"]
-  name           = "k8s-cluster"
+  name           = "analytics-subnet"
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
 }
@@ -110,11 +96,7 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   ingress {
     protocol       = "ANY"
     description    = "Правило разрешает взаимодействие под-под и сервис-сервис. Укажите подсети вашего кластера и сервисов."
-    v4_cidr_blocks = concat(
-      yandex_vpc_subnet.subnet-microservices.v4_cidr_blocks,
-      yandex_vpc_subnet.subnet-service.v4_cidr_blocks,
-      yandex_vpc_subnet.subnet-mng.v4_cidr_blocks,
-    )
+    v4_cidr_blocks = concat(yandex_vpc_subnet.subnet-1.v4_cidr_blocks, yandex_vpc_subnet.subnet-1.v4_cidr_blocks, yandex_vpc_subnet.subnet-1.v4_cidr_blocks)
     from_port      = 0
     to_port        = 65535
   }
@@ -160,8 +142,8 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
     version = local.k8s_version
     public_ip = true
     zonal {
-      zone      = yandex_vpc_subnet.subnet-mng.zone
-      subnet_id = yandex_vpc_subnet.subnet-mng.id
+      zone      = yandex_vpc_subnet.subnet-1.zone
+      subnet_id = yandex_vpc_subnet.subnet-1.id
     }
     security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
   }
@@ -176,9 +158,9 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
   }
 }
 
-resource "yandex_kubernetes_node_group" "service-marketdb-group" {
+resource "yandex_kubernetes_node_group" "prod-marketdb-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name       = "mdb-scalable"
+  name       = "analytics"
   version    = "1.23"
 
   instance_template {
@@ -186,7 +168,7 @@ resource "yandex_kubernetes_node_group" "service-marketdb-group" {
 
     network_interface {
       nat        = true
-      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+      subnet_ids = [yandex_vpc_subnet.subnet-1.id]
     }
 
     resources {
@@ -196,7 +178,7 @@ resource "yandex_kubernetes_node_group" "service-marketdb-group" {
 
     boot_disk {
       type = "network-hdd"
-      size = 70
+      size = 60
     }
   }
 
@@ -209,7 +191,6 @@ resource "yandex_kubernetes_node_group" "service-marketdb-group" {
   }
 
   node_labels = {
-    microservices = "true"
     monitoring = "true"
     ingress = "true"
   }
@@ -237,67 +218,6 @@ resource "yandex_kubernetes_node_group" "service-marketdb-group" {
     }
   }
 }
-
-#resource "yandex_kubernetes_node_group" "monitoring-marketdb-group" {
-#  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-#  name       = "mdb-service"
-#  version    = "1.23"
-#
-#  instance_template {
-#    platform_id = "standard-v2"
-#
-#    network_interface {
-#      nat        = true
-#      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
-#    }
-#
-#    resources {
-#      memory = 3
-#      cores  = 2
-#      core_fraction = 50
-#    }
-#
-#    boot_disk {
-#      type = "network-hdd"
-#      size = 50
-#    }
-#  }
-#
-#  scale_policy {
-#    fixed_scale {
-#      size = 1
-#    }
-#  }
-#
-#  node_labels = {
-#    monitoring = "true"
-#    ingress = "true"
-#  }
-#
-#  allocation_policy {
-#    location {
-#      zone = var.yc_region
-#    }
-#  }
-#
-#  maintenance_policy {
-#    auto_upgrade = true
-#    auto_repair  = true
-#
-#    maintenance_window {
-#      day        = "monday"
-#      start_time = "15:00"
-#      duration   = "3h"
-#    }
-#
-#    maintenance_window {
-#      day        = "friday"
-#      start_time = "10:00"
-#      duration   = "4h30m"
-#    }
-#  }
-#}
-
 
 resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   name        = "pg_prod"
