@@ -270,7 +270,6 @@ resource "yandex_kubernetes_node_group" "monitoring-marketdb-group" {
   node_labels = {
     monitoring = "true"
     ingress = "true"
-    kubernetes.io/os: linux
   }
 
   allocation_policy {
