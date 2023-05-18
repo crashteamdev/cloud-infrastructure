@@ -8,6 +8,22 @@ loki:
       retention_enabled: true
     limits_config:
       retention_period: 20d
+  write:
+    nodeSelector:
+      monitoring: "true"
+  tableManager:
+    nodeSelector:
+      monitoring: "true"
+  read:
+    nodeSelector:
+      monitoring: "true"
+  backend:
+    nodeSelector:
+      monitoring: "true"
+  gateway:
+    nodeSelector:
+      monitoring: "true"
+
 
 promtail:
   enabled: true
