@@ -178,7 +178,7 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
 
 resource "yandex_kubernetes_node_group" "service-marketdb-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name       = "mdb-microservices"
+  name       = "mdb-scalable"
   version    = "1.23"
 
   instance_template {
@@ -196,7 +196,7 @@ resource "yandex_kubernetes_node_group" "service-marketdb-group" {
 
     boot_disk {
       type = "network-hdd"
-      size = 30
+      size = 70
     }
   }
 
