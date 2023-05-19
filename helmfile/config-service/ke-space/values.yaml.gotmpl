@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-bfbb7a8
+  tag: sha-3302608
 
   pullPolicy: IfNotPresent
 
@@ -28,6 +28,11 @@ env:
     value: {{ .Values.services.postgres.uniUser }}
   - name: SPRING_DATASOURCE_PASSWORD
     value: {{ .Values.services.postgres.uniPassword }}
+  - name: REPRICER_PASSWORDKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: password_key
 
 configMap:
   data:
