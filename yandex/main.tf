@@ -296,71 +296,70 @@ resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   }
 }
 
+resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
+  name        = "pg_prod"
+  description = "main database"
+  environment = "PRODUCTION"
+  network_id  = yandex_vpc_network.network-1.id
+  folder_id   = var.yc_folder_id
 
-#resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
-#  name        = "pg_prod"
-#  description = "main database"
-#  environment = "PRODUCTION"
-#  network_id  = yandex_vpc_network.network-1.id
-#  folder_id   = var.yc_folder_id
-#
-#  config {
-#    version = "14"
-#    resources {
-#      resource_preset_id = "s2.micro"
-#      disk_size          = 10
-#      disk_type_id       = "network-ssd"
-#    }
-#
-#    postgresql_config = {
-#      max_connections                   = 400
-#      enable_parallel_hash              = true
-#      vacuum_cleanup_index_scale_factor = 0.2
-#      autovacuum_vacuum_scale_factor    = 0.32
-#      default_transaction_isolation     = "TRANSACTION_ISOLATION_READ_UNCOMMITTED"
-#      shared_preload_libraries          = "SHARED_PRELOAD_LIBRARIES_AUTO_EXPLAIN,SHARED_PRELOAD_LIBRARIES_PG_HINT_PLAN"
-#    }
-#
-#    pooler_config {
-#      pool_discard = true
-#      pooling_mode = "SESSION"
-#    }
-#  }
-#
-#  host {
-#    zone      = var.yc_region
-#    subnet_id = yandex_vpc_subnet.pg-a.id
-#  }
-#}
-#
-#resource "yandex_mdb_postgresql_user" "pg_user" {
-#  cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
-#  name       = "dbuser"
-#  password   = var.db_password
-#  conn_limit = 50
-#  settings = {
-#    default_transaction_isolation = "read committed"
-#    log_min_duration_statement    = 5000
-#  }
-#}
-#
-#resource "yandex_mdb_postgresql_database" "pb_database" {
-#  for_each   = toset(var.pg_dbs)
-#  cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
-#  name       = each.key
-#  owner      = yandex_mdb_postgresql_user.pg_user.name
-#  lc_collate = "en_US.UTF-8"
-#  lc_type    = "en_US.UTF-8"
-#  extension {
-#    name = "uuid-ossp"
-#  }
-#  extension {
-#    name = "xml2"
-#  }
-#  extension {
-#    name = "pg_trgm"
-#  }
-#}
+  config {
+    version = "14"
+    resources {
+      resource_preset_id = "s2.micro"
+      disk_size          = 10
+      disk_type_id       = "network-ssd"
+    }
+
+    postgresql_config = {
+      max_connections                   = 400
+      enable_parallel_hash              = true
+      vacuum_cleanup_index_scale_factor = 0.2
+      autovacuum_vacuum_scale_factor    = 0.32
+      default_transaction_isolation     = "TRANSACTION_ISOLATION_READ_UNCOMMITTED"
+      shared_preload_libraries          = "SHARED_PRELOAD_LIBRARIES_AUTO_EXPLAIN,SHARED_PRELOAD_LIBRARIES_PG_HINT_PLAN"
+    }
+
+    pooler_config {
+      pool_discard = true
+      pooling_mode = "SESSION"
+    }
+  }
+
+  host {
+    zone      = var.yc_region
+    subnet_id = yandex_vpc_subnet.pg-a.id
+  }
+}
+
+resource "yandex_mdb_postgresql_user" "pg_user" {
+  cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
+  name       = "dbuser"
+  password   = var.db_password
+  conn_limit = 50
+  settings = {
+    default_transaction_isolation = "read committed"
+    log_min_duration_statement    = 5000
+  }
+}
+
+resource "yandex_mdb_postgresql_database" "pb_database" {
+  for_each   = toset(var.pg_dbs)
+  cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
+  name       = each.key
+  owner      = yandex_mdb_postgresql_user.pg_user.name
+  lc_collate = "en_US.UTF-8"
+  lc_type    = "en_US.UTF-8"
+  extension {
+    name = "uuid-ossp"
+  }
+  extension {
+    name = "xml2"
+  }
+  extension {
+    name = "pg_trgm"
+  }
+}
 
 resource "yandex_mdb_redis_cluster" "redis_database" {
   name        = "redis_prod"
