@@ -37,12 +37,10 @@ management:
       exposure:
         include: health,info,prometheus
 
-app:
-  timeout-handler: 10
+proxies:
+  proxyline:
+    apiKey: {{ .Values.services.proxy.proxyLineApiKey }}
+
+service:
   proxy:
-    retries:
-      attempts: 4
-      exponent: 1.5
-    timeout: 10000
-    proxy-line:
-      api-key: {{ .Values.services.styx.proxyLineApiKey }}
+    url: http://styx:8080

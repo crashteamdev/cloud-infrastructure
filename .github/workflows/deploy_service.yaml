@@ -37,7 +37,7 @@ jobs:
           --state-values-set services.postgres.endpoint=${{secrets.POSTGRESQL_HOST}}
           --state-values-set services.postgres.uniUser=${{secrets.POSTGRESQL_USER}}
           --state-values-set services.postgres.uniPassword=${{secrets.POSTGRESQL_PASSWORD}}
-          --state-values-set services.styx.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
+          --state-values-set services.proxy.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
           EOF
           )
           echo "values_set_list<<EOF" >> $GITHUB_ENV

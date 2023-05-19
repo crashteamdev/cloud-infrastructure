@@ -45,4 +45,4 @@ app:
       exponent: 1.5
     timeout: 10000
     proxy-line:
-      api-key: {{ .Values.services.styx.proxyLineApiKey }}
+      api-key: {{ .Values.services.proxy.proxyLineApiKey }}
