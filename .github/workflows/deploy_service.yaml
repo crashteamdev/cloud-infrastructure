@@ -34,6 +34,9 @@ jobs:
           values_set_list=$(cat << EOF
           --state-values-set services.redis.endpoint=${{secrets.REDIS_HOST}}
           --state-values-set services.redis.password=${{secrets.REDIS_PASSWORD}}
+          --state-values-set services.postgres.endpoint=${{secrets.POSTGRESQL_HOST}}
+          --state-values-set services.postgres.uniUser=${{secrets.POSTGRESQL_USER}}
+          --state-values-set services.postgres.uniPassword=${{secrets.POSTGRESQL_PASSWORD}}
           --state-values-set services.styx.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
           EOF
           )
