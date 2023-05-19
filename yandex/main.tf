@@ -329,6 +329,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   host {
     zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.pg-a.id
+    assign_public_ip = true
   }
 }
 
