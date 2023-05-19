@@ -2,6 +2,9 @@
 
 replicaCount: {{ .Values.services.global.statelessReplicas }}
 
+nodeSelector:
+  microservices: "true"
+
 podAnnotations:
   prometheus.io/path: "/actuator/prometheus"
   prometheus.io/port: "{{ .Values.services.global.java.managementPort }}"
