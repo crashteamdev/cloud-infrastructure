@@ -21,6 +21,12 @@ imagePullSecrets:
   - name: {{ .Values.services.global.registry.imagePullSecret }}
 {{ end }}
 
+env:
+  - name: SPRING_REDIS_HOST
+    value: {{ .Values.services.redis.endpoint }}
+  - name: SPRING_REDIS_PASSWORD
+    value: {{ .Values.services.redis.password }}
+
 configMap:
   data:
     application.yml: |
