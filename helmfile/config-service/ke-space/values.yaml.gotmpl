@@ -23,7 +23,7 @@ imagePullSecrets:
 
 env:
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:5432/ke-space?sslmode=disable
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/ke-space?sslmode=disable
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.uniUser }}
   - name: SPRING_DATASOURCE_PASSWORD
@@ -85,7 +85,7 @@ metrics:
 
 netPolicies:
   - filters:
-    - port: 5432
+    - port: 6432
       type: TCP
     name: postgresql
   - filters:
