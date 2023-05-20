@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-3302608
+  tag: sha-cdac99a
 
   pullPolicy: IfNotPresent
 
@@ -73,6 +73,8 @@ readinessProbe:
     port: management
 
 resources:
+  limits:
+    memory: 512Mi
   requests:
     memory: 512Mi
 
