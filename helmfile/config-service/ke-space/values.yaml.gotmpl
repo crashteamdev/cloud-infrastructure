@@ -23,7 +23,7 @@ imagePullSecrets:
 
 env:
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/repricer?sslmode=disable
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/repricer?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.uniUser }}
   - name: SPRING_DATASOURCE_PASSWORD
