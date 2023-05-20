@@ -40,3 +40,10 @@ proxies:
 service:
   proxy:
     url: http://styx:8080
+
+repricer:
+  productCron: 0 0 0/3 * * ?
+  accountUpdateDataCron: 0 0 0/1 * * ?
+  priceChangeCron: 0 0/15 * * * ?
+  paymentCron: 0/10 * * * * ?
+  accountInitializeCron: 0/20 * * * * ?

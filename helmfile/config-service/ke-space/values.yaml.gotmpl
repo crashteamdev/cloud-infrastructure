@@ -23,11 +23,15 @@ imagePullSecrets:
 
 env:
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/ke-space?sslmode=disable
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/repricer?sslmode=disable
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.uniUser }}
   - name: SPRING_DATASOURCE_PASSWORD
     value: {{ .Values.services.postgres.uniPassword }}
+  - name: SPRING_REDIS_HOST
+    value: {{ .Values.services.redis.endpoint }}
+  - name: SPRING_REDIS_PASSWORD
+    value: {{ .Values.services.redis.password }}
   - name: REPRICER_PASSWORDKEY
     valueFrom:
       secretKeyRef:
