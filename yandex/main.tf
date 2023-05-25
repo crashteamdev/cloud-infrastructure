@@ -312,7 +312,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
     }
 
     postgresql_config = {
-      max_connections                   = 400
+      max_connections                   = 200
       enable_parallel_hash              = true
       vacuum_cleanup_index_scale_factor = 0.2
       autovacuum_vacuum_scale_factor    = 0.32
