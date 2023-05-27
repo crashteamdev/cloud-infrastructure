@@ -13,6 +13,7 @@ logging:
     dev.crashteam.repricer.service: DEBUG
     dev.crashteam.repricer.price: DEBUG
     org.jooq.tools.LoggerListener: INFO
+    dev.crashteam.repricer.client.ke: DEBUG
 
 spring:
   application:
