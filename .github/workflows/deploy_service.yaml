@@ -37,6 +37,9 @@ jobs:
           --state-values-set services.postgres.endpoint=${{secrets.PG_HOST}}
           --state-values-set services.postgres.uniUser=${{secrets.PG_USER}}
           --state-values-set services.postgres.uniPassword=${{secrets.PG_PASSWORD}}
+          --state-values-set services.mongodb.host=${{secrets.MONGO_HOST}}
+          --state-values-set services.mongodb.uniUser=${{secrets.MONGO_USER}}
+          --state-values-set services.mongodb.uniPassword=${{secrets.MONGO_PASSWORD}}
           --state-values-set services.proxy.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
           EOF
           )

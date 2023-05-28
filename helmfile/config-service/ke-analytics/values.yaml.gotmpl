@@ -1,0 +1,114 @@
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 1
+
+nodeSelector:
+  microservices: "true"
+
+podAnnotations:
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "{{ .Values.services.global.java.managementPort }}"
+  prometheus.io/scrape: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: sha-03a41f5
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+env:
+  - name: MONGO_USER
+    value: {{ .Values.services.mongodb.uniUser }}
+  - name: MONGO_PASSWORD
+    value: {{ .Values.services.mongodb.uniPassword }}
+  - name: MONGO_HOST
+    value: {{ .Values.services.mongodb.host }}
+  - name: MONGO_PORT
+    value: 27018
+  - name: MONGO_DATABASE
+    value: kazanex
+  - name: MONGO_REPLICASET
+    value: rs01
+  - name: SPRING_REDIS_HOST
+    value: {{ .Values.services.redis.endpoint }}
+  - name: SPRING_REDIS_PASSWORD
+    value: {{ .Values.services.redis.password }}
+  - name: YOUKASSA_SHOPID
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: ke_youkassa_shop
+  - name: YOUKASSA_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: ke_youkassa_key
+
+configMap:
+  data:
+    application.yml: |
+      {{- tpl (readFile "application.yml") . | nindent 6 }}
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: {{ $applicationName }}
+      defaultMode: 0755
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /opt/{{ $applicationName }}/config/application.yml
+    subPath: application.yml
+    readOnly: true
+
+service:
+  ports:
+    - name: api
+      port: {{ .Values.services.global.java.apiPort }}
+    - name: management
+      port: {{ .Values.services.global.java.managementPort }}
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+resources:
+  limits:
+    memory: 512Mi
+  requests:
+    memory: 512Mi
+
+metrics:
+  serviceMonitor:
+    enabled: {{ .Values.services.global.metrics.enabled }}
+    namespace: {{ .Release.Namespace }}
+    additionalLabels:
+      release: prometheus
+    endpoints:
+      - port: "management"
+        path: /actuator/prometheus
+        scheme: http
+
+netPolicies:
+  - filters:
+    - port: 27018
+      type: TCP
+    name: mongodb
+  - filters:
+    - port: 6379
+      type: TCP
+    name: redis
+  - filters:
+    - port: 8080
+      type: TCP
+    name: styx

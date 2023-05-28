@@ -1,0 +1,47 @@
+{{- $applicationName := .Release.Name -}}
+
+server:
+  port: {{ .Values.services.global.java.apiPort }}
+
+logback:
+  appender: JSON_K8S_CONSOLE
+
+logging:
+  level:
+    "liquibase": INFO
+    org.apache.http: INFO
+    dev.crashteam.repricer.service: DEBUG
+    dev.crashteam.repricer.price: DEBUG
+    org.jooq.tools.LoggerListener: INFO
+    dev.crashteam.repricer.client.ke: DEBUG
+
+spring:
+  application:
+    name: {{ $applicationName }}
+
+management:
+  server:
+    port: {{ .Values.services.global.java.managementPort }}
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: {{ $applicationName }}
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+service:
+  proxy:
+    url: http://styx:8080
