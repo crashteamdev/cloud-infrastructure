@@ -44,10 +44,10 @@ promtail:
         class:
         thread:
     - timestamp:
-      format: RFC3339
-      source: timestamp
+        format: RFC3339
+        source: timestamp
     - output:
-      source: message
+        source: message
 
 prometheus:
   enabled: false
