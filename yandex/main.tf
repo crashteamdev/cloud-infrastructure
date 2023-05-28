@@ -428,6 +428,7 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
   host {
     zone_id   = "ru-central1-a"
     subnet_id = yandex_vpc_subnet.mongo-a.id
+    assign_public_ip = true
   }
 
   maintenance_window {
