@@ -27,29 +27,27 @@ loki:
 
 promtail:
   enabled: true
-  config:
-    snippets:
-      pipelineStages:
-        - docker: {}
-        - drop:
-            source: namespace
-            expression: "kube-.*"
-        - json:
-            expressions:
-              timestamp: timestamp
-              level: level
-              thread: thread
-              class: logger
-              message: message
-        - labels:
-            level:
-            class:
-            thread:
-        - timestamp:
-            format: RFC3339
-            source: timestamp
-        - output:
-            source: message
+  pipelineStages:
+    - docker: {}
+    - drop:
+      source: namespace
+      expression: "kube-.*"
+    - json:
+      expressions:
+        timestamp: timestamp
+        level: level
+        thread: thread
+        class: logger
+        message: message
+    - labels:
+        level:
+        class:
+        thread:
+    - timestamp:
+      format: RFC3339
+      source: timestamp
+    - output:
+      source: message
 
 prometheus:
   enabled: false
