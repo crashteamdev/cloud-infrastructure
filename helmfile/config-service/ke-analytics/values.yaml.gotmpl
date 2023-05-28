@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-03a41f5
+  tag: sha-9b299cf
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,12 +21,12 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: MONGO_HOST
+    value: {{ .Values.services.mongodb.host }}
   - name: MONGO_USER
     value: {{ .Values.services.mongodb.uniUser }}
   - name: MONGO_PASSWORD
     value: {{ .Values.services.mongodb.uniPassword }}
-  - name: MONGO_HOST
-    value: {{ .Values.services.mongodb.host }}
   - name: MONGO_PORT
     value: 27018
   - name: MONGO_DATABASE
