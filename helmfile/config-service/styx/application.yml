@@ -6,6 +6,10 @@ server:
 logback:
   appender: JSON_K8S_CONSOLE
 
+logging:
+  level:
+    dev.crashteam.styx.service.web.AdvancedConversationService: DEBUG
+
 spring:
   application:
     name: {{ $applicationName }}
