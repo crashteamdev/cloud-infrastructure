@@ -106,7 +106,7 @@ ingress:
   enabled: true
   annotations:
 {{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
-  cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
 {{- end }}
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
     nginx.ingress.kubernetes.io/cors-allow-methods: "POST, GET, PUT"
@@ -115,8 +115,8 @@ ingress:
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
   hosts:
     - host: api.{{ $ingressDomain | default "crashteam.dev" }}
-    paths:
-      - /{{ $applicationName }}
+      paths:
+        - /{{ $applicationName }}
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -124,8 +124,8 @@ ingress:
   {{- else }}
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
-  hosts:
-  - api.{{ $ingressDomain | default "crashteam.dev" }}
+      hosts:
+        - api.{{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
   servicePort: {{ .Values.services.global.java.apiPort }}
 
