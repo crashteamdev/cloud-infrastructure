@@ -392,47 +392,47 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
   }
 }
 
-#resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
-#  name        = "marketdb"
-#  environment = "PRODUCTION"
-#  network_id  = yandex_vpc_network.network-1.id
-#
-#  cluster_config {
-#    version = "6.0"
-#  }
-#
-#  dynamic "database" {
-#    for_each = var.mongo_dbs
-#    content {
-#      name = database.value
-#    }
-#  }
-#
-#  user {
-#    name     = "dbuser"
-#    password = var.db_password
-#    dynamic "permission" {
-#      for_each = var.mongo_dbs
-#      content {
-#        database_name = permission.value
-#      }
-#    }
-#  }
-#
-#  resources {
-#    resource_preset_id = "m3-c2-m16"
-#    disk_type_id       = "network-ssd"
-#    disk_size          = 200
-#  }
-#
-#  host {
-#    zone_id   = "ru-central1-a"
-#    subnet_id = yandex_vpc_subnet.mongo-a.id
-#  }
-#
-#  maintenance_window {
-#    day  = "SUN"
-#    hour = 2
-#    type = "WEEKLY"
-#  }
-#}
+resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
+  name        = "marketdb"
+  environment = "PRODUCTION"
+  network_id  = yandex_vpc_network.network-1.id
+
+  cluster_config {
+    version = "6.0"
+  }
+
+  dynamic "database" {
+    for_each = var.mongo_dbs
+    content {
+      name = database.value
+    }
+  }
+
+  user {
+    name     = "dbuser"
+    password = var.db_password
+    dynamic "permission" {
+      for_each = var.mongo_dbs
+      content {
+        database_name = permission.value
+      }
+    }
+  }
+
+  resources {
+    resource_preset_id = "m3-c2-m16"
+    disk_type_id       = "network-ssd"
+    disk_size          = 250
+  }
+
+  host {
+    zone_id   = "ru-central1-a"
+    subnet_id = yandex_vpc_subnet.mongo-a.id
+  }
+
+  maintenance_window {
+    day  = "SUN"
+    hour = 2
+    type = "WEEKLY"
+  }
+}
