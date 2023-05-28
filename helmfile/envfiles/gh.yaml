@@ -30,6 +30,11 @@ services:
     uniUser: { }
     uniPassword: { }
 
+  mongodb:
+    host: { }
+    uniUser: { }
+    uniPassword: { }
+
   redis:
     endpoint: { }
     user: { }
