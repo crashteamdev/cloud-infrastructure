@@ -9,6 +9,9 @@ logback:
 spring:
   application:
     name: {{ $applicationName }}
+  redis:
+    username: default
+    ssl: false
 
 management:
   server:
