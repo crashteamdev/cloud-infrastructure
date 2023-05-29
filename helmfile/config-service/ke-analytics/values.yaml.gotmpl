@@ -56,7 +56,7 @@ configMap:
     application.yml: |
       {{- tpl (readFile "application.yml") . | nindent 6 }}
     marketdb.jks: |
-      {{ readFile "cert/marketdb.jks" | nindent 6 }}
+      {{- tpl (readFile "cert/marketdb.jks") . | nindent 6 }}
     entrypoint.sh: |
       {{- tpl (readFile "entrypoint.sh.gotmpl") . | nindent 6 }}
 
