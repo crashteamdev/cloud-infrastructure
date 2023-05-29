@@ -11,7 +11,7 @@ spring:
     name: {{ $applicationName }}
   redis:
     username: default
-    ssl: false
+    ssl: true
 
 management:
   server:
