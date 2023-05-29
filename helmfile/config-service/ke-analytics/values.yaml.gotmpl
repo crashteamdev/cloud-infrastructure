@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-dde7e9a
+  tag: sha-2c5e2d4
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -27,8 +27,6 @@ env:
     value: {{ .Values.services.mongodb.uniUser }}
   - name: MONGO_PASSWORD
     value: {{ .Values.services.mongodb.uniPassword }}
-  - name: MONGO_PORT
-    value: "27018"
   - name: MONGO_DATABASE
     value: kazanex
   - name: MONGO_REPLICASET
