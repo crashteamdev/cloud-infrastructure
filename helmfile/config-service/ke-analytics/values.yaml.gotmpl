@@ -20,6 +20,9 @@ imagePullSecrets:
   - name: {{ .Values.services.global.registry.imagePullSecret }}
 {{ end }}
 
+runopts:
+  command: ["/opt/{{ $applicationName }}/entrypoint.sh"]
+
 env:
   - name: MONGO_HOST
     value: {{ .Values.services.mongodb.host }}
@@ -52,6 +55,10 @@ configMap:
   data:
     application.yml: |
       {{- tpl (readFile "application.yml") . | nindent 6 }}
+    marketdb.jks: |
+      {{ readFile "cert/marketdb.jks" | nindent 6 }}
+    entrypoint.sh: |
+      {{- tpl (readFile "entrypoint.sh.gotmpl") . | nindent 6 }}
 
 volumes:
   - name: config-volume
@@ -61,8 +68,16 @@ volumes:
 
 volumeMounts:
   - name: config-volume
+    mountPath: /opt/{{ $applicationName }}/entrypoint.sh
+    subPath: entrypoint.sh
+    readOnly: true
+  - name: config-volume
     mountPath: /opt/{{ $applicationName }}/config/application.yml
     subPath: application.yml
+    readOnly: true
+  - name: config-volume
+    mountPath: /opt/{{ $applicationName }}/cert/marketdb.jks
+    subPath: marketdb.jks
     readOnly: true
 
 service:
