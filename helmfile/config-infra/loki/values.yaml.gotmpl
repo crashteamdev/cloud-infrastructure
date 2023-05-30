@@ -30,15 +30,15 @@ promtail:
   pipelineStages:
     - docker: {}
     - drop:
-      source: namespace
-      expression: "kube-.*"
+        source: namespace
+        expression: "kube-.*"
     - json:
-      expressions:
-        timestamp: timestamp
-        level: level
-        thread: thread
-        class: logger
-        message: message
+        expressions:
+          timestamp: timestamp
+          level: level
+          thread: thread
+          class: logger
+          message: message
     - labels:
         level:
         class:
