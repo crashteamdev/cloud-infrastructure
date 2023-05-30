@@ -1,0 +1,49 @@
+{{- $applicationName := .Release.Name -}}
+
+server:
+  port: {{ .Values.services.global.java.apiPort }}
+
+logback:
+  appender: JSON_K8S_CONSOLE
+
+spring:
+  application:
+    name: {{ $applicationName }}
+  redis:
+    port: 6380
+    username: default
+    ssl: true
+
+management:
+  server:
+    port: {{ .Values.services.global.java.managementPort }}
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: {{ $applicationName }}
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+service:
+  proxy:
+    url: http://styx:8080
+
+freekassa:
+  baseUrl: https://api.freekassa.ru
+  shopId: 26248
+
+qiwi:
+  siteId: d9jje0-00
