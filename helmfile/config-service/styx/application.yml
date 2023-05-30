@@ -8,7 +8,7 @@ logback:
 
 logging:
   level:
-    dev.crashteam.styx.service.web.AdvancedConversationService: DEBUG
+    dev.crashteam.styx.service.web.AdvancedConversationService: INFO
 
 spring:
   application:
