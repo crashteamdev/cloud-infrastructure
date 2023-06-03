@@ -1,5 +1,5 @@
 # -*- mode: yaml -*-
-replicaCount: {{ .Values.services.global.statelessReplicas }}
+replicaCount: 1
 
 nodeSelector:
   ingress: "true"
@@ -75,7 +75,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: {{ $ingressDomain | default "crashteam.dev" }}
+    - host: landing.{{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -86,6 +86,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - {{ $ingressDomain | default "crashteam.dev" }}
+        - landing.{{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
   servicePort: 8080
