@@ -18,7 +18,7 @@ service:
   type: ClusterIP
   ports:
     - name: http
-      port: 80
+      port: 8080
 
 configMap:
   data:
@@ -76,8 +76,7 @@ ingress:
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
     - host: {{ $ingressDomain | default "crashteam.dev" }}
-      paths:
-        - /
+  path: /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -88,4 +87,4 @@ ingress:
       hosts:
         - {{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
-  servicePort: 80
+  servicePort: 8080
