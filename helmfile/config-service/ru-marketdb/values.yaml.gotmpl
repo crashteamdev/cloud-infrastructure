@@ -18,7 +18,7 @@ service:
   type: ClusterIP
   ports:
     - name: http
-      port: 8080
+      port: 80
 
 configMap:
   data:
@@ -75,7 +75,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: landing.{{ $ingressDomain | default "crashteam.dev" }}
+    - host: {{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -86,6 +86,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - landing.{{ $ingressDomain | default "crashteam.dev" }}
+        - {{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
-  servicePort: 8080
+  servicePort: 80
