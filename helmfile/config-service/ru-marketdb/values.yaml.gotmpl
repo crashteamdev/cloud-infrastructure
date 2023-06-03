@@ -26,6 +26,8 @@ configMap:
       {{- tpl (readFile "appConfig.json.gotmpl") . | nindent 6 }}
     checkout.conf: |
       {{- readFile "vhost.conf" | nindent 6 }}
+    10_json_logs.conf: |
+      {{- readFile "json_logs.conf" | nindent 6 }}
 
 volumeMounts:
   - name: config-volume
@@ -35,6 +37,10 @@ volumeMounts:
   - name: config-volume
     mountPath: /etc/nginx/conf.d/checkout.conf
     subPath: checkout.conf
+    readOnly: true
+  - name: config-volume
+    mountPath: /etc/nginx/conf.d/10_json_logs.conf
+    subPath: 10_json_logs.conf
     readOnly: true
 
 volumes:
