@@ -81,7 +81,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: {{ $ingressDomain | default "crashteam.dev" }}
+    - host: land.{{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -92,6 +92,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - {{ $ingressDomain | default "crashteam.dev" }}
+        - land.{{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
   servicePort: 80
