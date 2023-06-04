@@ -12,16 +12,15 @@ repositories:
     url: https://crashteamdev.github.io/charts/
 
 releases:
-{{- if false }}
-  - name: uzum-analytics
-    <<: *generic_stateless
-{{- end }}
   - name: ke-analytics
     <<: *generic_stateless
   - name: ke-space
     <<: *generic_stateless
   - name: styx
     <<: *generic_stateless
+  - name: uzum-analytics
+    <<: *generic_stateless
+    installed: false
 #  - name: ke-data-scrapper
 #    <<: *generic_stateless
   - name: ru-marketdb
