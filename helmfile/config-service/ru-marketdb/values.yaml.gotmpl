@@ -18,7 +18,7 @@ service:
   type: ClusterIP
   ports:
     - name: http
-      port: 8080
+      port: 80
 
 configMap:
   data:
@@ -94,4 +94,4 @@ ingress:
       hosts:
         - land.{{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
-  servicePort: 8080
+  servicePort: 80
