@@ -1,0 +1,84 @@
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: {{ .Values.services.global.statelessReplicas }}
+
+nodeSelector:
+  microservices: "true"
+
+podAnnotations:
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "{{ .Values.services.global.java.managementPort }}"
+  prometheus.io/scrape: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: sha-9c35e36
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+env:
+  - name: SPRING_REDIS_HOST
+    value: {{ .Values.services.redis.endpoint }}
+  - name: SPRING_REDIS_PASSWORD
+    value: {{ .Values.services.redis.password }}
+
+configMap:
+  data:
+    application.yml: |
+      {{- tpl (readFile "application.yml") . | nindent 6 }}
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: {{ $applicationName }}
+      defaultMode: 0755
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /opt/{{ $applicationName }}/config/application.yml
+    subPath: application.yml
+    readOnly: true
+
+service:
+  ports:
+    - name: api
+      port: {{ .Values.services.global.java.apiPort }}
+    - name: management
+      port: {{ .Values.services.global.java.managementPort }}
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+resources:
+  limits:
+    memory: 512Mi
+  requests:
+    memory: 256Mi
+
+metrics:
+  serviceMonitor:
+    enabled: {{ .Values.services.global.metrics.enabled }}
+    namespace: {{ .Release.Namespace }}
+    additionalLabels:
+      release: prometheus
+    endpoints:
+      - port: "management"
+        path: /actuator/prometheus
+        scheme: http
+
+netPolicies:
+  - filters:
+    - port: 6379
+      type: TCP
+    name: redis

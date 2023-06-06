@@ -20,5 +20,5 @@ releases:
     <<: *generic_stateless
   - name: styx
     <<: *generic_stateless
-#  - name: ke-data-scrapper
-#    <<: *generic_stateless
+  - name: ke-data-scrapper
+    <<: *generic_stateless
