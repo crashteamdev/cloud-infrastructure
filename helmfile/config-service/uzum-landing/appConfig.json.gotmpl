@@ -2,5 +2,5 @@
 {{- $ingressDomain := .Values.services.ingress.namespacedDomain | ternary $domainWithNamespace .Values.services.ingress.rootDomain -}}
 {
     "brandless": true,
-    "apiEndpoint": "https://api.{{ $ingressDomain | default "crashteam.dev" }}",
+    "apiEndpoint": "https://api.marketdb.org",
 }

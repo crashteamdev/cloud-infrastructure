@@ -23,5 +23,7 @@ releases:
 #    installed: false
 #  - name: ke-data-scrapper
 #    <<: *generic_stateless
-  - name: ru-marketdb
+  - name: ke-landing
+    <<: *generic_stateless
+  - name: uzum-landing
     <<: *generic_stateless
