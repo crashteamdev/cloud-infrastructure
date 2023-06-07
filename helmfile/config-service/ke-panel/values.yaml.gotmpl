@@ -55,7 +55,7 @@ volumes:
       name: {{ .Release.Name }}
   - name: nodejs-env-file
     secret:
-      name: nodejs-env
+      secretName: nodejs-env
 
 livenessProbe:
   httpGet:
