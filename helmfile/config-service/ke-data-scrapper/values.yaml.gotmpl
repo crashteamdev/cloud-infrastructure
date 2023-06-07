@@ -1,6 +1,6 @@
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: {{ .Values.services.global.statelessReplicas }}
+replicaCount: 1
 
 nodeSelector:
   microservices: "true"
@@ -82,3 +82,7 @@ netPolicies:
     - port: 6379
       type: TCP
     name: redis
+  - filters:
+    - port: 8080
+      type: TCP
+      name: styx
