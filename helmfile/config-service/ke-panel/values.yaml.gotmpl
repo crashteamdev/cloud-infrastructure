@@ -55,7 +55,7 @@ volumes:
       name: {{ .Release.Name }}
   - name: nodejs-env-file
     secret:
-      secretName: nodejs-env
+      secretName: ke-panel
 
 livenessProbe:
   httpGet:
