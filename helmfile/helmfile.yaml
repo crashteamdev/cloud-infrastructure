@@ -27,3 +27,5 @@ releases:
     <<: *generic_stateless
   - name: uzum-landing
     <<: *generic_stateless
+  - name: ke-panel
+    <<: *generic_stateless
