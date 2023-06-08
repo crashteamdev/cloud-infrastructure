@@ -201,6 +201,9 @@ resource "yandex_kubernetes_node_group" "mdb-scalable" {
   }
 
   scale_policy {
+    fixed_scale {
+      size = 1
+    }
     auto_scale {
       min     = 1
       max     = 2
