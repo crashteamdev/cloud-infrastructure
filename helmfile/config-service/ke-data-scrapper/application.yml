@@ -13,6 +13,18 @@ spring:
     port: 6380
     username: default
     ssl: true
+  quartz:
+    job-store-type: memory
+    properties:
+      org:
+        quartz:
+          threadPool:
+            threadCount: 30
+            class: org.quartz.simpl.SimpleThreadPool
+          jobStore:
+            misfireThreshold: 60000
+            class: org.quartz.simpl.RAMJobStore
+
 
 management:
   server:
@@ -40,10 +52,17 @@ management:
 app:
   job:
     cron:
-      product-job: 0 8 0,19 ? * * *
+      product-job: 0 0 0,19 ? * * *
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
     kazan:
       token: Basic a2F6YW5leHByZXNzLWN1c3RvbWVyOmN1c3RvbWVyU2VjcmV0S2V5
     styx: http://styx:8080
+  stream:
+    product:
+      maxlen: 50000
+      waitPending: 40000
+    position:
+      maxlen: 50000
+      waitPending: 40000
