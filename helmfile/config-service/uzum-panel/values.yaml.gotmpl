@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-913ddf2
+  tag: sha-56b7e27
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -44,11 +44,18 @@ volumeMounts:
     mountPath: /etc/nginx/conf.d/10_json_logs.conf
     subPath: 10_json_logs.conf
     readOnly: true
+  - name: nodejs-env-file
+    mountPath: .env
+    subPath: .env
+    readOnly: true
 
 volumes:
   - name: config-volume
     configMap:
       name: {{ .Release.Name }}
+  - name: nodejs-env-file
+    secret:
+      secretName: ke-panel
 
 livenessProbe:
   httpGet:
@@ -83,7 +90,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: uzum.{{ $ingressDomain | default "crashteam.dev" }}
+    - host: kepanel.{{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -94,6 +101,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - upanel.{{ $ingressDomain | default "crashteam.dev" }}
+        - kepanel.{{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
   servicePort: 80

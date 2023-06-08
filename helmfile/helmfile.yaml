@@ -31,3 +31,5 @@ releases:
     <<: *generic_stateless
   - name: ke-panel
     <<: *generic_stateless
+  - name: uzum-panel
+    <<: *generic_stateless
