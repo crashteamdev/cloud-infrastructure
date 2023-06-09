@@ -14,7 +14,6 @@ repositories:
 releases:
   - name: ke-analytics
     <<: *generic_stateless
-    installed: false
   - name: ke-space
     <<: *generic_stateless
   - name: styx
