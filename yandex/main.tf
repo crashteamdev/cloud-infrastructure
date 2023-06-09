@@ -418,6 +418,7 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
       for_each = var.mongo_dbs
       content {
         database_name = permission.value
+        roles = ["readWrite"]
       }
     }
   }
