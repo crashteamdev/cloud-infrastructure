@@ -204,11 +204,11 @@ resource "yandex_kubernetes_node_group" "mdb-scalable" {
     fixed_scale {
       size = 1
     }
-    auto_scale {
-      min     = 1
-      max     = 2
-      initial = 1
-    }
+#    auto_scale {
+#      min     = 1
+#      max     = 2
+#      initial = 1
+#    }
   }
 
   node_labels = {
