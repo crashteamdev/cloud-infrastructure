@@ -42,13 +42,12 @@ service:
     url: http://styx:8080
 
 kazanex:
+  scheduleEnabled: true
   productCron: '0 0 0/4 * * ?'
   groupCron: '0 0 0/3 * * ?'
   sellerCron: '0 0 0/6 * * ?'
   pendingMessageCron: '0 0 0/6 * * ?'
-  scheduleEnabled:
-    enable: true
-    throttlingMs: 700
+  throttlingMs: 700
 
 redis:
   stream:
