@@ -40,3 +40,30 @@ management:
 service:
   proxy:
     url: http://styx:8080
+
+kazanex:
+  productCron: '0 0 0/4 * * ?'
+  groupCron: '0 0 0/3 * * ?'
+  sellerCron: '0 0 0/6 * * ?'
+  pendingMessageCron: '0 0 0/6 * * ?'
+  scheduleEnabled:
+    enable: true
+    throttlingMs: 700
+
+redis:
+  stream:
+    max-batch-size: 400
+    batch-buffer-duration-ms: 400
+    batch-parallel-count: 5
+    ke-product-info:
+      streamName: ke-product-stream
+      consumerGroup: ke-analytics-product-group
+      consumerName: ke-analytics-product-consumer
+    ke-product-position:
+      streamName: ke-position-stream
+      consumerGroup: ke-analytics-product-position-group
+      consumerName: ke-analytics-position-consumer
+    ke-category-info:
+      streamName: ke-category-stream
+      consumerGroup: ke-analytics-category-group
+      consumerName: ke-analytics-category-consumer
