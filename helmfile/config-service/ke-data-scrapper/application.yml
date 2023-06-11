@@ -62,7 +62,7 @@ app:
   stream:
     product:
       maxlen: 50000
-      waitPending: 40000
+      waitPending: 50000
     position:
       maxlen: 50000
-      waitPending: 40000
+      waitPending: 50000
