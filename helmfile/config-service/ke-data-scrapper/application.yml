@@ -52,7 +52,7 @@ management:
 app:
   job:
     cron:
-      product-job: 0 0 0,19 ? * * *
+      product-job: 0 43 0,19 ? * * *
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
@@ -62,7 +62,7 @@ app:
   stream:
     product:
       maxlen: 50000
-      waitPending: 50000
+      waitPending: 20000
     position:
       maxlen: 50000
-      waitPending: 50000
+      waitPending: 20000
