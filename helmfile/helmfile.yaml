@@ -21,6 +21,7 @@ releases:
     <<: *generic_stateless
   - name: uzum-analytics
     <<: *generic_stateless
+    installed: false
   - name: ke-data-scrapper
     <<: *generic_stateless
   - name: ke-landing
