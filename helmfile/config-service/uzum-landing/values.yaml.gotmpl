@@ -83,7 +83,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: uzum.{{ $ingressDomain | default "crashteam.dev" }}
+    - host: "marketdb.org"
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -94,6 +94,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - uzum.{{ $ingressDomain | default "crashteam.dev" }}
+        - "marketdb.org"
 {{- end }}
   servicePort: 80

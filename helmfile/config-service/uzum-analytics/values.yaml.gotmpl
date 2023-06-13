@@ -137,9 +137,12 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
   hosts:
-    - host: api.{{ $ingressDomain | default "crashteam.dev" }}
+    - host: "api.marketdb.org"
       paths:
         - /{{ $applicationName }}
+    - host: "uzum-api.marketdb.ru"
+      paths:
+        - /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -148,7 +151,8 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - api.{{ $ingressDomain | default "crashteam.dev" }}
+        - "api.marketdb.org"
+        - "uzum-api.marketdb.ru"
 {{- end }}
   servicePort: {{ .Values.services.global.java.apiPort }}
 

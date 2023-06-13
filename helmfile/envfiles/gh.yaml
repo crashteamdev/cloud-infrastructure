@@ -45,7 +45,7 @@ services:
 
   ingress:
     class: "nginx"
-    rootDomain: crashteam.dev
+    rootDomain: marketdb.ru
     namespacedDomain: false
     tls:
       enabled: true

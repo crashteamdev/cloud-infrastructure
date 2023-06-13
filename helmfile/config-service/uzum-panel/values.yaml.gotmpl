@@ -90,7 +90,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: upanel.{{ $ingressDomain | default "crashteam.dev" }}
+    - host: "lk.marketdb.org"
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -101,6 +101,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - upanel.{{ $ingressDomain | default "crashteam.dev" }}
+        - "lk.marketdb.org"
 {{- end }}
   servicePort: 80

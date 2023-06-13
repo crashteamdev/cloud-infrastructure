@@ -68,7 +68,7 @@ resources:
     memory: 64Mi
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
-{{ $ingressDomain := .Values.services.ingress.namespacedDomain | ternary $domainWithNamespace .Values.services.ingress.rootDomain }}
+{{ $ingressDomain := .Values.services.ingress.rootDomain }}
 
 ingress:
   enabled: true
@@ -83,7 +83,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: ke.{{ $ingressDomain | default "crashteam.dev" }}
+    - host: {{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -94,6 +94,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - ke.{{ $ingressDomain | default "crashteam.dev" }}
+        - {{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
   servicePort: 80
