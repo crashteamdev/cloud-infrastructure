@@ -47,3 +47,8 @@ freekassa:
 
 qiwi:
   siteId: d9jje0-00
+
+uzum:
+  scheduleEnabled: true
+  groupCron: '0 0 0/6 * * ?'
+  productCron: '0 0 0/4 * * ?'
