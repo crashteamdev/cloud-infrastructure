@@ -114,7 +114,6 @@ ingress:
   hosts:
     - host: api.{{ $ingressDomain | default "crashteam.dev" }}
       paths:
-        - /{{ $applicationName }}
         - /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
