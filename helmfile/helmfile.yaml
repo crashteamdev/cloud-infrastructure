@@ -30,3 +30,5 @@ releases:
     <<: *generic_stateless
   - name: uzum-panel
     <<: *generic_stateless
+  - name: uzum-data-scrapper
+    <<: *generic_stateless
