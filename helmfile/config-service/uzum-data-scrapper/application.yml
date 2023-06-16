@@ -57,7 +57,7 @@ app:
       category-job: 0 0 1 ? * * *
   integration:
     uzum:
-      token: Basic a2F6YW5leHByZXNzLWN1c3RvbWVyOmN1c3RvbWVyU2VjcmV0S2V5
+      token: Basic YjJjLWZyb250OmNsaWVudFNlY3JldA==
     styx: http://styx:8080
   stream:
     product:
