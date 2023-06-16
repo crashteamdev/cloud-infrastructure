@@ -54,4 +54,4 @@ qiwi:
 uzum:
   scheduleEnabled: true
   groupCron: '0 0 0/6 * * ?'
-  productCron: '0 0 0/4 * * ?'
+  productCron: '0 0 0 * * ?'
