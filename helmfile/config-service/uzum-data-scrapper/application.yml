@@ -52,7 +52,7 @@ management:
 app:
   job:
     cron:
-      product-job: 0 0 0 ? * * *
+      product-job: 0 20 11 ? * * *
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
@@ -61,8 +61,8 @@ app:
     styx: http://styx:8080
   stream:
     product:
-      maxlen: 50000
-      waitPending: 20000
+      maxlen: 100000
+      waitPending: 50000
     position:
-      maxlen: 50000
-      waitPending: 20000
+      maxlen: 100000
+      waitPending: 50000
