@@ -467,6 +467,7 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
     type      = "CLICKHOUSE"
     zone      = "ru-central1-a"
     subnet_id = yandex_vpc_subnet.clickhouse-a.id
+    assign_public_ip = true
   }
 
   dynamic "database" {
