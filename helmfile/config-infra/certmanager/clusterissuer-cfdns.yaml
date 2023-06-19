@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production-dns-cf
+  namespace: cert-manager
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: gloomboxy@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-production-dns-cf
+    solvers:
+    - selector:
+        dnsZones:
+        - 'crashteam.dev'
+      dns01:
+        cloudflare:
+          email: vitaxa93gamebox@gmail.com
+          apiTokenSecretRef:
+            name: cf-api-token-secret
+            key: api-token

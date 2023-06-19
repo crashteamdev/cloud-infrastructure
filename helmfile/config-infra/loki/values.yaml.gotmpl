@@ -1,0 +1,53 @@
+loki:
+  isDefault: false
+  persistence:
+    size: 20Gi
+    storageClassName: yc-network-hdd
+  config:
+    compactor:
+      retention_enabled: true
+    limits_config:
+      retention_period: 20d
+  write:
+    nodeSelector:
+      monitoring: "true"
+  tableManager:
+    nodeSelector:
+      monitoring: "true"
+  read:
+    nodeSelector:
+      monitoring: "true"
+  backend:
+    nodeSelector:
+      monitoring: "true"
+  gateway:
+    nodeSelector:
+      monitoring: "true"
+
+
+promtail:
+  enabled: true
+  pipelineStages:
+    - docker: {}
+    - drop:
+      source: namespace
+      expression: "kube-.*"
+    - json:
+      expressions:
+        timestamp: timestamp
+        level: level
+        thread: thread
+        class: logger
+        message: message
+    - labels:
+        level:
+        class:
+        thread:
+    - timestamp:
+        format: RFC3339
+        source: timestamp
+    - output:
+        source: message
+
+prometheus:
+  enabled: false

@@ -1,0 +1,68 @@
+{{- $applicationName := .Release.Name -}}
+
+server:
+  port: {{ .Values.services.global.java.apiPort }}
+
+logback:
+  appender: JSON_K8S_CONSOLE
+
+spring:
+  application:
+    name: {{ $applicationName }}
+  redis:
+    port: 6380
+    username: default
+    ssl: true
+  quartz:
+    job-store-type: memory
+    properties:
+      org:
+        quartz:
+          threadPool:
+            threadCount: 30
+            class: org.quartz.simpl.SimpleThreadPool
+          jobStore:
+            misfireThreshold: 60000
+            class: org.quartz.simpl.RAMJobStore
+
+
+management:
+  server:
+    port: {{ .Values.services.global.java.managementPort }}
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: {{ $applicationName }}
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+app:
+  job:
+    cron:
+      product-job: 0 0 0 ? * * *
+      position-job: 0 0 7 ? * * *
+      category-job: 0 0 1 ? * * *
+  integration:
+    uzum:
+      token: Basic YjJjLWZyb250OmNsaWVudFNlY3JldA==
+    styx: http://styx:8080
+  stream:
+    product:
+      maxlen: 100000
+      waitPending: 50000
+    position:
+      maxlen: 100000
+      waitPending: 50000

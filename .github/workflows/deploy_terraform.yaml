@@ -26,7 +26,6 @@ jobs:
           script: |
             const fs = require('fs');
             const os = require('os');
-            
             const osPlatform = os.platform();
             let terraformFileConfig = osPlatform === 'win32'
               ? `${process.env.APPDATA}/terraform.rc` : `${process.env.HOME}/.terraformrc`;

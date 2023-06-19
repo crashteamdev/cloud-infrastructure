@@ -1,0 +1,177 @@
+namespaceOverride: "monitoring"
+
+prometheus:
+  prometheusSpec:
+    storageSpec:
+    ## Using PersistentVolumeClaim
+    ##
+      volumeClaimTemplate:
+        spec:
+          storageClassName: yc-network-hdd
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+    retention: 20d
+    retentionSize: ""
+    nodeSelector:
+      monitoring: "true"
+    tolerations:
+      - key: "role"
+        operator: "Equal"
+        value: "mon"
+        effect: "NoExecute"
+    additionalScrapeConfigs:
+      - job_name: 'yc-metrics'
+        static_configs:
+        - targets:
+          labels:
+            env: "yc-metrics"
+      - job_name: 'kubernetes-service-endpoints'
+        scrape_interval: 5s
+        scrape_timeout: 2s
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+          action: replace
+          target_label: __scheme__
+          regex: (https?)
+        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+          action: replace
+          target_label: __metrics_path__
+          regex: (.+)
+        - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+          action: replace
+          target_label: __address__
+          regex: (.+)(?::\d+);(\d+)
+          replacement: $1:$2
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+        - source_labels: [__meta_kubernetes_service_name]
+          action: replace
+          target_label: application
+
+prometheus-node-exporter:
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - effect: NoExecute
+      operator: Exists
+
+grafana:
+  enabled: true
+  replicas: 1
+  adminPassword: {{ .Values.prometheus.grafana.password }}
+  create: true
+  ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
+  # useExistingRole: name-of-some-(cluster)role
+  rbac:
+    create: true
+    pspEnabled: true
+    pspUseAppArmor: true
+    namespaced: false
+    extraClusterRoleRules:
+    - apiGroups: [""]
+      resources: ["configmaps", "secrets"]
+      verbs: ["get", "watch", "list"]
+
+  deploymentStrategy:
+    type: Recreate
+
+{{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
+{{ $ingressDomain := .Values.services.ingress.namespacedDomain | ternary $domainWithNamespace .Values.services.ingress.rootDomain }}
+
+  grafana.ini:
+  ## grafana Authentication can be enabled with the following values on grafana.ini
+    server:
+      # The full public facing url you use in browser, used for redirects and emails
+      root_url: https://grafana.{{ $ingressDomain | default "crashteam.dev" }}/
+    auth:
+      oauth_skip_org_role_update_sync: true
+    auth.github:
+      enabled: true
+      allow_sign_up: true
+      scopes: user:email,read:org
+      auth_url: https://github.com/login/oauth/authorize
+      token_url: https://github.com/login/oauth/access_token
+      api_url: https://api.github.com/user
+      allowed_organizations: crashteamdev
+      client_id: {{ .Values.services.grafana.openid.client_id }}
+      client_secret: {{ .Values.services.grafana.openid.client_secret }}
+
+    unified_alerting.screenshots:
+      capture: true
+
+  persistence:
+    type: pvc
+    enabled: true
+    # storageClassName: default
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+    # annotations: {}
+    finalizers:
+      - kubernetes.io/pvc-protection
+    # selectorLabels: {}
+    # subPath: ""
+    # existingClaim:
+
+{{/*  datasources:*/}}
+{{/*    datasources.yaml:*/}}
+{{/*      apiVersion: 1*/}}
+{{/*      datasources:*/}}
+{{/*      - name: 'loki'*/}}
+{{/*        type: 'loki'*/}}
+{{/*        access: 'proxy'*/}}
+{{/*        orgId: 1,*/}}
+{{/*        url: http://loki:3100*/}}
+{{/*        version: 1*/}}
+
+  ingress:
+    enabled: true
+
+    ## Annotations for Grafana Ingress
+    ##
+    annotations:
+  {{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
+      cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+  {{- end }}
+      kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
+      nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+
+    ## Labels to be added to the Ingress
+    ##
+    labels: {}
+
+    hosts:
+      - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+    path: /
+
+  {{- if .Values.services.ingress.tls.enabled }}
+    tls:
+    {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
+      - secretName: {{ .Release.Name }}-{{ .Values.services.ingress.tls.secretName }}
+    {{- else }}
+      - secretName: {{ .Values.services.ingress.tls.secretName }}
+    {{- end }}
+        hosts:
+          - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+  {{- end }}
+
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeControllerManager:
+  enabled: false

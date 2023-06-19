@@ -1,0 +1,54 @@
+bases:
+  - environments.yaml
+---
+
+{{ readFile "hf-templates.yaml" }}
+
+repositories:
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx
+  - name: certmanager
+    url: https://charts.jetstack.io
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+  - name: crashteamdev
+    url: https://crashteamdev.github.io/charts/
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+
+releases:
+{{- if eq .Values.ingresscontroller.enabled true }}
+- name: ingress
+  <<: *infra_default
+  chart: ingress-nginx/ingress-nginx
+  namespace: ingress
+{{- end }}
+{{- if eq .Values.certmanager.enabled true }}
+- name: certmanager
+  <<: *infra_default
+  namespace: cert-manager
+  chart: certmanager/cert-manager
+  version: v1.11.0
+{{- end }}
+{{- if eq .Values.prometheus.enabled true }}
+- name: prometheus
+  <<: *infra_default
+  chart: prometheus-community/kube-prometheus-stack
+  namespace: monitoring
+  disableValidation: true
+  version: 43.1.3
+- name: loki
+  <<: *infra_default
+  chart: grafana/loki-stack
+  namespace: monitoring
+  disableValidation: true
+  needs:
+    - {{ .Namespace | default "default" }}/grafana
+    - {{ .Namespace | default "default" }}/prometheus
+    - {{ .Namespace | default "default" }}/certmanager
+  version: 2.9.10
+{{- end }}

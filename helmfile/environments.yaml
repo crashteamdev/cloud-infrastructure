@@ -1,0 +1,10 @@
+helmDefaults:
+  createNamespace: true
+  historyMax: 3
+environments:
+  default:
+    values:
+      - envfiles/gh.yaml
+  gh:
+    values:
+      - envfiles/gh.yaml
