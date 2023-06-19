@@ -151,6 +151,18 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     from_port = 6443
     to_port = 6443
   }
+  ingress {
+    description    = "HTTPS (secure)"
+    port           = 8443
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description    = "clickhouse-client (secure)"
+    port           = 9440
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
     protocol       = "ANY"
     description    = "Правило разрешает весь исходящий трафик. Узлы могут связаться с Yandex Container Registry, Yandex Object Storage, Docker Hub и т. д."
