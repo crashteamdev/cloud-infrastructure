@@ -81,6 +81,13 @@ resource "yandex_vpc_subnet" "mongo-a" {
   v4_cidr_blocks = ["10.3.0.0/24"]
 }
 
+resource "yandex_vpc_subnet" "clickhouse-a" {
+  name           = "clickhousenet-a"
+  zone           = var.yc_region
+  network_id     = yandex_vpc_network.network-1.id
+  v4_cidr_blocks = ["10.4.0.0/24"]
+}
+
 resource "yandex_kms_symmetric_key_iam_binding" "viewer" {
   symmetric_key_id = yandex_kms_symmetric_key.kms-key.id
   role             = "viewer"
@@ -441,3 +448,43 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
     type = "WEEKLY"
   }
 }
+
+resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
+  name               = "marketdb-clickhouse"
+  environment        = "PRODUCTION"
+  network_id         = yandex_vpc_network.network-1.id
+  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
+
+  clickhouse {
+    resources {
+      resource_preset_id = "b3-c1-m4"
+      disk_type_id       = "network-ssd"
+      disk_size          = 10
+    }
+  }
+
+  host {
+    type      = "CLICKHOUSE"
+    zone      = "ru-central1-a"
+    subnet_id = yandex_vpc_subnet.clickhouse-a.id
+  }
+
+  dynamic "database" {
+    for_each = var.clickhouse_dbs
+    content {
+      name = database.value
+    }
+  }
+
+  user {
+    name     = "dbuser"
+    password = var.db_password
+    dynamic "permission" {
+      for_each = var.clickhouse_dbs
+      content {
+        database_name = permission.value
+      }
+    }
+  }
+}
+

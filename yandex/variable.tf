@@ -31,6 +31,10 @@ variable "mongo_dbs" {
   description = ""
 }
 
+variable "clickhouse_dbs" {
+  description = ""
+}
+
 variable "db_password" {
   description = "Database administrator password"
   type        = string
