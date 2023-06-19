@@ -176,13 +176,13 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
   }
 }
 
-resource "yandex_kubernetes_node_group" "service-marketdb-group" {
+resource "yandex_kubernetes_node_group" "mdb-scalable" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name       = "mdb-microservices"
+  name       = "mdb-service"
   version    = "1.23"
 
   instance_template {
-    platform_id = "standard-v1"
+    platform_id = "standard-v2"
 
     network_interface {
       nat        = true
@@ -196,16 +196,19 @@ resource "yandex_kubernetes_node_group" "service-marketdb-group" {
 
     boot_disk {
       type = "network-hdd"
-      size = 30
+      size = 70
     }
   }
 
   scale_policy {
-    auto_scale {
-      min     = 1
-      max     = 2
-      initial = 1
+    fixed_scale {
+      size = 1
     }
+#    auto_scale {
+#      min     = 1
+#      max     = 2
+#      initial = 1
+#    }
   }
 
   node_labels = {
@@ -236,13 +239,13 @@ resource "yandex_kubernetes_node_group" "service-marketdb-group" {
   }
 }
 
-resource "yandex_kubernetes_node_group" "monitoring-marketdb-group" {
+resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name       = "mdb-service"
+  name       = "mdb-sup-service"
   version    = "1.23"
 
   instance_template {
-    platform_id = "standard-v1"
+    platform_id = "standard-v2"
 
     network_interface {
       nat        = true
@@ -250,14 +253,14 @@ resource "yandex_kubernetes_node_group" "monitoring-marketdb-group" {
     }
 
     resources {
-      memory = 3
+      memory = 2
       cores  = 2
-      core_fraction = 50
+      core_fraction = 20
     }
 
     boot_disk {
       type = "network-hdd"
-      size = 30
+      size = 50
     }
   }
 
@@ -296,7 +299,6 @@ resource "yandex_kubernetes_node_group" "monitoring-marketdb-group" {
   }
 }
 
-
 resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   name        = "pg_prod"
   description = "main database"
@@ -307,13 +309,13 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   config {
     version = "14"
     resources {
-      resource_preset_id = "s2.micro"
+      resource_preset_id = "b2.medium"
       disk_size          = 10
       disk_type_id       = "network-ssd"
     }
 
     postgresql_config = {
-      max_connections                   = 400
+      max_connections                   = 200
       enable_parallel_hash              = true
       vacuum_cleanup_index_scale_factor = 0.2
       autovacuum_vacuum_scale_factor    = 0.32
@@ -330,6 +332,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   host {
     zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.pg-a.id
+    assign_public_ip = true
   }
 }
 
@@ -415,6 +418,7 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
       for_each = var.mongo_dbs
       content {
         database_name = permission.value
+        roles = ["readWrite"]
       }
     }
   }
@@ -422,12 +426,13 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
   resources {
     resource_preset_id = "m3-c2-m16"
     disk_type_id       = "network-ssd"
-    disk_size          = 200
+    disk_size          = 250
   }
 
   host {
     zone_id   = "ru-central1-a"
     subnet_id = yandex_vpc_subnet.mongo-a.id
+    assign_public_ip = true
   }
 
   maintenance_window {

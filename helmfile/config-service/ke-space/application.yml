@@ -8,15 +8,16 @@ logback:
 
 logging:
   level:
-    dev.crashteam.styx.service.web.AdvancedConversationService: INFO
+    "liquibase": INFO
+    org.apache.http: INFO
+    dev.crashteam.repricer.service: DEBUG
+    dev.crashteam.repricer.price: DEBUG
+    org.jooq.tools.LoggerListener: INFO
+    dev.crashteam.repricer.client.ke: DEBUG
 
 spring:
   application:
     name: {{ $applicationName }}
-  redis:
-    port: 6380
-    username: default
-    ssl: true
 
 management:
   server:
@@ -41,12 +42,17 @@ management:
       exposure:
         include: health,info,prometheus
 
-app:
-  timeout-handler: 10
+proxies:
+  proxyline:
+    apiKey: {{ .Values.services.proxy.proxyLineApiKey }}
+
+service:
   proxy:
-    retries:
-      attempts: 4
-      exponent: 1.5
-    timeout: 10000
-    proxy-line:
-      api-key: {{ .Values.services.proxy.proxyLineApiKey }}
+    url: http://styx:8080
+
+repricer:
+  productCron: 0 0 0/3 * * ?
+  accountUpdateDataCron: 0 0 0/1 * * ?
+  priceChangeCron: 0 0/15 * * * ?
+  paymentCron: 0/10 * * * * ?
+  accountInitializeCron: 0/20 * * * * ?

@@ -1,0 +1,106 @@
+# -*- mode: yaml -*-
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 1
+
+nodeSelector:
+  ingress: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: sha-53620be
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+
+configMap:
+  data:
+    appConfig.json: |
+      {{- tpl (readFile "appConfig.json.gotmpl") . | nindent 6 }}
+    checkout.conf: |
+      {{- readFile "vhost.conf" | nindent 6 }}
+    10_json_logs.conf: |
+      {{- readFile "json_logs.conf" | nindent 6 }}
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /usr/share/nginx/html/appConfig.json
+    subPath: appConfig.json
+    readOnly: true
+  - name: config-volume
+    mountPath: /etc/nginx/conf.d/checkout.conf
+    subPath: checkout.conf
+    readOnly: true
+  - name: config-volume
+    mountPath: /etc/nginx/conf.d/10_json_logs.conf
+    subPath: 10_json_logs.conf
+    readOnly: true
+  - name: nodejs-env-file
+    mountPath: .env
+    subPath: .env
+    readOnly: true
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: {{ .Release.Name }}
+  - name: nodejs-env-file
+    secret:
+      secretName: ke-panel
+
+livenessProbe:
+  httpGet:
+    path: /appConfig.json
+    port: http
+  initialDelaySeconds: 30
+  timeoutSeconds: 3
+readinessProbe:
+  httpGet:
+    path: /appConfig.json
+    port: http
+  initialDelaySeconds: 30
+  timeoutSeconds: 3
+
+resources:
+  requests:
+    memory: 64Mi
+
+{{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
+{{ $ingressDomain := .Values.services.ingress.rootDomain }}
+
+ingress:
+  enabled: true
+  annotations:
+{{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
+    cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+{{- end }}
+    kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+       more_set_headers "Access-Control-Allow-Origin: $http_origin";
+  hosts:
+    - host: lk.{{ $ingressDomain | default "crashteam.dev" }}
+      paths:
+        - /
+{{- if .Values.services.ingress.tls.enabled }}
+  tls:
+  {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
+    - secretName: {{ .Release.Name }}-{{ .Values.services.ingress.tls.secretName }}
+  {{- else }}
+    - secretName: {{ .Values.services.ingress.tls.secretName }}
+  {{- end }}
+      hosts:
+        - lk.{{ $ingressDomain | default "crashteam.dev" }}
+{{- end }}
+  servicePort: 80

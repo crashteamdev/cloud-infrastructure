@@ -1,6 +1,6 @@
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: {{ .Values.services.global.statelessReplicas }}
+replicaCount: 1
 
 nodeSelector:
   microservices: "true"
@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-9c35e36
+  tag: sha-b6c2ea5
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,10 +21,21 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/repricer?sslmode=require
+  - name: SPRING_DATASOURCE_USERNAME
+    value: {{ .Values.services.postgres.uniUser }}
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: {{ .Values.services.postgres.uniPassword }}
   - name: SPRING_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
+  - name: REPRICER_PASSWORDKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: password_key
 
 configMap:
   data:
@@ -64,7 +75,7 @@ resources:
   limits:
     memory: 512Mi
   requests:
-    memory: 256Mi
+    memory: 512Mi
 
 metrics:
   serviceMonitor:
@@ -79,6 +90,14 @@ metrics:
 
 netPolicies:
   - filters:
+    - port: 6432
+      type: TCP
+    name: postgresql
+  - filters:
     - port: 6379
       type: TCP
     name: redis
+  - filters:
+    - port: 8080
+      type: TCP
+    name: styx

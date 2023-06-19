@@ -12,9 +12,9 @@ certmanager:
 services:
   global:
     java:
-      apiPort: 8022
+      rpcPort: 8022
       managementPort: 8023
-      adapterCallbackPort: 8080
+      apiPort: 8080
     ipv6only: false
     metrics:
       enabled: true
@@ -30,6 +30,11 @@ services:
     uniUser: { }
     uniPassword: { }
 
+  mongodb:
+    host: { }
+    uniUser: { }
+    uniPassword: { }
+
   redis:
     endpoint: { }
     user: { }
@@ -40,7 +45,7 @@ services:
 
   ingress:
     class: "nginx"
-    rootDomain: crashteam.dev
+    rootDomain: marketdb.ru
     namespacedDomain: false
     tls:
       enabled: true

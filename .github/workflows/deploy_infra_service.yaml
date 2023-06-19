@@ -69,7 +69,7 @@ jobs:
         if: steps.files.outputs.any_changed == 'true'
         uses: mamezou-tech/setup-helmfile@v1.1.0
         with:
-          helmfile-version: "v0.142.0"
+          helmfile-version: "v0.148.1"
 
       - name: Setup kustomize
         if: steps.files.outputs.any_changed == 'true'
