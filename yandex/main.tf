@@ -461,43 +461,43 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
   }
 }
 
-#resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
-#  name               = "marketdb-clickhouse"
-#  environment        = "PRODUCTION"
-#  network_id         = yandex_vpc_network.network-1.id
-##  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
-#
-#  clickhouse {
-#    resources {
-#      resource_preset_id = "b3-c1-m4"
-#      disk_type_id       = "network-ssd"
-#      disk_size          = 10
-#    }
-#  }
-#
-#  host {
-#    type      = "CLICKHOUSE"
-#    zone      = "ru-central1-a"
-#    subnet_id = yandex_vpc_subnet.clickhouse-a.id
-#    assign_public_ip = true
-#  }
-#
-#  dynamic "database" {
-#    for_each = var.clickhouse_dbs
-#    content {
-#      name = database.value
-#    }
-#  }
-#
-#  user {
-#    name     = "dbuser"
-#    password = var.db_password
-#    dynamic "permission" {
-#      for_each = var.clickhouse_dbs
-#      content {
-#        database_name = permission.value
-#      }
-#    }
-#  }
-#}
+resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
+  name               = "marketdb-clickhouse"
+  environment        = "PRODUCTION"
+  network_id         = yandex_vpc_network.network-1.id
+#  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
+
+  clickhouse {
+    resources {
+      resource_preset_id = "b3-c1-m4"
+      disk_type_id       = "network-ssd"
+      disk_size          = 10
+    }
+  }
+
+  host {
+    type      = "CLICKHOUSE"
+    zone      = "ru-central1-a"
+    subnet_id = yandex_vpc_subnet.clickhouse-a.id
+    assign_public_ip = true
+  }
+
+  dynamic "database" {
+    for_each = var.clickhouse_dbs
+    content {
+      name = database.value
+    }
+  }
+
+  user {
+    name     = "dbuser"
+    password = var.db_password
+    dynamic "permission" {
+      for_each = var.clickhouse_dbs
+      content {
+        database_name = permission.value
+      }
+    }
+  }
+}
 
