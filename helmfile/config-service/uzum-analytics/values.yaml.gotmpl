@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-6a6d633
+  tag: sha-e612211
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,6 +21,12 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: CLICKHOUSE_HOST
+    value: {{ .Values.services.clickhouse.host }}
+  - name: CLICKHOUSE_PASSWORD
+    value: {{ .Values.services.clickhouse.password }}
+  - name: CLICKHOUSE_PORT
+    value: 9440
   - name: MONGO_HOST
     value: {{ .Values.services.mongodb.host }}
   - name: MONGO_USER
