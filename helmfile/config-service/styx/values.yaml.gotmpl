@@ -1,6 +1,7 @@
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: {{ .Values.services.global.statelessReplicas }}
+{{/*replicaCount: {{ .Values.services.global.statelessReplicas }}*/}}
+replicaCount: 1
 
 nodeSelector:
   microservices: "true"
