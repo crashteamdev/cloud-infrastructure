@@ -41,6 +41,8 @@ jobs:
           --state-values-set services.mongodb.uniUser=${{secrets.MONGO_USER}}
           --state-values-set services.mongodb.uniPassword=${{secrets.MONGO_PASSWORD}}
           --state-values-set services.proxy.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
+          --state-values-set services.clickhouse.host=${{secrets.CLICKHOUSE_HOST}}
+          --state-values-set services.clickhouse.password=${{secrets.CLICKHOUSE_PASSWORD}}
           EOF
           )
           echo "values_set_list<<EOF" >> $GITHUB_ENV
