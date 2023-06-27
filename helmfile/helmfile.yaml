@@ -10,6 +10,8 @@ repositories:
     url: https://helm.releases.hashicorp.com
   - name: crashteamdev
     url: https://crashteamdev.github.io/charts/
+  - name: requarks
+    url: https://charts.js.wiki
 
 releases:
   - name: ke-analytics
@@ -32,3 +34,5 @@ releases:
     <<: *generic_stateless
   - name: uzum-data-scrapper
     <<: *generic_stateless
+  - name: wiki-marketdb
+    <<: *default

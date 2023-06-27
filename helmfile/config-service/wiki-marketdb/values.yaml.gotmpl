@@ -6,61 +6,23 @@ replicaCount: 1
 nodeSelector:
   ingress: "true"
 
-{{ if .Values.services.global.registry.imagePullSecret }}
-imagePullSecrets:
-  - name: {{ .Values.services.global.registry.imagePullSecret }}
-{{ end }}
-
 service:
   type: ClusterIP
   ports:
     - name: http
       port: 80
 
-configMap:
-  data:
-    appConfig.json: |
-      {{- tpl (readFile "appConfig.json.gotmpl") . | nindent 6 }}
-    checkout.conf: |
-      {{- readFile "vhost.conf" | nindent 6 }}
-    10_json_logs.conf: |
-      {{- readFile "json_logs.conf" | nindent 6 }}
-
-volumeMounts:
-  - name: config-volume
-    mountPath: /usr/share/nginx/html/appConfig.json
-    subPath: appConfig.json
-    readOnly: true
-  - name: config-volume
-    mountPath: /etc/nginx/conf.d/checkout.conf
-    subPath: checkout.conf
-    readOnly: true
-  - name: config-volume
-    mountPath: /etc/nginx/conf.d/10_json_logs.conf
-    subPath: 10_json_logs.conf
-    readOnly: true
-
-volumes:
-  - name: config-volume
-    configMap:
-      name: {{ .Release.Name }}
-
-livenessProbe:
-  httpGet:
-    path: /appConfig.json
-    port: http
-  initialDelaySeconds: 30
-  timeoutSeconds: 3
-readinessProbe:
-  httpGet:
-    path: /appConfig.json
-    port: http
-  initialDelaySeconds: 30
-  timeoutSeconds: 3
-
 resources:
   requests:
     memory: 64Mi
+
+postgresql:
+  postgresqlDatabase: mdb-wiki
+  postgresqlUser: {{ .Values.services.postgres.uniUser }}
+  postgresqlPassword: {{ .Values.services.postgres.uniPassword }}
+  postgresqlHost: {{ .Values.services.postgres.endpoint }}
+  postgresqlPort: 6432
+  ssl: true
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
 {{ $ingressDomain := .Values.services.ingress.rootDomain }}
@@ -78,7 +40,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: {{ $ingressDomain | default "crashteam.dev" }}
+    - host: wiki.{{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -89,6 +51,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - {{ $ingressDomain | default "crashteam.dev" }}
+        - wiki.{{ $ingressDomain | default "crashteam.dev" }}
 {{- end }}
   servicePort: 80

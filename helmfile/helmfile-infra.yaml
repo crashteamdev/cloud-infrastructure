@@ -19,8 +19,6 @@ repositories:
     url: https://charts.bitnami.com/bitnami
   - name: grafana
     url: https://grafana.github.io/helm-charts
-  - name: requarks
-    url: https://charts.js.wiki
 
 releases:
 {{- if eq .Values.ingresscontroller.enabled true }}
