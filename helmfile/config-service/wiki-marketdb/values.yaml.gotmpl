@@ -15,6 +15,7 @@ resources:
     memory: 64Mi
 
 postgresql:
+  enabled: false
   postgresqlDatabase: mdb-wiki
   postgresqlUser: {{ .Values.services.postgres.uniUser }}
   postgresqlPassword: {{ .Values.services.postgres.uniPassword }}
