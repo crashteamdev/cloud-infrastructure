@@ -36,3 +36,5 @@ releases:
     <<: *generic_stateless
   - name: wiki-marketdb
     <<: *default
+    chart: requarks/wiki
+    version: v2.5.299
