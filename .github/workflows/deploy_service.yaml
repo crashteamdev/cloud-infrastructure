@@ -96,7 +96,7 @@ jobs:
           releases_to_deploy+=($releasename)
           helmfile -e $hm_env -l namespace=default,name=$releasename --allow-no-matching-release \
           $values_set_list \
-          apply --args="--atomic" --suppress-secrets --skip-deps --dry-run --debug
+          apply --args="--atomic" --suppress-secrets --skip-deps --debug
           else
           echo "Release $releasename already been deployed"
           fi
