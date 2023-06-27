@@ -20,7 +20,6 @@ postgresql:
   postgresqlPassword: {{ .Values.services.postgres.uniPassword }}
   postgresqlHost: {{ .Values.services.postgres.endpoint }}
   postgresqlPort: 6432
-  ssl: true
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
 {{ $ingressDomain := .Values.services.ingress.rootDomain }}
