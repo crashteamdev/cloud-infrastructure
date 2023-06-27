@@ -14,11 +14,14 @@ resources:
   requests:
     memory: 64Mi
 
+env:
+  - name: DB_PASS
+    value: {{ .Values.services.postgres.uniPassword }}
+
 postgresql:
   enabled: false
   postgresqlDatabase: mdb-wiki
   postgresqlUser: {{ .Values.services.postgres.uniUser }}
-  postgresqlPassword: {{ .Values.services.postgres.uniPassword }}
   postgresqlHost: {{ .Values.services.postgres.endpoint }}
   postgresqlPort: 6432
 
