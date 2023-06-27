@@ -37,4 +37,4 @@ releases:
   - name: wiki-marketdb
     <<: *default
     chart: requarks/wiki
-    version: latest
+    version: v2.2.20
