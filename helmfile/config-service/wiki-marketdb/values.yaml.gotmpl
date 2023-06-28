@@ -54,7 +54,7 @@ postgresql:
   postgresqlUser: {{ .Values.services.postgres.uniUser }}
   postgresqlHost: {{ .Values.services.postgres.endpoint }}
   postgresqlPort: 6432
-  ssl: false
+  ssl: true
 {{/*  ca: /opt/ca.pem*/}}
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
