@@ -10,6 +10,22 @@ service:
     - name: http
       port: 80
 
+configMap:
+  data:
+    ca.pem: |
+      {{- tpl (readFile "ca.pem") . | nindent 6 }}
+
+volumeMounts:
+  - name: config-volume
+    mountPath: ca.pem
+    subPath: ca.pem
+    readOnly: true
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: {{ .Release.Name }}
+
 resources:
   requests:
     memory: 64Mi
@@ -21,6 +37,7 @@ postgresql:
   postgresqlHost: {{ .Values.services.postgres.endpoint }}
   postgresqlPort: 6432
   ssl: true
+  ca: ca.pem
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
 {{ $ingressDomain := .Values.services.ingress.rootDomain }}
