@@ -58,7 +58,7 @@ postgresql:
 {{/*  ca: /opt/ca.pem*/}}
 
 externalPostgresql:
-  databaseURL: postgresql://{{ .Values.services.postgres.endpoint }}:6432/mdb-wiki?ssl=false
+  databaseURL: postgresql://{{ .Values.services.postgres.endpoint }}:6432/mdb-wiki
 {{/*  NODE_TLS_REJECT_UNAUTHORIZED: "0"*/}}
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
