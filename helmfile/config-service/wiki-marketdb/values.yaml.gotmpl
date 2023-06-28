@@ -57,8 +57,9 @@ postgresql:
   ssl: true
   ca: /opt/ca.pem
 
-externalPostgresql:
-  NODE_TLS_REJECT_UNAUTHORIZED: "0"
+sideload:
+  externalPostgresql:
+    NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
 {{ $ingressDomain := .Values.services.ingress.rootDomain }}
