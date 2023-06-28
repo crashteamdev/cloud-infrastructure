@@ -1,4 +1,6 @@
 # -*- mode: yaml -*-
+nameOverride: "wiki-marketdb"
+
 replicaCount: 1
 
 nodeSelector:
@@ -53,7 +55,7 @@ postgresql:
   postgresqlHost: {{ .Values.services.postgres.endpoint }}
   postgresqlPort: 6432
   ssl: true
-  ca: ca.pem
+  ca: ./ca.pem
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
 {{ $ingressDomain := .Values.services.ingress.rootDomain }}
