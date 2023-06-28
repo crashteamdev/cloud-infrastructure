@@ -54,11 +54,11 @@ postgresql:
 {{/*  postgresqlUser: {{ .Values.services.postgres.uniUser }}*/}}
 {{/*  postgresqlHost: {{ .Values.services.postgres.endpoint }}*/}}
 {{/*  postgresqlPort: 6432*/}}
-  ssl: true
+{{/*  ssl: true*/}}
 {{/*  ca: /opt/ca.pem*/}}
 
 externalPostgresql:
-  databaseURL: postgresql://{{ .Values.services.postgres.endpoint }}:6432/mdb-wiki
+  databaseURL: postgresql://{{ .Values.services.postgres.endpoint }}:6432/mdb-wiki?ssl=true
   NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
