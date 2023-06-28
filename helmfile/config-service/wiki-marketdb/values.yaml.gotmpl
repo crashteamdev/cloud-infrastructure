@@ -48,18 +48,18 @@ startupProbe:
     path: /healthz
     port: http
 
-postgresql:
-  enabled: false
-  postgresqlDatabase: mdb-wiki
-  postgresqlUser: {{ .Values.services.postgres.uniUser }}
-  postgresqlHost: {{ .Values.services.postgres.endpoint }}
-  postgresqlPort: 6432
-  ssl: true
-  ca: /opt/ca.pem
+{{/*postgresql:*/}}
+{{/*  enabled: false*/}}
+{{/*  postgresqlDatabase: mdb-wiki*/}}
+{{/*  postgresqlUser: {{ .Values.services.postgres.uniUser }}*/}}
+{{/*  postgresqlHost: {{ .Values.services.postgres.endpoint }}*/}}
+{{/*  postgresqlPort: 6432*/}}
+{{/*  ssl: true*/}}
+{{/*  ca: /opt/ca.pem*/}}
 
-sideload:
-  externalPostgresql:
-    NODE_TLS_REJECT_UNAUTHORIZED: "0"
+externalPostgresql:
+  databaseURL: postgresql://{{ .Values.services.postgres.endpoint }}:6432/mdb-wiki?ssl=false
+  NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
 {{ $ingressDomain := .Values.services.ingress.rootDomain }}
