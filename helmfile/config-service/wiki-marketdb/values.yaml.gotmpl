@@ -14,16 +14,13 @@ resources:
   requests:
     memory: 64Mi
 
-env:
-  - name: DB_PASS
-    value: {{ .Values.services.postgres.uniPassword }}
-
 postgresql:
   enabled: false
   postgresqlDatabase: mdb-wiki
   postgresqlUser: {{ .Values.services.postgres.uniUser }}
   postgresqlHost: {{ .Values.services.postgres.endpoint }}
   postgresqlPort: 6432
+  ssl: true
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
 {{ $ingressDomain := .Values.services.ingress.rootDomain }}
