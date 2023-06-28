@@ -10,10 +10,11 @@ service:
     - name: http
       port: 80
 
-configMap:
-  data:
-    ca.pem: |
-      {{- tpl (readFile "ca.pem") . | nindent 6 }}
+volumes:
+  - name: config-volume
+    configMap:
+      name: yc-ca
+      defaultMode: 0755
 
 volumeMounts:
   - name: config-volume
@@ -21,14 +22,29 @@ volumeMounts:
     subPath: ca.pem
     readOnly: true
 
-volumes:
-  - name: config-volume
-    configMap:
-      name: {{ .Release.Name }}
-
 resources:
   requests:
     memory: 64Mi
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+
+startupProbe:
+  initialDelaySeconds: 15
+  periodSeconds: 5
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 60
+  httpGet:
+    path: /healthz
+    port: http
 
 postgresql:
   enabled: false
