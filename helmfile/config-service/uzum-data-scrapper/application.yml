@@ -54,7 +54,7 @@ app:
     cron:
       product-job: 0 0 0,19 ? * * *
       position-job: 0 0 7 ? * * *
-      category-job: 0 15 17 ? * * *
+      category-job: 0 38 17 ? * * *
   integration:
     uzum:
       token: Basic YjJjLWZyb250OmNsaWVudFNlY3JldA==
