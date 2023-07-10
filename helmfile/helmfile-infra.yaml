@@ -47,7 +47,7 @@ releases:
   namespace: monitoring
   disableValidation: true
   needs:
-    - {{ .Namespace | default "default" }}/prometheus
-    - {{ .Namespace | default "default" }}/certmanager
+    - prometheus
+    - certmanager
   version: 2.9.10
 {{- end }}
