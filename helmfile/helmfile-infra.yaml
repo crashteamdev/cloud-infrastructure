@@ -46,8 +46,8 @@ releases:
   chart: grafana/loki-stack
   namespace: monitoring
   disableValidation: true
-  needs:
-    - prometheus
-    - certmanager
+#  needs:
+#    - {{ .Namespace | default "default" }}/prometheus
+#    - {{ .Namespace | default "default" }}/certmanager
   version: 2.9.10
 {{- end }}
