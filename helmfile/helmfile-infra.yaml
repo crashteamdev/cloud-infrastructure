@@ -32,7 +32,7 @@ releases:
   <<: *infra_default
   namespace: cert-manager
   chart: certmanager/cert-manager
-  version: v1.11.0
+  version: v1.12.2
 {{- end }}
 {{- if eq .Values.prometheus.enabled true }}
 - name: prometheus
@@ -46,8 +46,8 @@ releases:
   chart: grafana/loki-stack
   namespace: monitoring
   disableValidation: true
-  needs:
-    - {{ .Namespace | default "default" }}/prometheus
-    - {{ .Namespace | default "default" }}/certmanager
+#  needs:
+#    - {{ .Namespace | default "default" }}/prometheus
+#    - {{ .Namespace | default "default" }}/certmanager
   version: 2.9.10
 {{- end }}
