@@ -13,6 +13,8 @@ spec:
     - selector:
         dnsZones:
         - 'crashteam.dev'
+        - 'marketdb.ru'
+        - 'marketdb.org'
       dns01:
         cloudflare:
           email: vitaxa93gamebox@gmail.com
