@@ -36,6 +36,8 @@ releases:
     <<: *generic_stateless
   - name: uzum-data-scrapper
     <<: *generic_stateless
+  - name: space-dashboard
+    <<: *generic_stateless
   - name: wiki-marketdb
     <<: *default
     chart: requarks/wiki
