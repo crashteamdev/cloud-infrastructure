@@ -50,4 +50,3 @@ app:
     timeout: 10000
     proxy-line:
       url: https://panel.proxyline.net/api/
-      api-key: {{ .Values.services.proxy.proxyLineApiKey }}
