@@ -22,6 +22,27 @@ service:
     - name: http
       port: 80
 
+env:
+  - name: REACT_APP_FIREBASE_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: firebase_api_key
+  - name: REACT_APP_FIREBASE_AUTH_DOMAIN
+    value: marketdb-gloom.firebaseapp.com
+  - name: REACT_APP_FIREBASE_PROJECT_ID
+    value: marketdb-gloom
+  - name: REACT_APP_FIREBASE_STORAGE_BUCKET
+    value: marketdb-gloom.appspot.com
+  - name: REACT_APP_FIREBASE_MESSAGING_SENDER_ID
+    value: 90378873227
+  - name: REACT_APP_FIREBASE_APP_ID
+    value: 1:90378873227:web:43aa0130f00cdf0bb5678e
+  - name: REACT_APP_FIREBASE_MEASUREMENT_ID
+    value: G-QWFEV7P5QS
+  - name: API
+    value: https://api.marketdb.org/v1/
+
 configMap:
   data:
     appConfig.json: |
@@ -44,18 +65,11 @@ volumeMounts:
     mountPath: /etc/nginx/conf.d/10_json_logs.conf
     subPath: 10_json_logs.conf
     readOnly: true
-  - name: nodejs-env-file
-    mountPath: .env
-    subPath: .env
-    readOnly: true
 
 volumes:
   - name: config-volume
     configMap:
       name: {{ .Release.Name }}
-  - name: nodejs-env-file
-    secret:
-      secretName: {{ .Release.Name }}
 
 livenessProbe:
   httpGet:
