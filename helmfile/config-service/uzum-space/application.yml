@@ -10,10 +10,6 @@ logging:
   level:
     "liquibase": INFO
     org.apache.http: INFO
-#    dev.crashteam.repricer.service: DEBUG
-#    dev.crashteam.repricer.price: DEBUG
-#    org.jooq.tools.LoggerListener: INFO
-#    dev.crashteam.repricer.client.ke: DEBUG
 
 spring:
   application:
@@ -41,10 +37,6 @@ management:
     web:
       exposure:
         include: health,info,prometheus
-
-proxies:
-  proxyline:
-    apiKey: {{ .Values.services.proxy.proxyLineApiKey }}
 
 service:
   proxy:

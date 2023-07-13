@@ -18,6 +18,8 @@ releases:
     <<: *generic_stateless
   - name: ke-space
     <<: *generic_stateless
+  - name: uzum-space
+    <<: *generic_stateless
   - name: styx
     <<: *generic_stateless
   - name: uzum-analytics
@@ -33,6 +35,8 @@ releases:
   - name: uzum-panel
     <<: *generic_stateless
   - name: uzum-data-scrapper
+    <<: *generic_stateless
+  - name: space-dashboard
     <<: *generic_stateless
   - name: wiki-marketdb
     <<: *default
