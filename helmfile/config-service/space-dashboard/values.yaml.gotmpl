@@ -24,10 +24,11 @@ service:
 
 env:
   - name: REACT_APP_FIREBASE_API_KEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: firebase_api_key
+    value: {{ .Values.services.firebase.apikey }}
+{{/*    valueFrom:*/}}
+{{/*      secretKeyRef:*/}}
+{{/*        name: {{ .Release.Name }}*/}}
+{{/*        key: firebase_api_key*/}}
   - name: REACT_APP_FIREBASE_AUTH_DOMAIN
     value: marketdb-gloom.firebaseapp.com
   - name: REACT_APP_FIREBASE_PROJECT_ID
