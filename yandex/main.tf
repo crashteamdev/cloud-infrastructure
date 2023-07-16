@@ -470,9 +470,9 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
 
   clickhouse {
     resources {
-      resource_preset_id = "b3-c1-m4"
+      resource_preset_id = "s3-c2-m8"
       disk_type_id       = "network-ssd"
-      disk_size          = 10
+      disk_size          = 50
     }
   }
 
