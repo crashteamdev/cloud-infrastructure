@@ -8,6 +8,7 @@ mongo_dbs = [
   "uzum",
 ]
 clickhouse_dbs = [
-  "uzum"
+  "uzum",
+  "kazanex"
 ]
 db_password = "Str0ngPasswd"
