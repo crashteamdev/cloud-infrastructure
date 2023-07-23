@@ -2,6 +2,8 @@
 
 server:
   port: {{ .Values.services.global.java.apiPort }}
+  servlet:
+    context-path: /space
 
 logback:
   appender: JSON_K8S_CONSOLE
