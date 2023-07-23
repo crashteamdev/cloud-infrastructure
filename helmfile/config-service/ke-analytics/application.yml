@@ -66,3 +66,6 @@ redis:
       streamName: ke-category-stream
       consumerGroup: ke-analytics-category-group
       consumerName: ke-analytics-category-consumer
+
+clickhouse:
+  ssl: true
