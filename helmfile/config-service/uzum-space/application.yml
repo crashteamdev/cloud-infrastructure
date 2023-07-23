@@ -16,6 +16,8 @@ logging:
 spring:
   application:
     name: {{ $applicationName }}
+  webflux:
+    base-path: /space
 
 management:
   server:
