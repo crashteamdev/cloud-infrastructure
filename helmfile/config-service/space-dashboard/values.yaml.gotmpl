@@ -90,8 +90,7 @@ ingress:
   hosts:
     - host: "space.marketdb.org"
       paths:
-        - /(.*)
-        - /static
+        - /dashboard(/|$)(.*)
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
