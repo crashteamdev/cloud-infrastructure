@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-24f97fb
+  tag: sha-0273351
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -90,8 +90,7 @@ ingress:
   hosts:
     - host: "space.marketdb.org"
       paths:
-        - /dashboard
-        - /reprice
+        - /reprice/?(.*)
         - /?(.*)
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
