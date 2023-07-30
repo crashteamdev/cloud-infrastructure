@@ -90,7 +90,7 @@ ingress:
   hosts:
     - host: "space.marketdb.org"
       paths:
-        - /reprice/?(.*)
+        - /reprice(/|$)(.*)
         - /?(.*)
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
