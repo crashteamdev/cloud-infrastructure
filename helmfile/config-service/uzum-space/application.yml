@@ -11,7 +11,7 @@ logback:
 logging:
   level:
     "liquibase": INFO
-    org.apache.http: INFO
+    org.apache.http: DEBUG
 
 spring:
   application:
