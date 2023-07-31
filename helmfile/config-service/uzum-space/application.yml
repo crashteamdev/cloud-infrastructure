@@ -11,7 +11,8 @@ logback:
 logging:
   level:
     "liquibase": INFO
-    org.apache.http: DEBUG
+    org.apache.http: INFO
+    dev.crashteam.uzumspace.client.uzum: DEBUG
 
 spring:
   application:
