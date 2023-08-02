@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/test-nextjs
-  tag: sha-27773fe
+  tag: sha-9b931d8
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -52,13 +52,13 @@ volumes:
 
 livenessProbe:
   httpGet:
-    path: /appConfig.json
+    path: /api/healthcheck
     port: http
   initialDelaySeconds: 30
   timeoutSeconds: 3
 readinessProbe:
   httpGet:
-    path: /appConfig.json
+    path: /api/healthcheck
     port: http
   initialDelaySeconds: 30
   timeoutSeconds: 3
