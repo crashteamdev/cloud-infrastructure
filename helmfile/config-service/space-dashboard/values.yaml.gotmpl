@@ -7,8 +7,8 @@ nodeSelector:
   ingress: "true"
 
 image:
-  repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-c837f1b
+  repository: ghcr.io/crashteamdev/test-nextjs
+  tag: sha-27773fe
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -84,13 +84,13 @@ ingress:
 {{/*    nginx.ingress.kubernetes.io/configuration-snippet: |*/}}
 {{/*      try_files $uri $uri/ $uri/index.html /index.html;*/}}
 {{/*    nginx.ingress.kubernetes.io/add-base-url: "true"*/}}
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
     - host: "space.marketdb.org"
       paths:
-        - /
+        - /?(.*)
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
