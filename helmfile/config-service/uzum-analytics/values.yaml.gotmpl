@@ -144,6 +144,8 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+    nginx.ingress.kubernetes.io/limit-rpm: "150"
   hosts:
     - host: "api.marketdb.org"
       paths:
