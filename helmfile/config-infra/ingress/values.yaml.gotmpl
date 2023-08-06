@@ -38,5 +38,5 @@ controller:
       "http_x-request-id": "$http_x_request_id", "http_referrer": "$http_referer", "http_user_agent": "$http_user_agent",
       "http_x-forwarded-for": "$http_x_forwarded_for"}'
     limit-req-status-code: "429"
-    # use-proxy-protocol: "true"
-    # real-ip-header: "proxy_protocol"
+    use-proxy-protocol: "true"
+    real-ip-header: "proxy_protocol"
