@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-d792ba4
+  tag: sha-70ffc62
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -53,6 +53,21 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: ke_youkassa_key
+  - name: FREEKASSA_APIKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: ke_freekassa_apikey
+  - name: FREEKASSA_SECRETWORDFIRST
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: ke_freekassa_secretwordfirst
+  - name: FREEKASSA_SECRETWORDSECOND
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: ke_freekassa_secretwordsecond
 
 configMap:
   data:
