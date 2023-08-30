@@ -51,6 +51,10 @@ freekassa:
 qiwi:
   siteId: d9jje0-00
 
+uzumbank:
+  ssl:
+    key-store: classpath:uzum-bank.jks
+
 uzum:
   scheduleEnabled: true
   groupCron: '0 0 0/6 * * ?'
