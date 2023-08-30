@@ -53,7 +53,7 @@ qiwi:
 
 uzumbank:
   ssl:
-    key-store: classpath:uzum-bank.jks
+    key-store: classpath:cert/uzum-bank.jks
 
 uzum:
   scheduleEnabled: true
