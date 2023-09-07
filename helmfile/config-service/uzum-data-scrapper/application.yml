@@ -52,8 +52,8 @@ management:
 app:
   job:
     cron:
-      product-job: 0 0 0,8 ? * * *
-      position-job: 0 0 7 ? * * *
+      product-job: 0 0 0,18 ? * * *
+      position-job: 0 0 12 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
     uzum:
