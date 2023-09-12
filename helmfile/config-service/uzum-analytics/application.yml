@@ -64,3 +64,7 @@ uzum:
 
 clickhouse:
   ssl: true
+
+logging:
+  level:
+    org.apache.http: DEBUG
