@@ -52,6 +52,7 @@ qiwi:
   siteId: d9jje0-00
 
 uzumbank:
+  baseUrl: https://checkout-api.ipt-merch.com
   ssl:
     key-store: classpath:cert/uzum-bank.jks
 
