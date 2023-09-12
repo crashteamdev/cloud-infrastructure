@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-e473443
+  tag: sha-3be7822
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -78,6 +78,31 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: uzum_currency_apikey
+  - name: UZUMBANK_TERMINALID
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: uzum_bank_terminal_id
+  - name: UZUMBANK_FINGERPRINT
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: uzum_bank_fingerprint
+  - name: UZUMBANK_SSL_CERTPASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: uzum_bank_certpassword
+  - name: UZUMBANK_SSL_KEYSTOREPASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: uzum_bank_keystorepassword
+  - name: UZUMBANK_SSL_KEYPASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: uzum_bank_keypassword
 
 configMap:
   data:
