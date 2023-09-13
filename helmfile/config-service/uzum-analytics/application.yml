@@ -67,4 +67,4 @@ clickhouse:
 
 logging:
   level:
-    org.apache.http: DEBUG
+    org.apache.http: 
