@@ -19,7 +19,7 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 31
+            threadCount: 32
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
             misfireThreshold: 60000
@@ -52,7 +52,7 @@ management:
 app:
   job:
     cron:
-      product-job: 0 0 9,19 ? * * *
+      product-job: 0 0 0,19 ? * * *
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
