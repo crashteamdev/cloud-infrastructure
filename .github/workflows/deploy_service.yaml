@@ -43,6 +43,7 @@ jobs:
           --state-values-set services.proxy.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
           --state-values-set services.clickhouse.host=${{secrets.CLICKHOUSE_HOST}}
           --state-values-set services.clickhouse.password=${{secrets.CLICKHOUSE_PASSWORD}}
+          --state-values-set services.firebase.apikey=${{secrets.FIREBASE_API_KEY}}
           EOF
           )
           echo "values_set_list<<EOF" >> $GITHUB_ENV
