@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-cc9c6ce
+  tag: sha-0617c53
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -73,7 +73,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 512Mi
+    memory: 712Mi
   requests:
     memory: 256Mi
 
