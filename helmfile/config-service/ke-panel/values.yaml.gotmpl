@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-273329b
+  tag: sha-5de976c
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
