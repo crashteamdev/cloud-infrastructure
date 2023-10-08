@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "s3" {
-    endpoint = "http://storage.yandexcloud.net"
+    endpoint = "https://storage.yandexcloud.net"
     bucket   = "marketdb-tf-state"
     region   = "ru-central1"
     key      = "marketdb-tf.tfstate"
