@@ -414,7 +414,7 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
   }
 }
 
-resource "yandex_mdb_redis_cluster" "redis_database" {
+resource "yandex_nmdb_redis_cluster" "redis_database" {
   name        = "redis_mdb"
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
