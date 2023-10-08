@@ -474,7 +474,7 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
   }
 
   resources {
-    resource_preset_id = "m3-c2-m16"
+    resource_preset_id = "s3-c2-m8"
     disk_type_id       = "network-ssd"
     disk_size          = 250
   }
