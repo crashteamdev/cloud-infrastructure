@@ -19,7 +19,7 @@ spring:
     ssl: true
   quartz:
     properties:
-      org.quartz.threadPool.threadCount: 60
+      org.quartz.threadPool.threadCount: 30
 
 management:
   server:
