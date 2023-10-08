@@ -384,36 +384,6 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
   }
 }
 
-resource "yandex_mdb_redis_cluster" "redis_database" {
-  name        = "redis_prod"
-  environment = "PRODUCTION"
-  network_id  = yandex_vpc_network.network-1.id
-  folder_id   = var.yc_folder_id
-  tls_enabled = true
-
-  config {
-    password = var.db_password
-    version  = "7.0"
-  }
-
-  resources {
-    resource_preset_id = "hm1.nano"
-    disk_size          = 16
-  }
-
-  host {
-    zone      = var.yc_region
-    subnet_id = yandex_vpc_subnet.redis-a.id
-    assign_public_ip = true
-  }
-
-  maintenance_window {
-    day  = "SUN"
-    hour = 2
-    type = "WEEKLY"
-  }
-}
-
 resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   name        = "redis_mdb"
   environment = "PRODUCTION"
