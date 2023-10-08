@@ -427,7 +427,7 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   }
 
   resources {
-    resource_preset_id = "ru-central1-b"
+    resource_preset_id = "b3-c1-m4"
     disk_size          = 16
   }
 
