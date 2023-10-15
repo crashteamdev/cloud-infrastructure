@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-584e311
+  tag: sha-93ed77b
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,6 +21,11 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: JDK_JAVA_OPTIONS
+    value: >-
+      -Xms256M -Xss256k -XX:+UnlockDiagnosticVMOptions -XX:+UseContainerSupport -XX:+HeapDumpOnOutOfMemoryError
+      -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
+      -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MaxRAMFraction=2
   - name: CLICKHOUSE_HOST
     value: {{ .Values.services.clickhouse.host }}
   - name: CLICKHOUSE_PASSWORD

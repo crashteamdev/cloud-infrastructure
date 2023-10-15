@@ -6,6 +6,10 @@ server:
 logback:
   appender: JSON_K8S_CONSOLE
 
+logging:
+  level:
+    dev.crashteam.uzumanalytics.service: DEBUG
+
 spring:
   application:
     name: {{ $applicationName }}
@@ -15,7 +19,7 @@ spring:
     ssl: true
   quartz:
     properties:
-      org.quartz.threadPool.threadCount: 60
+      org.quartz.threadPool.threadCount: 30
 
 management:
   server:

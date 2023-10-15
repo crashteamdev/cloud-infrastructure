@@ -384,8 +384,8 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
   }
 }
 
-resource "yandex_mdb_redis_cluster" "redis_database" {
-  name        = "redis_prod"
+resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
+  name        = "redis_mdb"
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
   folder_id   = var.yc_folder_id
@@ -393,11 +393,11 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
 
   config {
     password = var.db_password
-    version  = "7.0"
+    version  = "7.2"
   }
 
   resources {
-    resource_preset_id = "hm1.nano"
+    resource_preset_id = "b3-c1-m4"
     disk_size          = 16
   }
 
@@ -413,6 +413,7 @@ resource "yandex_mdb_redis_cluster" "redis_database" {
     type = "WEEKLY"
   }
 }
+
 
 resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
   name        = "marketdb"
@@ -443,7 +444,7 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
   }
 
   resources {
-    resource_preset_id = "m3-c2-m16"
+    resource_preset_id = "s3-c2-m8"
     disk_type_id       = "network-ssd"
     disk_size          = 250
   }
@@ -465,7 +466,7 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   name               = "marketdb-clickhouse"
   environment        = "PRODUCTION"
   network_id         = yandex_vpc_network.network-1.id
-  version = "23.6"
+  version = "23.8"
 #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
 
   clickhouse {
