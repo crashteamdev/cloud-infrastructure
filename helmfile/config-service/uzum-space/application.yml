@@ -51,5 +51,5 @@ repricer:
   productCron: 0 0 0/3 * * ?
   accountUpdateDataCron: 0 0 0/1 * * ?
   priceChangeCron: 0 0/15 * * * ?
-  paymentCron: 0/10 * * * * ?
+  paymentCron: 0/15 * * * * ?
   accountInitializeCron: 0/20 * * * * ?
