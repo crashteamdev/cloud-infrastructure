@@ -19,7 +19,7 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 30
+            threadCount: 32
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
             misfireThreshold: 60000
@@ -66,3 +66,8 @@ app:
     position:
       maxlen: 100000
       waitPending: 50000
+  aws-stream:
+    endpoint: 'yds.serverless.yandexcloud.net'
+    region: ru-central-1
+    uzum-stream:
+      name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/uzum-stream'

@@ -51,7 +51,7 @@ kazanex:
 
 redis:
   stream:
-    max-batch-size: 400
+    max-batch-size: 500
     batch-buffer-duration-ms: 400
     batch-parallel-count: 5
     ke-product-info:
