@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-93ed77b
+  tag: sha-b0e181a
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -118,6 +118,8 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: uzum_aws_stream_secret_key
+  - name: AWS_CBOR_DISABLE
+    value: 1
 
 configMap:
   data:
