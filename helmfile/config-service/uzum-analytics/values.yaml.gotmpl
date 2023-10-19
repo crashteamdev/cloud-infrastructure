@@ -183,6 +183,9 @@ ingress:
     - host: "uzum-api.marketdb.ru"
       paths:
         - /
+    - host: "uzum-api.marketdb.pro"
+      paths:
+        - /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -193,6 +196,7 @@ ingress:
       hosts:
         - "api.marketdb.org"
         - "uzum-api.marketdb.ru"
+        - "uzum-api.marketdb.pro"
 {{- end }}
   servicePort: {{ .Values.services.global.java.apiPort }}
 
