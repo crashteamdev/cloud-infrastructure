@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xms256M -Xss256k -XX:+UnlockDiagnosticVMOptions -XX:+UseContainerSupport -XX:+HeapDumpOnOutOfMemoryError
+      -Xms256M -Xmx1024M -Xss256k -XX:+UnlockDiagnosticVMOptions -XX:+UseContainerSupport -XX:+HeapDumpOnOutOfMemoryError
       -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
       -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MaxRAMFraction=2
   - name: CLICKHOUSE_HOST
@@ -145,6 +145,9 @@ ingress:
     - host: api.{{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
+    - host: "ke-api.marketdb.pro"
+      paths:
+        - /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -154,6 +157,7 @@ ingress:
   {{- end }}
       hosts:
         - api.{{ $ingressDomain | default "crashteam.dev" }}
+        - "ke-api.marketdb.pro"
 {{- end }}
   servicePort: {{ .Values.services.global.java.apiPort }}
 

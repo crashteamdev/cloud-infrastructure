@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xms256M -Xss256k -XX:+UnlockDiagnosticVMOptions -XX:+UseContainerSupport -XX:+HeapDumpOnOutOfMemoryError
+      -Xms256M -Xmx1024M -Xss256k -XX:+UnlockDiagnosticVMOptions -XX:+UseContainerSupport -XX:+HeapDumpOnOutOfMemoryError
       -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
       -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MaxRAMFraction=2
       -Dcom.amazonaws.sdk.disableCertChecking
@@ -158,7 +158,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 4024Mi
+    memory: 2024Mi
   requests:
     memory: 512Mi
 
@@ -196,6 +196,9 @@ ingress:
     - host: "uzum-api.marketdb.ru"
       paths:
         - /
+    - host: "uzum-api.marketdb.pro"
+      paths:
+        - /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -206,6 +209,7 @@ ingress:
       hosts:
         - "api.marketdb.org"
         - "uzum-api.marketdb.ru"
+        - "uzum-api.marketdb.pro"
 {{- end }}
   servicePort: {{ .Values.services.global.java.apiPort }}
 
