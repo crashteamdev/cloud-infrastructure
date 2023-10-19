@@ -145,6 +145,9 @@ ingress:
     - host: api.{{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
+    - host: "ke-api.marketdb.pro"
+      paths:
+        - /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -154,6 +157,7 @@ ingress:
   {{- end }}
       hosts:
         - api.{{ $ingressDomain | default "crashteam.dev" }}
+        - "ke-api.marketdb.pro"
 {{- end }}
   servicePort: {{ .Values.services.global.java.apiPort }}
 
