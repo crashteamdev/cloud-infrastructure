@@ -60,6 +60,10 @@ uzum:
   groupCron: '0 0 0/6 * * ?'
   productCron: '0 0 0 * * ?'
   pendingMessageCron: '0 0/10 * * * ?'
+  apiLimit:
+    maxIp: 4
+    maxBrowser: 3
+    blockRemoveHour: 2
 
 clickhouse:
   ssl: true
