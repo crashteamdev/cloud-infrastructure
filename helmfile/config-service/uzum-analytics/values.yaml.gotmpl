@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1670M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=111093K
+      -Xmx1670M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=221M
       -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
       -XX:+UseParallelGC
       -Dcom.amazonaws.sdk.disableCertChecking
@@ -158,7 +158,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 2024Mi
+    memory: 2124Mi
   requests:
     memory: 512Mi
 
