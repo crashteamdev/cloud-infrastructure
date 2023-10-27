@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx256M -Xss256k
+      -Xmx122M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=111093K
   - name: SPRING_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_REDIS_PASSWORD
