@@ -250,7 +250,7 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
 resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name = "mdb-service-spot"
-  version = "1.24"
+  version = "1.23"
   node_labels = {
     mdb-service = "true"
   }
