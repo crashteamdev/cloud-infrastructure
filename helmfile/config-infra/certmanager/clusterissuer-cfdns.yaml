@@ -18,6 +18,8 @@ spec:
         - '*.marketdb.org'
         - 'marketdb.ru'
         - '*.marketdb.ru'
+        - 'marketdb.pro'
+        - '*.marketdb.pro'
       dns01:
         cloudflare:
           email: vitaxa93gamebox@gmail.com
