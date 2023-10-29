@@ -201,7 +201,7 @@ resource "yandex_compute_instance_group" "mdb-service-spot-group" {
   service_account_id  = yandex_iam_service_account.marketdb-tf.id
   deletion_protection = true
   instance_template {
-    platform_id = "standard-v1"
+    platform_id = "standard-v2"
     resources {
       memory = 12
       cores  = 4
@@ -214,6 +214,7 @@ resource "yandex_compute_instance_group" "mdb-service-spot-group" {
       }
     }
     network_interface {
+      nat        = true
       network_id = yandex_vpc_network.network-1.id
       subnet_ids = [yandex_vpc_subnet.subnet-service.id]
     }
@@ -253,6 +254,29 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   instance_group_id = yandex_compute_instance_group.mdb-service-spot-group.id
   node_labels = {
     mdb-service = "true"
+  }
+  instance_template {
+    platform_id = "standard-v2"
+
+    network_interface {
+      nat        = true
+      network_id = yandex_vpc_network.network-1.id
+      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+    }
+
+    resources {
+      memory = 12
+      cores  = 4
+    }
+
+    boot_disk {
+      type = "network-hdd"
+      size = 50
+    }
+
+    scheduling_policy {
+      preemptible = true
+    }
   }
   scale_policy {
     auto_scale {
