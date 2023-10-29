@@ -3,7 +3,7 @@
 replicaCount: 1
 
 nodeSelector:
-  microservices: "true"
+  mdb-service: "true"
 
 podAnnotations:
   prometheus.io/path: "/actuator/prometheus"
@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-9daeab7
+  tag: sha-f9b08de
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -23,9 +23,10 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xms256M -Xmx1024M -Xss256k -XX:+UnlockDiagnosticVMOptions -XX:+UseContainerSupport -XX:+HeapDumpOnOutOfMemoryError
-      -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
-      -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MaxRAMFraction=2
+      -Xmx1570M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=221M
+      -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
+      -XX:+UseParallelGC
+      -Dcom.amazonaws.sdk.disableCertChecking
   - name: CLICKHOUSE_HOST
     value: {{ .Values.services.clickhouse.host }}
   - name: CLICKHOUSE_PASSWORD
@@ -111,8 +112,6 @@ readinessProbe:
 resources:
   limits:
     memory: 2024Mi
-  requests:
-    memory: 512Mi
 
 metrics:
   serviceMonitor:
