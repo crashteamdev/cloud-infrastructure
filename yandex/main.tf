@@ -195,58 +195,6 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
   }
 }
 
-#resource "yandex_compute_instance_group" "mdb-service-spot-group" {
-#  name                = "mdb-service-instance-group"
-#  folder_id           = var.yc_folder_id
-#  service_account_id  = yandex_iam_service_account.marketdb-tf.id
-#  deletion_protection = true
-#  instance_template {
-#    platform_id = "standard-v2"
-#    resources {
-#      memory = 12
-#      cores  = 4
-#    }
-#    boot_disk {
-#      mode = "READ_WRITE"
-#      initialize_params {
-#        image_id = var.yc_debian_image_id
-#        size     = 50
-#      }
-#    }
-#    network_interface {
-#      nat        = true
-#      network_id = yandex_vpc_network.network-1.id
-#      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
-#    }
-#    labels = {
-#      mdb-service = "true"
-#    }
-#    network_settings {
-#      type = "STANDARD"
-#    }
-#    scheduling_policy {
-#      preemptible = true
-#    }
-#  }
-#
-#  scale_policy {
-#    fixed_scale {
-#      size = 2
-#    }
-#  }
-#
-#  allocation_policy {
-#    zones = ["ru-central1-a", "ru-central1-b"]
-#  }
-#
-#  deploy_policy {
-#    max_unavailable = 1
-#    max_creating    = 1
-#    max_expansion   = 1
-#    max_deleting    = 1
-#  }
-#}
-
 resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name = "mdb-service-spot"
@@ -297,68 +245,68 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
 }
 
-resource "yandex_kubernetes_node_group" "mdb-scalable" {
-  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name       = "mdb-service"
-  version    = "1.23"
-
-  instance_template {
-    platform_id = "standard-v2"
-
-    network_interface {
-      nat        = true
-      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
-    }
-
-    resources {
-      memory = 8
-      cores  = 4
-    }
-
-    boot_disk {
-      type = "network-hdd"
-      size = 70
-    }
-  }
-
-  scale_policy {
-    fixed_scale {
-      size = 1
-    }
-#    auto_scale {
-#      min     = 1
-#      max     = 2
-#      initial = 1
+#resource "yandex_kubernetes_node_group" "mdb-scalable" {
+#  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
+#  name       = "mdb-service"
+#  version    = "1.23"
+#
+#  instance_template {
+#    platform_id = "standard-v2"
+#
+#    network_interface {
+#      nat        = true
+#      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
 #    }
-  }
-
-  node_labels = {
-    microservices = "true"
-  }
-
-  allocation_policy {
-    location {
-      zone = var.yc_region
-    }
-  }
-
-  maintenance_policy {
-    auto_upgrade = true
-    auto_repair  = true
-
-    maintenance_window {
-      day        = "monday"
-      start_time = "15:00"
-      duration   = "3h"
-    }
-
-    maintenance_window {
-      day        = "friday"
-      start_time = "10:00"
-      duration   = "4h30m"
-    }
-  }
-}
+#
+#    resources {
+#      memory = 8
+#      cores  = 4
+#    }
+#
+#    boot_disk {
+#      type = "network-hdd"
+#      size = 70
+#    }
+#  }
+#
+#  scale_policy {
+#    fixed_scale {
+#      size = 1
+#    }
+##    auto_scale {
+##      min     = 1
+##      max     = 2
+##      initial = 1
+##    }
+#  }
+#
+#  node_labels = {
+#    microservices = "true"
+#  }
+#
+#  allocation_policy {
+#    location {
+#      zone = var.yc_region
+#    }
+#  }
+#
+#  maintenance_policy {
+#    auto_upgrade = true
+#    auto_repair  = true
+#
+#    maintenance_window {
+#      day        = "monday"
+#      start_time = "15:00"
+#      duration   = "3h"
+#    }
+#
+#    maintenance_window {
+#      day        = "friday"
+#      start_time = "10:00"
+#      duration   = "4h30m"
+#    }
+#  }
+#}
 
 resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
