@@ -254,6 +254,13 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   node_labels = {
     mdb-service = "true"
   }
+  scale_policy {
+    auto_scale {
+      min     = 1
+      max     = 2
+      initial = 1
+    }
+  }
 }
 
 resource "yandex_kubernetes_node_group" "mdb-scalable" {
