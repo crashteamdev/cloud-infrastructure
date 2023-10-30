@@ -23,6 +23,11 @@ variable "cluster_name" {
   type    = string
 }
 
+variable "yc_debian_image_id" {
+  default = "fd8987mnac4uroc0d16s"
+  type = string
+}
+
 variable "pg_dbs" {
   description = ""
 }

@@ -3,7 +3,7 @@
 replicaCount: 1
 
 nodeSelector:
-  microservices: "true"
+  mdb-service: "true"
 
 podAnnotations:
   prometheus.io/path: "/actuator/prometheus"
@@ -21,6 +21,9 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: JDK_JAVA_OPTIONS
+    value: >-
+      -Xmx645M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=111M
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/space?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
@@ -78,7 +81,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 512Mi
+    memory: 1024Mi
   requests:
     memory: 512Mi
 

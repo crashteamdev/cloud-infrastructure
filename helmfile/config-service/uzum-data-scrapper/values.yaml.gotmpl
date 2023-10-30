@@ -3,7 +3,7 @@
 replicaCount: 1
 
 nodeSelector:
-  microservices: "true"
+  mdb-service: "true"
 
 podAnnotations:
   prometheus.io/path: "/actuator/prometheus"
@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-547c695
+  tag: sha-f913c43
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,10 +21,24 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: JDK_JAVA_OPTIONS
+    value: >-
+      -Xmx326M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=111M
   - name: SPRING_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
+  - name: APP_AWS-STREAM_ACCESSKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: aws_stream_access_key
+  - name: APP_AWS-STREAM_SECRETKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: aws_stream_secret_key
+
 
 configMap:
   data:
@@ -62,9 +76,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 512Mi
-  requests:
-    memory: 256Mi
+    memory: 712Mi
 
 metrics:
   serviceMonitor:
