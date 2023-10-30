@@ -245,69 +245,6 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
 }
 
-#resource "yandex_kubernetes_node_group" "mdb-scalable" {
-#  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-#  name       = "mdb-service"
-#  version    = "1.23"
-#
-#  instance_template {
-#    platform_id = "standard-v2"
-#
-#    network_interface {
-#      nat        = true
-#      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
-#    }
-#
-#    resources {
-#      memory = 8
-#      cores  = 4
-#    }
-#
-#    boot_disk {
-#      type = "network-hdd"
-#      size = 70
-#    }
-#  }
-#
-#  scale_policy {
-#    fixed_scale {
-#      size = 1
-#    }
-##    auto_scale {
-##      min     = 1
-##      max     = 2
-##      initial = 1
-##    }
-#  }
-#
-#  node_labels = {
-#    microservices = "true"
-#  }
-#
-#  allocation_policy {
-#    location {
-#      zone = var.yc_region
-#    }
-#  }
-#
-#  maintenance_policy {
-#    auto_upgrade = true
-#    auto_repair  = true
-#
-#    maintenance_window {
-#      day        = "monday"
-#      start_time = "15:00"
-#      duration   = "3h"
-#    }
-#
-#    maintenance_window {
-#      day        = "friday"
-#      start_time = "10:00"
-#      duration   = "4h30m"
-#    }
-#  }
-#}
-
 resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name       = "mdb-sup-service"
@@ -489,6 +426,18 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
       content {
         database_name = permission.value
         roles = ["readWrite"]
+      }
+    }
+  }
+
+  user {
+    name     = "support"
+    password = var.db_password
+    dynamic "permission" {
+      for_each = var.mongo_dbs
+      content {
+        database_name = permission.value
+        roles = ["read"]
       }
     }
   }
