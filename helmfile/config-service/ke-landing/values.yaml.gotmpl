@@ -88,6 +88,9 @@ ingress:
     - host: {{ $ingressDomain | default "crashteam.dev" }}
       paths:
         - /
+    - host: "marketdb.pro"
+      paths:
+        - /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -97,5 +100,6 @@ ingress:
   {{- end }}
       hosts:
         - {{ $ingressDomain | default "crashteam.dev" }}
+        - "marketdb.pro"
 {{- end }}
   servicePort: 80
