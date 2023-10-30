@@ -42,7 +42,7 @@ env:
         name: {{ .Release.Name }}
         key: ninja_api_key
   - name: SPRING_DATASOURCE_URL
-    value: {{ .Values.services.postgres.url }}
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/space?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.username }}
   - name: SPRING_DATASOURCE_PASSWORD
