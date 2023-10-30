@@ -42,11 +42,11 @@ env:
         name: {{ .Release.Name }}
         key: ninja_api_key
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/space?sslmode=require
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/charon?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
-    value: {{ .Values.services.postgres.username }}
+    value: {{ .Values.services.postgres.uniUser }}
   - name: SPRING_DATASOURCE_PASSWORD
-    value: {{ .Values.services.postgres.password }}
+    value: {{ .Values.services.postgres.uniPassword }}
   - name: APP_AWS-STREAM_ACCESSKEY
     valueFrom:
       secretKeyRef:
