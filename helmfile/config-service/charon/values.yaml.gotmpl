@@ -1,0 +1,120 @@
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 1
+
+nodeSelector:
+  microservices: "true"
+
+podAnnotations:
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "{{ .Values.services.global.java.managementPort }}"
+  prometheus.io/scrape: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: sha-62ce493
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+env:
+  - name: FREEKASSA_APIKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_freekassa_apikey
+  - name: FREEKASSA_SECRETWORDFIRST
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_freekassa_secretwordfirst
+  - name: FREEKASSA_SECRETWORDSECOND
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_freekassa_secretwordsecond
+  - name: APP_INTEGRATION_NINJA_API-KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: ninja_api_key
+  - name: SPRING_DATASOURCE_URL
+    value: {{ .Values.services.postgres.url }}
+  - name: SPRING_DATASOURCE_USERNAME
+    value: {{ .Values.services.postgres.username }}
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: {{ .Values.services.postgres.password }}
+  - name: APP_AWS-STREAM_ACCESSKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: aws_stream_access_key
+  - name: APP_AWS-STREAM_SECRETKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: aws_stream_secret_key
+
+configMap:
+  data:
+    application.yml: |
+      {{- tpl (readFile "application.yml") . | nindent 6 }}
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: {{ $applicationName }}
+      defaultMode: 0755
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /opt/{{ $applicationName }}/config/application.yml
+    subPath: application.yml
+    readOnly: true
+
+service:
+  ports:
+    - name: api
+      port: {{ .Values.services.global.java.apiPort }}
+    - name: management
+      port: {{ .Values.services.global.java.managementPort }}
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+resources:
+  limits:
+    memory: 512Mi
+  requests:
+    memory: 256Mi
+
+metrics:
+  serviceMonitor:
+    enabled: {{ .Values.services.global.metrics.enabled }}
+    namespace: {{ .Release.Namespace }}
+    additionalLabels:
+      release: prometheus
+    endpoints:
+      - port: "management"
+        path: /actuator/prometheus
+        scheme: http
+
+netPolicies:
+  - filters:
+    - port: 6379
+      type: TCP
+    name: redis
+  - filters:
+    - port: 8080
+      type: TCP
+    name: styx

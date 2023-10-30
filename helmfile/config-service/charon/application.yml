@@ -1,0 +1,56 @@
+{{- $applicationName := .Release.Name -}}
+
+server:
+  port: {{ .Values.services.global.java.apiPort }}
+
+logback:
+  appender: JSON_K8S_CONSOLE
+
+spring:
+  application:
+    name: {{ $applicationName }}
+  quartz:
+    job-store-type: memory
+    properties:
+      org:
+        quartz:
+          threadPool:
+            threadCount: 30
+            class: org.quartz.simpl.SimpleThreadPool
+          jobStore:
+            misfireThreshold: 60000
+            class: org.quartz.simpl.RAMJobStore
+
+management:
+  server:
+    port: {{ .Values.services.global.java.managementPort }}
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: {{ $applicationName }}
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+app:
+  scheduler:
+    exchange-rate:
+      cron: 0 0/50 * * * ?
+    evict-currency:
+      cron: 0 0/50 * * * ?
+    balance-deposit:
+      cron: 0 0/1 * * * ?
+    purchase-service:
+      cron: 0 0/1 * * * ?
