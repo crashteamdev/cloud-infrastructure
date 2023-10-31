@@ -125,6 +125,7 @@ grafana:
 
   ingress:
     enabled: true
+    serviceName: prometheus-grafana
 
     ## Annotations for Grafana Ingress
     ##
@@ -144,9 +145,8 @@ grafana:
     labels: {}
 
     hosts:
-      - name: grafana.{{ $ingressDomain | default "crashteam.dev" }}
-        path: /
-        serviceName: prometheus-grafana
+      - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+    path: /
 
   {{- if .Values.services.ingress.tls.enabled }}
     tls:
