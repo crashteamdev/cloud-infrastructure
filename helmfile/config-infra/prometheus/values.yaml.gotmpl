@@ -11,8 +11,8 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 30Gi
-    retention: 30d
+              storage: 20Gi
+    retention: 20d
     retentionSize: ""
     nodeSelector:
       monitoring: "true"
@@ -115,7 +115,7 @@ grafana:
     # storageClassName: default
     accessModes:
       - ReadWriteOnce
-    size: 15Gi
+    size: 10Gi
     # annotations: {}
     finalizers:
       - kubernetes.io/pvc-protection
