@@ -1,4 +1,4 @@
-{{/*namespaceOverride: "monitoring"*/}}
+namespaceOverride: "monitoring"
 
 prometheus:
   prometheusSpec:
@@ -144,8 +144,9 @@ grafana:
     labels: {}
 
     hosts:
-      - grafana.{{ $ingressDomain | default "crashteam.dev" }}
-    path: /
+      - name: grafana.{{ $ingressDomain | default "crashteam.dev" }}
+        path: /
+        serviceName: prometheus-grafana
 
   {{- if .Values.services.ingress.tls.enabled }}
     tls:
