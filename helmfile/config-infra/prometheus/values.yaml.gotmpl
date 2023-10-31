@@ -67,7 +67,7 @@ prometheus-node-exporter:
 
 grafana:
   enabled: true
-  replicas: 2
+  replicas: 1
   adminPassword: {{ .Values.prometheus.grafana.password }}
   create: true
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
