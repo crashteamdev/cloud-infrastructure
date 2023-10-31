@@ -15,7 +15,7 @@ prometheus:
     retention: 20d
     retentionSize: ""
     nodeSelector:
-      monitoring: "true"
+      mdb-service: "true"
     tolerations:
       - key: "role"
         operator: "Equal"
@@ -67,7 +67,7 @@ prometheus-node-exporter:
 
 grafana:
   enabled: true
-  replicas: 1
+  replicas: 2
   adminPassword: {{ .Values.prometheus.grafana.password }}
   create: true
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
