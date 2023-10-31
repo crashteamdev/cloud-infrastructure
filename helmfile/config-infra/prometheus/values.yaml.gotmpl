@@ -144,7 +144,7 @@ grafana:
     labels: {}
 
     hosts:
-      - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+      - gf.{{ $ingressDomain | default "crashteam.dev" }}
     path: /
 
   {{- if .Values.services.ingress.tls.enabled }}
@@ -155,7 +155,7 @@ grafana:
       - secretName: {{ .Values.services.ingress.tls.secretName }}
     {{- end }}
         hosts:
-          - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+          - gf.{{ $ingressDomain | default "crashteam.dev" }}
   {{- end }}
 
 kubeScheduler:
