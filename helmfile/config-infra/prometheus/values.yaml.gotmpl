@@ -85,14 +85,11 @@ grafana:
   deploymentStrategy:
     type: Recreate
 
-{{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
-{{ $ingressDomain := .Values.services.ingress.namespacedDomain | ternary $domainWithNamespace .Values.services.ingress.rootDomain }}
-
   grafana.ini:
   ## grafana Authentication can be enabled with the following values on grafana.ini
     server:
       # The full public facing url you use in browser, used for redirects and emails
-      root_url: https://grafana.{{ $ingressDomain | default "crashteam.dev" }}/
+      root_url: https://grafana.crashteam.dev/
     auth:
       oauth_skip_org_role_update_sync: true
     auth.github:
@@ -125,7 +122,6 @@ grafana:
 
   ingress:
     enabled: true
-    serviceName: prometheus-grafana
 
     ## Annotations for Grafana Ingress
     ##
@@ -145,7 +141,7 @@ grafana:
     labels: {}
 
     hosts:
-      - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+      - grafana.crashteam.dev
     path: /
 
   {{- if .Values.services.ingress.tls.enabled }}
@@ -156,7 +152,7 @@ grafana:
       - secretName: {{ .Values.services.ingress.tls.secretName }}
     {{- end }}
         hosts:
-          - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+          - grafana.crashteam.dev
   {{- end }}
 
 kubeScheduler:
