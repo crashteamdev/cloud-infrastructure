@@ -28,8 +28,8 @@ prometheus:
           labels:
             env: "yc-metrics"
       - job_name: 'kubernetes-service-endpoints'
-        scrape_interval: 5s
-        scrape_timeout: 2s
+        scrape_interval: 6s
+        scrape_timeout: 3s
         kubernetes_sd_configs:
           - role: endpoints
         relabel_configs:
