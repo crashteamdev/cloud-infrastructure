@@ -11,8 +11,8 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 20Gi
-    retention: 20d
+              storage: 30Gi
+    retention: 30d
     retentionSize: ""
     nodeSelector:
       monitoring: "true"
@@ -28,8 +28,8 @@ prometheus:
           labels:
             env: "yc-metrics"
       - job_name: 'kubernetes-service-endpoints'
-        scrape_interval: 5s
-        scrape_timeout: 2s
+        scrape_interval: 6s
+        scrape_timeout: 3s
         kubernetes_sd_configs:
           - role: endpoints
         relabel_configs:
@@ -115,7 +115,7 @@ grafana:
     # storageClassName: default
     accessModes:
       - ReadWriteOnce
-    size: 10Gi
+    size: 15Gi
     # annotations: {}
     finalizers:
       - kubernetes.io/pvc-protection
