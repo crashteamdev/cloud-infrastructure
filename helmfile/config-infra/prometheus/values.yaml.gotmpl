@@ -15,7 +15,7 @@ prometheus:
     retention: 20d
     retentionSize: ""
     nodeSelector:
-      mdb-service: "true"
+      monitoring: "true"
     tolerations:
       - key: "role"
         operator: "Equal"
@@ -28,8 +28,8 @@ prometheus:
           labels:
             env: "yc-metrics"
       - job_name: 'kubernetes-service-endpoints'
-        scrape_interval: 6s
-        scrape_timeout: 3s
+        scrape_interval: 5s
+        scrape_timeout: 2s
         kubernetes_sd_configs:
           - role: endpoints
         relabel_configs:
