@@ -28,8 +28,8 @@ prometheus:
           labels:
             env: "yc-metrics"
       - job_name: 'kubernetes-service-endpoints'
-        scrape_interval: 5s
-        scrape_timeout: 2s
+        scrape_interval: 6s
+        scrape_timeout: 4s
         kubernetes_sd_configs:
           - role: endpoints
         relabel_configs:
@@ -85,14 +85,11 @@ grafana:
   deploymentStrategy:
     type: Recreate
 
-{{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
-{{ $ingressDomain := .Values.services.ingress.namespacedDomain | ternary $domainWithNamespace .Values.services.ingress.rootDomain }}
-
   grafana.ini:
   ## grafana Authentication can be enabled with the following values on grafana.ini
     server:
       # The full public facing url you use in browser, used for redirects and emails
-      root_url: https://grafana.{{ $ingressDomain | default "crashteam.dev" }}/
+      root_url: https://grafana.crashteam.dev/
     auth:
       oauth_skip_org_role_update_sync: true
     auth.github:
@@ -123,17 +120,6 @@ grafana:
     # subPath: ""
     # existingClaim:
 
-{{/*  datasources:*/}}
-{{/*    datasources.yaml:*/}}
-{{/*      apiVersion: 1*/}}
-{{/*      datasources:*/}}
-{{/*      - name: 'loki'*/}}
-{{/*        type: 'loki'*/}}
-{{/*        access: 'proxy'*/}}
-{{/*        orgId: 1,*/}}
-{{/*        url: http://loki:3100*/}}
-{{/*        version: 1*/}}
-
   ingress:
     enabled: true
 
@@ -155,7 +141,7 @@ grafana:
     labels: {}
 
     hosts:
-      - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+      - grafana.crashteam.dev
     path: /
 
   {{- if .Values.services.ingress.tls.enabled }}
@@ -166,7 +152,7 @@ grafana:
       - secretName: {{ .Values.services.ingress.tls.secretName }}
     {{- end }}
         hosts:
-          - grafana.{{ $ingressDomain | default "crashteam.dev" }}
+          - grafana.crashteam.dev
   {{- end }}
 
 kubeScheduler:
