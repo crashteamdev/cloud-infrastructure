@@ -8,7 +8,7 @@ prometheus:
       volumeClaimTemplate:
         spec:
           storageClassName: yc-network-hdd
-          accessModes: ["ReadWriteOnce"]
+          accessModes: ["ReadWriteMany"]
           resources:
             requests:
               storage: 20Gi
