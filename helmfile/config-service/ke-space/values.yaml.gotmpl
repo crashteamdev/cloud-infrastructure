@@ -111,8 +111,8 @@ ingress:
   {{- else }}
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
-  hosts:
-  - "ke-api.marketdb.pro"
+      hosts:
+        - "ke-api.marketdb.pro"
 {{- end }}
   servicePort: {{ .Values.services.global.java.apiPort }}
 
