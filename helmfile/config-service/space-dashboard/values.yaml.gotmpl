@@ -7,8 +7,8 @@ nodeSelector:
   ingress: "true"
 
 image:
-  repository: ghcr.io/crashteamdev/test-nextjs
-  tag: sha-9b931d8
+  repository: ghcr.io/crashteamdev/space-dashboard
+  tag: sha-be0fee9
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -88,7 +88,7 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
   hosts:
-    - host: "space.marketdb.org"
+    - host: "space.marketdb.pro"
       paths:
         - /?(.*)
 {{- if .Values.services.ingress.tls.enabled }}
@@ -99,6 +99,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - "space.marketdb.org"
+        - "space.marketdb.pro"
 {{- end }}
   servicePort: 3000
