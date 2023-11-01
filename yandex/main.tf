@@ -500,5 +500,16 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
       }
     }
   }
+
+  user {
+    name     = "support"
+    password = var.db_password
+    dynamic "permission" {
+      for_each = var.clickhouse_dbs
+      content {
+        database_name = permission.value
+      }
+    }
+  }
 }
 
