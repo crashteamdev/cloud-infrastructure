@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/space-dashboard
-  tag: sha-be0fee9
+  tag: sha-6b5015c
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -52,16 +52,16 @@ volumes:
 
 livenessProbe:
   httpGet:
-    path: /api/healthcheck
+    path: /api/health
     port: 3000
   initialDelaySeconds: 30
-  timeoutSeconds: 3
+  timeoutSeconds: 5
 readinessProbe:
   httpGet:
-    path: /api/healthcheck
+    path: /api/health
     port: 3000
   initialDelaySeconds: 30
-  timeoutSeconds: 3
+  timeoutSeconds: 5
 
 resources:
   requests:
