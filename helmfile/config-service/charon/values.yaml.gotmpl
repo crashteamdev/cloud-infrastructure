@@ -1,4 +1,5 @@
 {{- $applicationName := .Release.Name -}}
+{{- $grpcPort := 9090 }}
 
 replicaCount: 1
 
@@ -81,6 +82,8 @@ service:
       port: {{ .Values.services.global.java.apiPort }}
     - name: management
       port: {{ .Values.services.global.java.managementPort }}
+    - name: grpc
+      port: {{ $grpcPort }}
 
 livenessProbe:
   httpGet:

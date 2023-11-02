@@ -3,6 +3,10 @@
 server:
   port: {{ .Values.services.global.java.apiPort }}
 
+grpc:
+  server:
+    port: 9090
+
 logback:
   appender: JSON_K8S_CONSOLE
 
