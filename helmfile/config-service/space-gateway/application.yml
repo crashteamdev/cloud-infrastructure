@@ -41,3 +41,7 @@ grpc:
   client:
     paymentService.address: dns:///charon:9090
     paymentService.negotiationType: PLAINTEXT
+
+gateway:
+  admin-user-ids:
+    - pKbSkfbXuwVuXKXTgIH2z3YOhYj1
