@@ -75,11 +75,11 @@ aws-stream:
     name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/uzum-stream'
     maxRecords: 200
     timeoutInSec: 120
-    failOverTimeMillis: 30000
+    failOverTimeMillis: 60000
     consumerName: uzum-analytics-consumer
   payment-stream:
     name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/payment'
     maxRecords: 50
     timeoutInSec: 120
-    failOverTimeMillis: 30000
+    failOverTimeMillis: 60000
     consumerName: uzum-payment-consumer
