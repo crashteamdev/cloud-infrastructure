@@ -27,7 +27,7 @@ spring:
             isClustered: true
             useProperties: true
     jdbc:
-      initialize-schema: never
+      initialize-schema: always
 
 
 management:
