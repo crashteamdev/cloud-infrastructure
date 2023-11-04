@@ -1,4 +1,5 @@
 {{- $applicationName := .Release.Name -}}
+{{- $grpcPort := 9090 }}
 
 replicaCount: 1
 
@@ -12,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-2d320c1
+  tag: sha-d39f293
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,19 +22,32 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: FREEKASSA_APIKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_freekassa_apikey
+  - name: FREEKASSA_SECRETWORDFIRST
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_freekassa_secretwordfirst
+  - name: FREEKASSA_SECRETWORDSECOND
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_freekassa_secretwordsecond
+  - name: APP_INTEGRATION_NINJA_API-KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: ninja_api_key
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/uzum-scrapper?sslmode=require
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/charon?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.uniUser }}
   - name: SPRING_DATASOURCE_PASSWORD
     value: {{ .Values.services.postgres.uniPassword }}
-  - name: JDK_JAVA_OPTIONS
-    value: >-
-      -Xmx326M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=111M
-  - name: SPRING_REDIS_HOST
-    value: {{ .Values.services.redis.endpoint }}
-  - name: SPRING_REDIS_PASSWORD
-    value: {{ .Values.services.redis.password }}
   - name: APP_AWS-STREAM_ACCESSKEY
     valueFrom:
       secretKeyRef:
@@ -44,7 +58,6 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: aws_stream_secret_key
-
 
 configMap:
   data:
@@ -69,6 +82,8 @@ service:
       port: {{ .Values.services.global.java.apiPort }}
     - name: management
       port: {{ .Values.services.global.java.managementPort }}
+    - name: grpc
+      port: {{ $grpcPort }}
 
 livenessProbe:
   httpGet:
@@ -82,7 +97,9 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 712Mi
+    memory: 512Mi
+  requests:
+    memory: 256Mi
 
 metrics:
   serviceMonitor:
