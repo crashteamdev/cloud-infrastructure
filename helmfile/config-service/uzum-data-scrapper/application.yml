@@ -14,16 +14,20 @@ spring:
     username: default
     ssl: true
   quartz:
-    job-store-type: memory
+    job-store-type: jdbc
     properties:
       org:
         quartz:
           threadPool:
-            threadCount: 32
+            threadCount: 30
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
             misfireThreshold: 60000
-            class: org.quartz.simpl.RAMJobStore
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            isClustered: true
+            useProperties: true
+    jdbc:
+      initialize-schema: always
 
 
 management:
