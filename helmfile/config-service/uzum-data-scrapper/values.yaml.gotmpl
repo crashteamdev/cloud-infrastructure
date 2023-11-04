@@ -21,6 +21,12 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/uzum-scrapper?sslmode=require
+  - name: SPRING_DATASOURCE_USERNAME
+    value: {{ .Values.services.postgres.uniUser }}
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: {{ .Values.services.postgres.uniPassword }}
   - name: JDK_JAVA_OPTIONS
     value: >-
       -Xmx326M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=111M
