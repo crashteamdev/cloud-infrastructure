@@ -52,7 +52,7 @@ management:
 app:
   job:
     cron:
-      product-job: 0 34 0,9,19 ? * * *
+      product-job: 0 56 0,9,19 ? * * *
       position-job: 0 0 12 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
