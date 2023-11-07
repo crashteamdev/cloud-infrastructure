@@ -73,7 +73,7 @@ aws-stream:
   dinamoDbEndpoint: 'docapi.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
   uzum-stream:
     name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/uzum-stream'
-    maxRecords: 220
+    maxRecords: 215
     timeoutInSec: 60
     failOverTimeMillis: 60000
     consumerName: uzum-analytics-consumer
