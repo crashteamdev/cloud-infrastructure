@@ -483,6 +483,10 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
     assign_public_ip = true
   }
 
+  access {
+    data_lens = true
+  }
+
   dynamic "database" {
     for_each = var.clickhouse_dbs
     content {
