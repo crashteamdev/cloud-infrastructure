@@ -37,6 +37,11 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: charon_freekassa_secretwordsecond
+  - name: CLICK_SECRETKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_click_secret_key
   - name: APP_INTEGRATION_NINJA_API-KEY
     valueFrom:
       secretKeyRef:
