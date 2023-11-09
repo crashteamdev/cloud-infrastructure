@@ -84,11 +84,10 @@ ingress:
        more_set_headers "Access-Control-Allow-Origin: $http_origin";
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
     nginx.ingress.kubernetes.io/limit-rpm: "50"
-    nginx.ingress.kubernetes.io/rewrite-target: $1
   hosts:
     - host: {{ $ingressDomain | default "crashteam.dev" }}
       paths:
-        - /(.+)
+        - /
 {{/*    - host: "marketdb.pro"*/}}
 {{/*      paths:*/}}
 {{/*        - /*/}}
