@@ -89,9 +89,7 @@ ingress:
   hosts:
     - host: {{ $ingressDomain | default "crashteam.dev" }}
       paths:
-        - path: "/"
-        - path: /privacy/.*
-        - path: /policy/.*
+        - path: /(.*)
 {{/*    - host: "marketdb.pro"*/}}
 {{/*      paths:*/}}
 {{/*        - /*/}}
