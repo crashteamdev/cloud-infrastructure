@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-1fa0f64
+  tag: sha-d1e7aa0
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,6 +21,12 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/ke-scrapper?sslmode=require
+  - name: SPRING_DATASOURCE_USERNAME
+    value: {{ .Values.services.postgres.uniUser }}
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: {{ .Values.services.postgres.uniPassword }}
   - name: JDK_JAVA_OPTIONS
     value: >-
       -Xmx121M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=111M

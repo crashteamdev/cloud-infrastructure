@@ -13,17 +13,6 @@ spring:
     port: 6380
     username: default
     ssl: true
-  quartz:
-    job-store-type: memory
-    properties:
-      org:
-        quartz:
-          threadPool:
-            threadCount: 32
-            class: org.quartz.simpl.SimpleThreadPool
-          jobStore:
-            misfireThreshold: 60000
-            class: org.quartz.simpl.RAMJobStore
 
 
 management:
