@@ -69,3 +69,4 @@ redis:
 
 clickhouse:
   ssl: true
+  connection.timeout: 60000
