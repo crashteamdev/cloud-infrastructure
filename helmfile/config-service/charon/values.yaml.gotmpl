@@ -47,11 +47,6 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: charon_click_secret_key
-  - name: APP_INTEGRATION_NINJA_API-KEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: ninja_api_key
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/charon?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
