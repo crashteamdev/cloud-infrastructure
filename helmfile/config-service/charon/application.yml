@@ -42,10 +42,6 @@ management:
 
 app:
   scheduler:
-    exchange-rate:
-      cron: 0 0 1 ? * * *
-    evict-currency:
-      cron: 0 0 1 ? * * *
     balance-deposit:
       cron: 0 0/1 * * * ?
     purchase-service:
