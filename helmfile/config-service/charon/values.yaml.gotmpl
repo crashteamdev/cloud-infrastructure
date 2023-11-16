@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-86d2c91
+  tag: sha-c8519fa
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -22,6 +22,11 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: APP_INTEGRATION_CURRENCY-API_API-KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_currency_apikey
   - name: FREEKASSA_APIKEY
     valueFrom:
       secretKeyRef:
@@ -42,11 +47,6 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: charon_click_secret_key
-  - name: APP_INTEGRATION_NINJA_API-KEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: ninja_api_key
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/charon?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
