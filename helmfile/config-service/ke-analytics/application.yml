@@ -70,3 +70,13 @@ redis:
 clickhouse:
   ssl: true
   connection.timeout: 60000
+
+aws-stream:
+  kinesisEndpoint: 'yds.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
+  dinamoDbEndpoint: 'docapi.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
+  payment-stream:
+    name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/payment'
+    maxRecords: 50
+    timeoutInSec: 60
+    failOverTimeMillis: 60000
+    consumerName: ke-payment-consumer
