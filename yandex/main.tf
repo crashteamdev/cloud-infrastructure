@@ -443,7 +443,7 @@ resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
   }
 
   resources {
-    resource_preset_id = "s3-c2-m8"
+    resource_preset_id = "b3-c1-m4"
     disk_type_id       = "network-ssd"
     disk_size          = 250
   }
