@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-cca7d15
+  tag: sha-0fb55ae
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx645M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=111M
+      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=70M -XX:MaxMetaspaceSize=111M
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/space?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
@@ -81,9 +81,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 1024Mi
-  requests:
-    memory: 512Mi
+    memory: 2024Mi
 
 metrics:
   serviceMonitor:
