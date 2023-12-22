@@ -41,6 +41,8 @@ management:
         include: health,info,prometheus
 
 app:
+  stream:
+    publisher: AWS
   scheduler:
     balance-deposit:
       cron: 0 0/1 * * * ?
