@@ -73,13 +73,13 @@ aws-stream:
   kinesisEndpoint: 'yds.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
   dinamoDbEndpoint: 'docapi.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
   uzum-stream:
-    name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/mdb-payment'
+    name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/uzum-stream'
     maxRecords: 215
     timeoutInSec: 60
     failOverTimeMillis: 60000
     consumerName: uzum-analytics-consumer
   payment-stream:
-    name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/payment'
+    name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/mdb-payment'
     maxRecords: 50
     timeoutInSec: 60
     failOverTimeMillis: 60000
