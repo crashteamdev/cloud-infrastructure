@@ -51,3 +51,6 @@ app:
       cron: 0 0/1 * * * ?
     purchase-service:
       cron: 0 0/1 * * * ?
+  aws-stream:
+    uzum-stream:
+      name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/mdb-payment'
