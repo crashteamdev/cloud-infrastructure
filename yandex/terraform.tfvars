@@ -3,7 +3,8 @@ pg_dbs = [
   "mdb-wiki",
   "space",
   "uzum-scrapper",
-  "ke-scrapper"
+  "ke-scrapper",
+  "crm"
 ]
 mongo_dbs = [
   "kazanex",
