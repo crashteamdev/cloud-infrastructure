@@ -38,3 +38,11 @@ management:
     web:
       exposure:
         include: health,info,prometheus
+
+app:
+  integration:
+    oko-crm:
+      pipeline-id:
+        demo: 5199
+        feedback: 5755
+        service: 5756
