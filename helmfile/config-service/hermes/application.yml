@@ -9,10 +9,12 @@ logback:
 spring:
   application:
     name: {{ $applicationName }}
-  redis:
-    port: 6380
-    username: default
-    ssl: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    change-log: 'classpath:db/changelog/main.xml'
+    enabled: true
 
 management:
   server:
@@ -37,13 +39,10 @@ management:
       exposure:
         include: health,info,prometheus
 
-grpc:
-  client:
-    paymentService.address: dns:///charon:9090
-    paymentService.negotiationType: PLAINTEXT
-    crmService.address: dns:///hermes:9090
-    crmService.negotiationType: PLAINTEXT
-
-gateway:
-  admin-user-ids:
-    - pKbSkfbXuwVuXKXTgIH2z3YOhYj1
+app:
+  integration:
+    oko-crm:
+      pipeline-id:
+        demo: 5199
+        feedback: 5755
+        service: 5756
