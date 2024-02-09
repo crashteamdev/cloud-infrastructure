@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-9337ed9
+  tag: sha-0135ccd
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -26,7 +26,7 @@ env:
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
-  - name: APP_PROXY_PROXY-LINE_API-KEY
+  - name: INTEGRATION_PROXY-LINE_API-KEY
     valueFrom:
       secretKeyRef:
         name: {{ .Release.Name }}
