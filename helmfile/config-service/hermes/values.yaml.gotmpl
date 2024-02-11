@@ -1,4 +1,5 @@
 {{- $applicationName := .Release.Name -}}
+{{- $grpcPort := 9090 }}
 
 replicaCount: 1
 
@@ -12,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-ce7e352
+  tag: sha-f82e7cc
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -23,22 +24,20 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=70M -XX:MaxMetaspaceSize=224M
+      -Xmx121M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=112M
+      -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
+      -XX:+UseParallelGC
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/repricer?sslmode=require
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/crm?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.uniUser }}
   - name: SPRING_DATASOURCE_PASSWORD
     value: {{ .Values.services.postgres.uniPassword }}
-  - name: SPRING_REDIS_HOST
-    value: {{ .Values.services.redis.endpoint }}
-  - name: SPRING_REDIS_PASSWORD
-    value: {{ .Values.services.redis.password }}
-  - name: REPRICER_PASSWORDKEY
+  - name: APP_INTEGRATION_OKO-CRM_TOKEN
     valueFrom:
       secretKeyRef:
         name: {{ .Release.Name }}
-        key: password_key
+        key: oko_crm_token
 
 configMap:
   data:
@@ -63,6 +62,8 @@ service:
       port: {{ .Values.services.global.java.apiPort }}
     - name: management
       port: {{ .Values.services.global.java.managementPort }}
+    - name: grpc
+      port: {{ $grpcPort }}
 
 livenessProbe:
   httpGet:
@@ -76,7 +77,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 2024Mi
+    memory: 512Mi
 
 metrics:
   serviceMonitor:
@@ -88,44 +89,3 @@ metrics:
       - port: "management"
         path: /actuator/prometheus
         scheme: http
-
-ingress:
-  enabled: true
-  annotations:
-{{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
-    cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
-{{- end }}
-    kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
-    nginx.ingress.kubernetes.io/cors-allow-methods: "POST, GET, PUT"
-    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
-    kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
-  hosts:
-    - host: "ke-api.marketdb.pro"
-      paths:
-        - /space
-{{- if .Values.services.ingress.tls.enabled }}
-  tls:
-  {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
-    - secretName: api-{{ .Values.services.ingress.tls.secretName }}
-  {{- else }}
-    - secretName: {{ .Values.services.ingress.tls.secretName }}
-  {{- end }}
-      hosts:
-        - "ke-api.marketdb.pro"
-{{- end }}
-  servicePort: {{ .Values.services.global.java.apiPort }}
-
-netPolicies:
-  - filters:
-    - port: 6432
-      type: TCP
-    name: postgresql
-  - filters:
-    - port: 6379
-      type: TCP
-    name: redis
-  - filters:
-    - port: 8080
-      type: TCP
-    name: styx

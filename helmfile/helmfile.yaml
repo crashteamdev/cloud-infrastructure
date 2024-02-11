@@ -38,6 +38,8 @@ releases:
     <<: *generic_stateless
   - name: charon
     <<: *generic_stateless
+  - name: hermes
+    <<: *generic_stateless
   - name: wiki-marketdb
     <<: *default
     chart: requarks/wiki
