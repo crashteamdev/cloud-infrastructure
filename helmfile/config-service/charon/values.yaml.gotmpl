@@ -72,6 +72,21 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: aws_stream_secret_key
+  - name: APP_INTEGRATION_LAVA_SECRETKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_lava_secretkey
+  - name: APP_INTEGRATION_ENOT_SECRETKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_enot_secretkey
+  - name: APP_INTEGRATION_ENOT_SHOPID
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_enot_shopid
 
 configMap:
   data:
