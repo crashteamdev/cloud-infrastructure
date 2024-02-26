@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-33368b4
+  tag: sha-7050ca2
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -72,6 +72,11 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: aws_stream_secret_key
+  - name: APP_INTEGRATION_ENOT_SECRETKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_enot_secretkey
 
 configMap:
   data:
