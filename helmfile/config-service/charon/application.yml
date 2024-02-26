@@ -44,6 +44,9 @@ management:
         include: health,info,prometheus
 
 app:
+  integration:
+    enot:
+      shopId: d374961e-f7db-4cf4-a4a9-9caa61e661a8
   stream:
     publisher: AWS
   scheduler:
