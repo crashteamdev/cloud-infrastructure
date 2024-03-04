@@ -9,6 +9,7 @@ logback:
 logging:
   level:
     dev.crashteam.keanalytics.rpc: DEBUG
+    dev.crashteam.keanalytics.service: DEBUG
 
 spring:
   application:
