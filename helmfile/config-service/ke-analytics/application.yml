@@ -6,6 +6,10 @@ server:
 logback:
   appender: JSON_K8S_CONSOLE
 
+logging:
+  level:
+    dev.crashteam.keanalytics.rpc: DEBUG
+
 spring:
   application:
     name: {{ $applicationName }}
