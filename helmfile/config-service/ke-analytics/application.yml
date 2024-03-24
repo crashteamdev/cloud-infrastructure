@@ -74,7 +74,7 @@ redis:
 
 clickhouse:
   ssl: true
-  connection.timeout: 60000
+  connectionTimeout: 120000
 
 aws-stream:
   kinesisEndpoint: 'yds.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
