@@ -10,6 +10,7 @@ logging:
   level:
     dev.crashteam.keanalytics.rpc: DEBUG
     dev.crashteam.keanalytics.service: DEBUG
+    dev.crashteam.keanalytics.repository.clickhouse: DEBUG
 
 spring:
   application:
