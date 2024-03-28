@@ -43,6 +43,8 @@ grpc:
     paymentService.negotiationType: PLAINTEXT
     crmService.address: dns:///hermes:9090
     crmService.negotiationType: PLAINTEXT
+    keAnalyticsService.address: static://ke-analytics:9090
+    keAnalyticsService.negotiationType: PLAINTEXT
 
 gateway:
   admin-user-ids:
