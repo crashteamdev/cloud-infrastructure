@@ -43,7 +43,7 @@ management:
 
 integration:
   mobile-proxy:
-    change-ip-cron: 0 0/2 * 1/1 * ? *
+    change-ip-cron: 0 0/1 * * * ? *
 
 app:
   timeout-handler: 5
