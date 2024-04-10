@@ -55,3 +55,14 @@ app:
     position:
       maxlen: 100000
       waitPending: 50000
+
+logging:
+  level:
+    dev:
+      crashteam:
+        ke_data_scrapper:
+          job:
+            position:
+              PositionJob: DEBUG
+            product:
+              ProductJob: DEBUG
