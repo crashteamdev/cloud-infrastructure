@@ -46,7 +46,7 @@ integration:
     change-ip-cron: 0 0/3 * * * ?
 
 app:
-  timeout-handler: 5
+  timeout-handler: 10
   proxy:
     retries:
       attempts: 3
