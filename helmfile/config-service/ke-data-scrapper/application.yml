@@ -66,3 +66,5 @@ logging:
               PositionJob: DEBUG
             product:
               ProductJob: DEBUG
+            category:
+              CategoryJob: DEBUG
