@@ -52,6 +52,9 @@ app:
     product:
       maxlen: 100000
       waitPending: 50000
+    position:
+      maxlen: 100000
+      waitPending: 50000
 
 logging:
   level:
@@ -63,6 +66,3 @@ logging:
               PositionJob: DEBUG
             product:
               ProductJob: DEBUG
-    position:
-      maxlen: 100000
-      waitPending: 50000
