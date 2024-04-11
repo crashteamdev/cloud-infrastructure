@@ -49,7 +49,7 @@ application:
   forbidden-expire: 4
 
 app:
-  timeout-handler: 10
+  timeout-handler: 15
   proxy:
     retries:
       attempts: 3
