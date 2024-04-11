@@ -45,6 +45,9 @@ integration:
   mobile-proxy:
     change-ip-cron: 0/3 * * ? * *
 
+application:
+  forbidden-expire: 4
+
 app:
   timeout-handler: 10
   proxy:
