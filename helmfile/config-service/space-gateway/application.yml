@@ -45,6 +45,8 @@ grpc:
     crmService.negotiationType: PLAINTEXT
     keAnalyticsService.address: static://ke-analytics:9090
     keAnalyticsService.negotiationType: PLAINTEXT
+    uzumAnalyticsService.address: static://uzum-analytics:9090
+    uzumAnalyticsService.negotiationType: PLAINTEXT
 
 gateway:
   admin-user-ids:
