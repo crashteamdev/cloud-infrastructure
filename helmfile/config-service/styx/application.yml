@@ -46,7 +46,7 @@ integration:
     change-ip-cron: 0/3 * * ? * *
 
 application:
-  forbidden-expire: 4
+  forbidden-expire: 1
 
 app:
   timeout-handler: 15
