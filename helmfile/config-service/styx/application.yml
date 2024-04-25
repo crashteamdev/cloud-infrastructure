@@ -49,7 +49,7 @@ application:
   forbidden-expire: 1
   scheduler:
     redis:
-      forbidden-url-cron:  0/10 * * * * ? *
+      forbidden-url-cron: 0/10 * * * * ? *
 
 app:
   timeout-handler: 15
