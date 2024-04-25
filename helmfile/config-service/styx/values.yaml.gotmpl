@@ -1,7 +1,7 @@
 {{- $applicationName := .Release.Name -}}
 
 {{/*replicaCount: {{ .Values.services.global.statelessReplicas }}*/}}
-replicaCount: 2
+replicaCount: 1
 
 nodeSelector:
   mdb-service: "true"
