@@ -8,7 +8,10 @@ logback:
 
 logging:
   level:
-    dev.crashteam.uzumanalytics.service: DEBUG
+    dev.crashteam.uzumanalytics.service: INFO
+    dev.crashteam.uzumanalytics.rpc: INFO
+    dev.crashteam.uzumanalytics.repository.clickhouse: INFO
+    dev.crashteam.uzumanalytics.repository.clickhouse.mapper: INFO
 
 spring:
   application:
