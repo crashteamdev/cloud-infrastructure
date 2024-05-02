@@ -84,3 +84,7 @@ aws-stream:
     timeoutInSec: 60
     failOverTimeMillis: 60000
     consumerName: uzum-payment-consumer
+
+grpc:
+  client:
+    uzumAnalyticsService.address: static://uzum-analytics:9090
