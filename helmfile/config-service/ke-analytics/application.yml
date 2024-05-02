@@ -17,12 +17,10 @@ logging:
 spring:
   application:
     name: {{ $applicationName }}
-  data:
-    redis:
-      port: 6380
-      username: default
-      ssl:
-        enabled: true
+  redis:
+    port: 6380
+    username: default
+    ssl: true
 
 management:
   server:

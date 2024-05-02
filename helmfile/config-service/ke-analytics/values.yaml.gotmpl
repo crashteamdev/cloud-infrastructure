@@ -46,9 +46,9 @@ env:
     value: kazanex
   - name: MONGO_REPLICASET
     value: rs01
-  - name: SPRING_DATA_REDIS_HOST
+  - name: SPRING_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
-  - name: SPRING_DATA_REDIS_PASSWORD
+  - name: SPRING_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
   - name: YOUKASSA_SHOPID
     valueFrom:
