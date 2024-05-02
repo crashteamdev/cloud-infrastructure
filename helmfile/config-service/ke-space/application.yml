@@ -58,3 +58,7 @@ repricer:
   priceChangeCron: 0 0/15 * * * ?
   paymentCron: 0/15 * * * * ?
   accountInitializeCron: 0/20 * * * * ?
+
+grpc:
+  client:
+    uzumAnalyticsService.address: static://ke-analytics:9090
