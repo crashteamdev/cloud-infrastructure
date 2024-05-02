@@ -61,4 +61,4 @@ repricer:
 
 grpc:
   client:
-    uzumAnalyticsService.address: static://ke-analytics:9090
+    keAnalyticsService.address: static://ke-analytics:9090
