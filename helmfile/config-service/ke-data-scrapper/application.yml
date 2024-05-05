@@ -45,6 +45,7 @@ app:
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
+    timeout: 2000
     kazan:
       token: Basic a2F6YW5leHByZXNzLWN1c3RvbWVyOmN1c3RvbWVyU2VjcmV0S2V5
     styx: http://styx:8080
