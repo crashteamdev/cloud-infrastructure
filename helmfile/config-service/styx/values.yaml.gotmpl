@@ -31,6 +31,12 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: styx_proxyline_apikey
+  - name: INTEGRATION_PROXY-HOUSE_API-KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: styx_proxyhouse_apikey
+
 
 configMap:
   data:
