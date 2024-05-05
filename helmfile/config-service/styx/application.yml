@@ -48,7 +48,7 @@ integration:
     change-ip-cron: 0/3 * * ? * *
 
 application:
-  forbidden-expire: 1
+  forbidden-expire: 3
   scheduler:
     redis:
       forbidden-url-cron: 0/10 * * * * ?
