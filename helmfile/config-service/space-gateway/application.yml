@@ -13,7 +13,8 @@ spring:
     redis:
       port: 6380
       username: default
-      ssl: true
+      ssl:
+        enable: false
 
 management:
   server:
