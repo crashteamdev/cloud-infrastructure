@@ -9,10 +9,11 @@ logback:
 spring:
   application:
     name: {{ $applicationName }}
-  redis:
-    port: 6380
-    username: default
-    ssl: true
+  data:
+    redis:
+      port: 6380
+      username: default
+      ssl: true
 
 management:
   server:
