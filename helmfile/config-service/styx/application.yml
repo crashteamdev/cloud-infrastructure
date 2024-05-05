@@ -42,6 +42,8 @@ management:
         include: health,info,prometheus
 
 integration:
+  proxy-house:
+    api-key: 607295_1714898905_3c3c40c2727b7ba5e0ffa04675ad6cdc44ef5560
   mobile-proxy:
     change-ip-cron: 0/3 * * ? * *
 
