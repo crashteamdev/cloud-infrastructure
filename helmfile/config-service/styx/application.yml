@@ -52,6 +52,7 @@ application:
   scheduler:
     redis:
       forbidden-url-cron: 0/10 * * * * ?
+      update-user-agents: 0 0 3 * * ? *
 
 app:
   timeout-handler: 15
