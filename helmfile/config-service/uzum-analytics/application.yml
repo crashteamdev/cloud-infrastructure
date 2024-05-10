@@ -72,8 +72,8 @@ uzum:
 
 clickhouse:
   ssl: true
-  connectionTimeout: 320000
-  socketTimeout: 300000
+  connectionTimeout: 420000
+  socketTimeout: 400000
 
 aws-stream:
   kinesisEndpoint: 'yds.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
