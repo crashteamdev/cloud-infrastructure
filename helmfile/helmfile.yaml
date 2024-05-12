@@ -44,3 +44,5 @@ releases:
     <<: *default
     chart: requarks/wiki
     version: v2.2.20
+  - name: knowledge-doc
+    <<: *generic_stateless
