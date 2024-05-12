@@ -1,8 +1,12 @@
 # -*- mode: yaml -*-
+{{- $applicationName := .Release.Name -}}
 replicaCount: 1
 
+nodeSelector:
+  ingress: "true"
+
 image:
-  repository: ghcr.io/valitydev/knowledge-doc
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
   tag: sha-3d8196b
   pullPolicy: IfNotPresent
 
@@ -77,7 +81,7 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
   hosts:
-    - host: doc.{{ $ingressDomain | default "crashteam.dev" }}
+    - host: doc.marketdb.pro
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -88,6 +92,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - doc.{{ $ingressDomain | default "crashteam.dev" }}
+        - doc.marketdb.pro
 {{- end }}
   servicePort: 8080
