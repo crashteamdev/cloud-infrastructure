@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-728dd3c
+  tag: sha-dc8bc89
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -24,7 +24,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1570M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=221M
+      -Xmx1570M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=222M
       -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
       -XX:+UseParallelGC
       -Dcom.amazonaws.sdk.disableCertChecking
@@ -46,9 +46,9 @@ env:
     value: kazanex
   - name: MONGO_REPLICASET
     value: rs01
-  - name: SPRING_REDIS_HOST
+  - name: SPRING_DATA_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
-  - name: SPRING_REDIS_PASSWORD
+  - name: SPRING_DATA_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
   - name: YOUKASSA_SHOPID
     valueFrom:

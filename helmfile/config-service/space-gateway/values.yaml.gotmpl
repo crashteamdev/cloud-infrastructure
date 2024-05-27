@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-a14f363
+  tag: sha-0bcc66e
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -23,10 +23,10 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx122M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=111093K
-  - name: SPRING_REDIS_HOST
+      -Xmx122M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=152M
+  - name: SPRING_DATA_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
-  - name: SPRING_REDIS_PASSWORD
+  - name: SPRING_DATA_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
 
 configMap:
