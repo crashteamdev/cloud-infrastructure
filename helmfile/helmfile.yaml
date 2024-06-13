@@ -40,9 +40,5 @@ releases:
     <<: *generic_stateless
   - name: hermes
     <<: *generic_stateless
-  - name: wiki-marketdb
-    <<: *default
-    chart: requarks/wiki
-    version: v2.2.20
   - name: knowledge-doc
     <<: *generic_stateless
