@@ -71,7 +71,8 @@ ingress:
   hosts:
     - host: "strapi.marketdb.pro"
       paths:
-        - /
+        - path: /
+          pathType: ImplementationSpecific
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -80,6 +81,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - "strapi.marketdb.pro"
+        - host: "strapi.marketdb.pro"
 {{- end }}
   servicePort: 80
