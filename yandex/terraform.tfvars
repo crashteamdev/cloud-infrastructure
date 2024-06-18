@@ -4,7 +4,8 @@ pg_dbs = [
   "space",
   "uzum-scrapper",
   "ke-scrapper",
-  "crm"
+  "crm",
+  "strapi"
 ]
 mongo_dbs = [
   "kazanex",
