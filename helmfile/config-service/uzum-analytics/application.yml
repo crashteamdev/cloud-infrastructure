@@ -8,15 +8,20 @@ logback:
 
 logging:
   level:
-    dev.crashteam.uzumanalytics.service: DEBUG
+    dev.crashteam.uzumanalytics.service: INFO
+    dev.crashteam.uzumanalytics.rpc: INFO
+    dev.crashteam.uzumanalytics.repository.clickhouse: INFO
+    dev.crashteam.uzumanalytics.repository.clickhouse.mapper: INFO
 
 spring:
   application:
     name: {{ $applicationName }}
-  redis:
-    port: 6380
-    username: default
-    ssl: true
+  data:
+    redis:
+      port: 6380
+      username: default
+      ssl:
+        enable: true
   quartz:
     properties:
       org.quartz.threadPool.threadCount: 30
@@ -67,7 +72,8 @@ uzum:
 
 clickhouse:
   ssl: true
-  connection.timeout: 60000
+  connectionTimeout: 420000
+  socketTimeout: 400000
 
 aws-stream:
   kinesisEndpoint: 'yds.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'

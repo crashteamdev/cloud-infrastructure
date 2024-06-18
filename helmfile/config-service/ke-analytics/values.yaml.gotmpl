@@ -1,4 +1,5 @@
 {{- $applicationName := .Release.Name -}}
+{{- $grpcPort := 9090 }}
 
 replicaCount: 1
 
@@ -12,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-61d533f
+  tag: sha-e17fef3
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -23,7 +24,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1570M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=221M
+      -Xmx1570M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=222M
       -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
       -XX:+UseParallelGC
       -Dcom.amazonaws.sdk.disableCertChecking
@@ -45,9 +46,9 @@ env:
     value: kazanex
   - name: MONGO_REPLICASET
     value: rs01
-  - name: SPRING_REDIS_HOST
+  - name: SPRING_DATA_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
-  - name: SPRING_REDIS_PASSWORD
+  - name: SPRING_DATA_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
   - name: YOUKASSA_SHOPID
     valueFrom:
@@ -110,6 +111,8 @@ service:
       port: {{ .Values.services.global.java.apiPort }}
     - name: management
       port: {{ .Values.services.global.java.managementPort }}
+    - name: grpc
+      port: {{ $grpcPort }}
 
 livenessProbe:
   httpGet:

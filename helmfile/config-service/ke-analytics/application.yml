@@ -6,13 +6,24 @@ server:
 logback:
   appender: JSON_K8S_CONSOLE
 
+logging:
+  level:
+    dev.crashteam.keanalytics.rpc: INFO
+    dev.crashteam.keanalytics.service: INFO
+    dev.crashteam.keanalytics.repository.clickhouse: INFO
+    dev.crashteam.keanalytics.repository.clickhouse.mapper: INFO
+    org.springframework.jdbc.core.JdbcTemplate: INFO
+
 spring:
   application:
     name: {{ $applicationName }}
-  redis:
-    port: 6380
-    username: default
-    ssl: true
+  data:
+    redis:
+      port: 6380
+      username: default
+      ssl: true
+  liquibase:
+    enabled: true
 
 management:
   server:
@@ -69,7 +80,8 @@ redis:
 
 clickhouse:
   ssl: true
-  connection.timeout: 60000
+  connectionTimeout: 420000
+  socketTimeout: 400000
 
 aws-stream:
   kinesisEndpoint: 'yds.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
