@@ -33,11 +33,11 @@ configMap:
 secret:
   enabled: true
   data:
-    APP_KEYS: {{ .Values.services.strapi.appKeys }}
-    API_TOKEN_SALT: {{ .Values.services.strapi.apiTokenSalt }}
-    ADMIN_JWT_SECRET: {{ .Values.services.strapi.jwtAdminSecret }}
-    JWT_SECRET: {{ .Values.services.strapi.jwtSecret }}
-    DATABASE_PASSWORD: {{ .Values.services.postgres.uniPassword }}
+    APP_KEYS: {{ .Values.services.strapi.appKeys | quote }}
+    API_TOKEN_SALT: {{ .Values.services.strapi.apiTokenSalt | quote }}
+    ADMIN_JWT_SECRET: {{ .Values.services.strapi.jwtAdminSecret | quote }}
+    JWT_SECRET: {{ .Values.services.strapi.jwtSecret | quote }}
+    DATABASE_PASSWORD: {{ .Values.services.postgres.uniPassword | quote }}
 
 livenessProbe:
   httpGet:
