@@ -45,4 +45,4 @@ releases:
   - name: strapi
     <<: *default
     chart: crashteamdev/strapi-chart
-    version: 0.1.0
+    version: 0.1.1
