@@ -76,11 +76,11 @@ ingress:
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
-    - secretName: api-{{ .Values.services.ingress.tls.secretName }}
+    - secretName: strapi-{{ .Values.services.ingress.tls.secretName }}
   {{- else }}
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - host: "strapi.marketdb.pro"
+        - "strapi.marketdb.pro"
 {{- end }}
   servicePort: 80
