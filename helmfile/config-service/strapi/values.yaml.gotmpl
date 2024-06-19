@@ -1,0 +1,86 @@
+# -*- mode: yaml -*-
+replicaCount: 2
+
+nodeSelector:
+  mdb-service: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/strapi-mdb
+  tag: sha-d0c31e9
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+  imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+service:
+  type: NodePort
+  port: 1337
+  containerPort: 1337
+  nodePort: 31337
+
+configMap:
+  enabled: true
+  data:
+    HOST: 0.0.0.0
+    PORT: "1337"
+    NODE_ENV: production
+    DATABASE_HOST: {{ .Values.services.postgres.endpoint }}
+    DATABASE_PORT: "6432"
+    DATABASE_USERNAME: dbuser
+    DATABASE_NAME: strapi
+
+secret:
+  enabled: true
+  data:
+    APP_KEYS: {{ .Values.services.strapi.appKeys }}
+    API_TOKEN_SALT: {{ .Values.services.strapi.apiTokenSalt }}
+    ADMIN_JWT_SECRET: {{ .Values.services.strapi.jwtAdminSecret }}
+    JWT_SECRET: {{ .Values.services.strapi.jwtSecret }}
+    DATABASE_PASSWORD: {{ .Values.services.postgres.uniPassword }}
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 1Gi
+  limits:
+    cpu: 300m
+    memory: 2Gi
+
+ingress:
+  enabled: true
+  annotations:
+{{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
+    cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+{{- end }}
+    kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+    nginx.ingress.kubernetes.io/cors-allow-methods: "POST, GET, PUT"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
+    kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+  hosts:
+    - host: "strapi.marketdb.pro"
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+{{- if .Values.services.ingress.tls.enabled }}
+  tls:
+  {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
+    - secretName: strapi-{{ .Values.services.ingress.tls.secretName }}
+  {{- else }}
+    - secretName: {{ .Values.services.ingress.tls.secretName }}
+  {{- end }}
+      hosts:
+        - "strapi.marketdb.pro"
+{{- end }}
+  servicePort: 80
