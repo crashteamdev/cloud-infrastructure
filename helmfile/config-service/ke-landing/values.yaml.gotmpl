@@ -86,12 +86,9 @@ ingress:
     nginx.ingress.kubernetes.io/limit-rpm: "50"
     nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
   hosts:
-    - host: {{ $ingressDomain | default "crashteam.dev" }}
+    - host: "marketdb.pro"
       paths:
         - /
-{{/*    - host: "marketdb.pro"*/}}
-{{/*      paths:*/}}
-{{/*        - /*/}}
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
   {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
@@ -100,7 +97,6 @@ ingress:
     - secretName: {{ .Values.services.ingress.tls.secretName }}
   {{- end }}
       hosts:
-        - {{ $ingressDomain | default "crashteam.dev" }}
-{{/*        - "marketdb.pro"*/}}
+        - "marketdb.pro"
 {{- end }}
   servicePort: 3000
