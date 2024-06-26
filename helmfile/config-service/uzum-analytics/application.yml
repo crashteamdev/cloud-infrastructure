@@ -23,8 +23,12 @@ spring:
       ssl:
         enable: true
   quartz:
+    jdbc:
+      initialize-schema: never
     properties:
       org.quartz.threadPool.threadCount: 30
+  datasource:
+    driver-class-name: org.postgresql.Driver
 
 management:
   server:
