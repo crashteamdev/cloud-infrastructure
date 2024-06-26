@@ -53,13 +53,6 @@ service:
   proxy:
     url: http://styx:8080
 
-freekassa:
-  baseUrl: https://api.freekassa.ru
-  shopId: 26248
-
-qiwi:
-  siteId: d9jje0-00
-
 uzum:
   scheduleEnabled: true
   groupCron: '0 0 0/6 * * ?'

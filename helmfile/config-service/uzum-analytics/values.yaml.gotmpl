@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-40ea723
+  tag: sha-c56dfe4
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -36,16 +36,6 @@ env:
     value: "8443"
   - name: CLICKHOUSE_DB
     value: uzum
-  - name: MONGO_HOST
-    value: {{ .Values.services.mongodb.host }}
-  - name: MONGO_USER
-    value: {{ .Values.services.mongodb.uniUser }}
-  - name: MONGO_PASSWORD
-    value: {{ .Values.services.mongodb.uniPassword }}
-  - name: MONGO_DATABASE
-    value: uzum
-  - name: MONGO_REPLICASET
-    value: rs01
   - name: SPRING_DATA_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_DATA_REDIS_PASSWORD
@@ -215,10 +205,6 @@ ingress:
   servicePort: {{ .Values.services.global.java.apiPort }}
 
 netPolicies:
-  - filters:
-    - port: 27018
-      type: TCP
-    name: mongodb
   - filters:
     - port: 6379
       type: TCP
