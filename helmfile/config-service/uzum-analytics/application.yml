@@ -24,6 +24,7 @@ spring:
         enable: true
   quartz:
     jdbc:
+      job-store-type: jdbc
       initialize-schema: never
     properties:
       org.quartz.scheduler.instanceName: UzumMasterScheduler
