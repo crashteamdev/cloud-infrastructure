@@ -32,6 +32,7 @@ spring:
       org.quartz.scheduler.skipUpdateCheck: true
       org.quartz.scheduler.threadsInheritContextClassLoaderOfInitializer: true
       org.quartz.threadPool.threadCount: 30
+      org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
       org.quartz.jobStore.isClustered: true
       org.quartz.jobStore.misfireThreshold: 30000
       org.quartz.jobStore.useProperties: true
