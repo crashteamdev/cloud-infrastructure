@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-2f59205
+  tag: sha-613597a
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -40,7 +40,7 @@ env:
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_DATA_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
-  - name: SPRING_DATASOURCE_JDBCURL
+  - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/uzum-analytics?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.uniUser }}
