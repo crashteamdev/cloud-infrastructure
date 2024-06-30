@@ -45,6 +45,9 @@ app:
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
+    timeout:
+      from: 1400
+      to: 2900
     kazan:
       token: Basic a2F6YW5leHByZXNzLWN1c3RvbWVyOmN1c3RvbWVyU2VjcmV0S2V5
     styx: http://styx:8080
@@ -55,3 +58,16 @@ app:
     position:
       maxlen: 100000
       waitPending: 50000
+
+logging:
+  level:
+    dev:
+      crashteam:
+        ke_data_scrapper:
+          job:
+            position:
+              PositionJob: DEBUG
+            product:
+              ProductJob: DEBUG
+            category:
+              CategoryJob: DEBUG

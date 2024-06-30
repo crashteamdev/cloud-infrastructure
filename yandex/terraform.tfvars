@@ -1,11 +1,12 @@
 pg_dbs = [
   "repricer",
-  "mdb-wiki",
   "space",
   "uzum-scrapper",
   "ke-scrapper",
   "crm",
-  "strapi"
+  "strapi",
+  "ke-analytics",
+  "uzum-analytics"
 ]
 mongo_dbs = [
   "kazanex",

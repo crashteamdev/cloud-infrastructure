@@ -53,8 +53,12 @@ service:
     url: http://styx:8080
 
 repricer:
-  productCron: 0 0 0/3 * * ?
+  productCron: 0 0 14 ? * * ?
   accountUpdateDataCron: 0 0 0/1 * * ?
   priceChangeCron: 0 0/15 * * * ?
   paymentCron: 0/15 * * * * ?
   accountInitializeCron: 0/20 * * * * ?
+
+grpc:
+  client:
+    keAnalyticsService.address: static://ke-analytics:9090

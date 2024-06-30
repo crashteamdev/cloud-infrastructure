@@ -1,6 +1,6 @@
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: 1
+replicaCount: 2
 
 nodeSelector:
   mdb-service: "true"
@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-d1e7aa0
+  tag: sha-573aedf
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
