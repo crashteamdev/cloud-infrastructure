@@ -22,9 +22,8 @@ spring:
       username: default
       ssl:
         enable: true
-  quartz:
-    properties:
-      org.quartz.threadPool.threadCount: 30
+  datasource:
+    driver-class-name: org.postgresql.Driver
 
 management:
   server:
@@ -52,13 +51,6 @@ management:
 service:
   proxy:
     url: http://styx:8080
-
-freekassa:
-  baseUrl: https://api.freekassa.ru
-  shopId: 26248
-
-qiwi:
-  siteId: d9jje0-00
 
 uzum:
   scheduleEnabled: true
