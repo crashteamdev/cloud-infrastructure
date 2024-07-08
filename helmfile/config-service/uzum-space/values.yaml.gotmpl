@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=70M -XX:MaxMetaspaceSize=224M
+      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=224M
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/space?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
