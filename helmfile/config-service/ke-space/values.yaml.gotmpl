@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=224M
+      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=200M -XX:MaxMetaspaceSize=224M
       -XX:+UnlockDiagnosticVMOptions -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/heapdumps
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/repricer?sslmode=require
