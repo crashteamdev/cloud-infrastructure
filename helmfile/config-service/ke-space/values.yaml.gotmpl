@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1024M
+      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=224M
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/repricer?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
@@ -68,11 +68,15 @@ livenessProbe:
   httpGet:
     path: /actuator/health
     port: management
+  initialDelaySeconds: 30
+  periodSeconds: 10
 
 readinessProbe:
   httpGet:
     path: /actuator/health
     port: management
+  initialDelaySeconds: 30
+  periodSeconds: 10
 
 resources:
   limits:
