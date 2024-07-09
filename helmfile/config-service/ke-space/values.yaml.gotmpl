@@ -55,7 +55,6 @@ volumes:
     hostPath:
       path: /home/{{ $applicationName }}/heapdumps
       type: DirectoryOrCreate
-      defaultMode: 0777
 
 volumeMounts:
   - name: config-volume
