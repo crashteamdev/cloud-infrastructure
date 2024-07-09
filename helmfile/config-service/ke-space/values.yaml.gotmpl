@@ -23,8 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=200M -XX:MaxMetaspaceSize=224M
-      -XX:+UnlockDiagnosticVMOptions -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/heapdumps
+      -Xmx1024M
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/repricer?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
@@ -51,18 +50,12 @@ volumes:
     configMap:
       name: {{ $applicationName }}
       defaultMode: 0755
-  - name: heapdump-volume
-    hostPath:
-      path: /home/{{ $applicationName }}/heapdumps
-      type: DirectoryOrCreate
 
 volumeMounts:
   - name: config-volume
     mountPath: /opt/{{ $applicationName }}/config/application.yml
     subPath: application.yml
     readOnly: true
-  - name: heapdump-volume
-    mountPath: /opt/heapdumps
 
 service:
   ports:
