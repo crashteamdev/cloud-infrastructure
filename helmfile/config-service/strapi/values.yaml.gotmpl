@@ -30,6 +30,15 @@ configMap:
     DATABASE_USERNAME: dbuser
     DATABASE_NAME: strapi
 
+storage:
+  claim:
+    enabled: true
+  capacity: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: yc-network-hdd
+  mountPath: "/tmp"
+
 secret:
   enabled: true
   data:
