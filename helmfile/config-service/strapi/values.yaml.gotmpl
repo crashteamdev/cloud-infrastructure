@@ -43,11 +43,15 @@ livenessProbe:
   httpGet:
     path: /
     port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
 
 readinessProbe:
   httpGet:
     path: /
     port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
 
 resources:
   requests:
