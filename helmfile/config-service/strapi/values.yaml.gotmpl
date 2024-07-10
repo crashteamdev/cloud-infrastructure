@@ -68,6 +68,7 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+    nginx.ingress.kubernetes.io/proxy-body-size: "300m"
   hosts:
     - host: "strapi.marketdb.pro"
       paths:
