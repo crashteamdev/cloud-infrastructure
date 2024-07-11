@@ -1,5 +1,5 @@
 # -*- mode: yaml -*-
-replicaCount: 2
+replicaCount: 1
 
 nodeSelector:
   mdb-service: "true"
@@ -35,7 +35,7 @@ storage:
     enabled: true
   capacity: 5Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   storageClassName: yc-network-hdd
   mountPath: "/opt/app/public/uploads"
 
