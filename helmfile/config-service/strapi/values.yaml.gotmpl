@@ -35,9 +35,9 @@ storage:
     enabled: true
   capacity: 5Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   storageClassName: yc-network-hdd
-  mountPath: "/tmp"
+  mountPath: "/opt/app/public/uploads"
 
 secret:
   enabled: true
