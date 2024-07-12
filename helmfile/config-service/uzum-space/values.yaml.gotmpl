@@ -73,15 +73,21 @@ livenessProbe:
   httpGet:
     path: /actuator/health
     port: management
+  initialDelaySeconds: 30
+  periodSeconds: 10
 
 readinessProbe:
   httpGet:
     path: /actuator/health
     port: management
+  initialDelaySeconds: 30
+  periodSeconds: 10
 
 resources:
+  requests:
+    memory: 1Gi
   limits:
-    memory: 2024Mi
+    memory: 2Gi
 
 metrics:
   serviceMonitor:

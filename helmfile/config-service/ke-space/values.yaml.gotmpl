@@ -79,8 +79,10 @@ readinessProbe:
   periodSeconds: 10
 
 resources:
+  requests:
+    memory: 1Gi
   limits:
-    memory: 2024Mi
+    memory: 2Gi
 
 metrics:
   serviceMonitor:
