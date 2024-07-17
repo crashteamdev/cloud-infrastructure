@@ -74,13 +74,6 @@ resource "yandex_vpc_subnet" "redis-a" {
   v4_cidr_blocks = ["10.2.0.0/24"]
 }
 
-resource "yandex_vpc_subnet" "mongo-a" {
-  name           = "mongonet-a"
-  zone           = var.yc_region
-  network_id     = yandex_vpc_network.network-1.id
-  v4_cidr_blocks = ["10.3.0.0/24"]
-}
-
 resource "yandex_vpc_subnet" "clickhouse-a" {
   name           = "clickhousenet-a"
   zone           = var.yc_region
