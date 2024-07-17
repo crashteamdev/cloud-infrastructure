@@ -1,5 +1,5 @@
 locals {
-  k8s_version = "1.23"
+  k8s_version = "1.28"
 }
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
@@ -198,7 +198,7 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
 resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name = "mdb-service-spot"
-  version = "1.23"
+  version = local.k8s_version
   node_labels = {
     mdb-service = "true"
   }
@@ -248,7 +248,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
 resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name       = "mdb-sup-service"
-  version    = "1.23"
+  version    = local.k8s_version
 
   instance_template {
     platform_id = "standard-v2"
