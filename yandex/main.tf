@@ -1,5 +1,5 @@
 locals {
-  k8s_version = "1.24"
+  k8s_version = "1.25"
 }
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
@@ -223,8 +223,8 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
     }
   }
   deploy_policy {
-    max_unavailable = 2
-    max_expansion   = 2
+    max_unavailable = 1
+    max_expansion   = 1
   }
   maintenance_policy {
     auto_upgrade = true
