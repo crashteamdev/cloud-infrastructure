@@ -1,5 +1,5 @@
 locals {
-  k8s_version = "1.27"
+  k8s_version = "1.28"
 }
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
