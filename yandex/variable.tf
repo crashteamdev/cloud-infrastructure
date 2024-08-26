@@ -32,10 +32,6 @@ variable "pg_dbs" {
   description = ""
 }
 
-variable "mongo_dbs" {
-  description = ""
-}
-
 variable "clickhouse_dbs" {
   description = ""
 }

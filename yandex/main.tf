@@ -1,5 +1,5 @@
 locals {
-  k8s_version = "1.23"
+  k8s_version = "1.28"
 }
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
@@ -72,13 +72,6 @@ resource "yandex_vpc_subnet" "redis-a" {
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
   v4_cidr_blocks = ["10.2.0.0/24"]
-}
-
-resource "yandex_vpc_subnet" "mongo-a" {
-  name           = "mongonet-a"
-  zone           = var.yc_region
-  network_id     = yandex_vpc_network.network-1.id
-  v4_cidr_blocks = ["10.3.0.0/24"]
 }
 
 resource "yandex_vpc_subnet" "clickhouse-a" {
@@ -198,7 +191,7 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
 resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name = "mdb-service-spot"
-  version = "1.23"
+  version = local.k8s_version
   node_labels = {
     mdb-service = "true"
   }
@@ -230,8 +223,8 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
     }
   }
   deploy_policy {
-    max_unavailable = 2
-    max_expansion   = 2
+    max_unavailable = 1
+    max_expansion   = 1
   }
   maintenance_policy {
     auto_upgrade = true
@@ -248,7 +241,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
 resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name       = "mdb-sup-service"
-  version    = "1.23"
+  version    = local.k8s_version
 
   instance_template {
     platform_id = "standard-v2"
@@ -391,66 +384,6 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   host {
     zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.redis-a.id
-    assign_public_ip = true
-  }
-
-  maintenance_window {
-    day  = "SUN"
-    hour = 2
-    type = "WEEKLY"
-  }
-}
-
-
-resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
-  name        = "marketdb"
-  environment = "PRODUCTION"
-  network_id  = yandex_vpc_network.network-1.id
-
-  cluster_config {
-    version = "6.0"
-  }
-
-  dynamic "database" {
-    for_each = var.mongo_dbs
-    content {
-      name = database.value
-    }
-  }
-
-  user {
-    name     = "dbuser"
-    password = var.db_password
-    dynamic "permission" {
-      for_each = var.mongo_dbs
-      content {
-        database_name = permission.value
-        roles = ["readWrite"]
-      }
-    }
-  }
-
-  user {
-    name     = "support"
-    password = var.db_password
-    dynamic "permission" {
-      for_each = var.mongo_dbs
-      content {
-        database_name = permission.value
-        roles = ["read"]
-      }
-    }
-  }
-
-  resources {
-    resource_preset_id = "b3-c1-m4"
-    disk_type_id       = "network-ssd"
-    disk_size          = 250
-  }
-
-  host {
-    zone_id   = "ru-central1-a"
-    subnet_id = yandex_vpc_subnet.mongo-a.id
     assign_public_ip = true
   }
 

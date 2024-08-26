@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-40ea723
+  tag: sha-e89cb5f
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -36,80 +36,21 @@ env:
     value: "8443"
   - name: CLICKHOUSE_DB
     value: uzum
-  - name: MONGO_HOST
-    value: {{ .Values.services.mongodb.host }}
-  - name: MONGO_USER
-    value: {{ .Values.services.mongodb.uniUser }}
-  - name: MONGO_PASSWORD
-    value: {{ .Values.services.mongodb.uniPassword }}
-  - name: MONGO_DATABASE
-    value: uzum
-  - name: MONGO_REPLICASET
-    value: rs01
   - name: SPRING_DATA_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_DATA_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
-  - name: FREEKASSA_APIKEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_freekassa_apikey
-  - name: FREEKASSA_SECRETWORDFIRST
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_freekassa_secretwordfirst
-  - name: FREEKASSA_SECRETWORDSECOND
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_freekassa_secretwordsecond
-  - name: QIWI_APIKEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_qiwi_apikey
-  - name: QIWI_PUBLICKEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_qiwi_publickey
-  - name: QIWI_CALLBACKSECRET
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_qiwi_callbacksecret
+  - name: SPRING_DATASOURCE_JDBCURL
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/uzum-analytics?sslmode=require
+  - name: SPRING_DATASOURCE_USERNAME
+    value: {{ .Values.services.postgres.uniUser }}
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: {{ .Values.services.postgres.uniPassword }}
   - name: CURRENCY_APIKEY
     valueFrom:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: uzum_currency_apikey
-  - name: UZUMBANK_TERMINALID
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_bank_terminal_id
-  - name: UZUMBANK_FINGERPRINT
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_bank_fingerprint
-  - name: UZUMBANK_SSL_CERTPASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_bank_certpassword
-  - name: UZUMBANK_SSL_KEYSTOREPASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_bank_keystorepassword
-  - name: UZUMBANK_SSL_KEYPASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: {{ .Release.Name }}
-        key: uzum_bank_keypassword
   - name: AWS-STREAM_ACCESSKEY
     valueFrom:
       secretKeyRef:
@@ -215,10 +156,6 @@ ingress:
   servicePort: {{ .Values.services.global.java.apiPort }}
 
 netPolicies:
-  - filters:
-    - port: 27018
-      type: TCP
-    name: mongodb
   - filters:
     - port: 6379
       type: TCP
