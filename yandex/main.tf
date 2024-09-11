@@ -25,6 +25,25 @@ resource "yandex_vpc_subnet" "subnet-mng" {
   network_id     = yandex_vpc_network.network-1.id
 }
 
+resource "yandex_vpc_nat_gateway" "nat_gateway" {
+  name      = "nat-gateway"
+  network_id = yandex_vpc_network.network-1.id
+  subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+}
+
+resource "yandex_vpc_route_table" "nat_route_table" {
+  network_id = yandex_vpc_network.network-1.id
+  static_route {
+    destination_prefix    = "0.0.0.0/0"
+    next_hop_nat_gateway_id = yandex_vpc_nat_gateway.nat_gateway.id
+  }
+}
+
+resource "yandex_vpc_subnet_route_table_attachment" "subnet_service_route_table" {
+  subnet_id    = yandex_vpc_subnet.subnet-service.id
+  route_table_id = yandex_vpc_route_table.nat_route_table.id
+}
+
 resource "yandex_iam_service_account" "marketdb-tf" {
   name        = "marketdb-tf"
   description = "service account for terraform"
