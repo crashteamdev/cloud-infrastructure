@@ -19,7 +19,7 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 10
+            threadCount: 12
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
             misfireThreshold: 60000
@@ -63,7 +63,7 @@ app:
   integration:
     timeout:
       from: 5500
-      to: 9500
+      to: 6500
     uzum:
       token: Basic YjJjLWZyb250OmNsaWVudFNlY3JldA==
     styx: http://styx:8080
