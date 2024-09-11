@@ -9,6 +9,7 @@ resource "yandex_vpc_subnet" "subnet-microservices" {
   name           = "microservices-subnet"
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
+  route_table_id = yandex_vpc_route_table.service-rt.id
 }
 
 resource "yandex_vpc_subnet" "subnet-service" {
@@ -16,6 +17,7 @@ resource "yandex_vpc_subnet" "subnet-service" {
   name           = "service-subnet"
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
+  route_table_id = yandex_vpc_route_table.service-rt.id
 }
 
 resource "yandex_vpc_subnet" "subnet-mng" {
@@ -25,23 +27,21 @@ resource "yandex_vpc_subnet" "subnet-mng" {
   network_id     = yandex_vpc_network.network-1.id
 }
 
-resource "yandex_vpc_nat_gateway" "nat_gateway" {
-  name      = "nat-gateway"
-  network_id = yandex_vpc_network.network-1.id
-  subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+resource "yandex_vpc_gateway" "nat-gateway" {
+  folder_id      = var.yc_folder_id
+  name = "nat-gateway"
+  shared_egress_gateway {}
 }
 
-resource "yandex_vpc_route_table" "nat_route_table" {
-  network_id = yandex_vpc_network.network-1.id
+resource "yandex_vpc_route_table" "service-rt" {
+  folder_id      = var.yc_folder_id
+  name           = "service-route-table"
+  network_id     = yandex_vpc_network.network-1.id
+
   static_route {
-    destination_prefix    = "0.0.0.0/0"
-    next_hop_nat_gateway_id = yandex_vpc_nat_gateway.nat_gateway.id
+    destination_prefix = "0.0.0.0/0"
+    gateway_id         = yandex_vpc_gateway.nat-gateway.id
   }
-}
-
-resource "yandex_vpc_subnet_route_table_attachment" "subnet_service_route_table" {
-  subnet_id    = yandex_vpc_subnet.subnet-service.id
-  route_table_id = yandex_vpc_route_table.nat_route_table.id
 }
 
 resource "yandex_iam_service_account" "marketdb-tf" {
