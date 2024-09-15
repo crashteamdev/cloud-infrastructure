@@ -9,7 +9,6 @@ resource "yandex_vpc_subnet" "subnet-microservices" {
   name           = "microservices-subnet"
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
-  route_table_id = yandex_vpc_route_table.service-rt.id
 }
 
 resource "yandex_vpc_subnet" "subnet-service" {
@@ -17,7 +16,6 @@ resource "yandex_vpc_subnet" "subnet-service" {
   name           = "service-subnet"
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
-  route_table_id = yandex_vpc_route_table.service-rt.id
 }
 
 resource "yandex_vpc_subnet" "subnet-mng" {
