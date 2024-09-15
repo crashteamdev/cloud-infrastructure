@@ -298,18 +298,6 @@ resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   }
 }
 
-resource "yandex_vpc_security_group" "pg_sg" {
-  name       = "pg-security-group"
-  network_id = yandex_vpc_network.network-1.id
-
-  ingress {
-    protocol       = "TCP"
-    description    = "Allow PostgreSQL access from service subnet"
-    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
-    port           = 6432
-  }
-}
-
 resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   name        = "pg_prod"
   description = "main database"
@@ -343,7 +331,6 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   host {
     zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.pg-a.id
-    security_group_ids = [yandex_vpc_security_group.pg_sg.id]
     assign_public_ip = true
   }
 }
@@ -377,18 +364,6 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
   }
 }
 
-resource "yandex_vpc_security_group" "redis_sg" {
-  name       = "redis-security-group"
-  network_id = yandex_vpc_network.network-1.id
-
-  ingress {
-    protocol       = "TCP"
-    description    = "Allow Redis access from service subnet"
-    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
-    port           = 26379
-  }
-}
-
 resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   name        = "redis_mdb"
   environment = "PRODUCTION"
@@ -409,7 +384,6 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   host {
     zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.redis-a.id
-    security_group_ids = [yandex_vpc_security_group.redis_sg.id]
     assign_public_ip = true
   }
 
@@ -417,18 +391,6 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
     day  = "SUN"
     hour = 2
     type = "WEEKLY"
-  }
-}
-
-resource "yandex_vpc_security_group" "clickhouse_sg" {
-  name       = "clickhouse-security-group"
-  network_id = yandex_vpc_network.network-1.id
-
-  ingress {
-    protocol       = "TCP"
-    description    = "Allow ClickHouse access from service subnet"
-    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
-    port           = 9440
   }
 }
 
@@ -451,7 +413,6 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
     type      = "CLICKHOUSE"
     zone      = "ru-central1-a"
     subnet_id = yandex_vpc_subnet.clickhouse-a.id
-    security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
     assign_public_ip = true
   }
 
