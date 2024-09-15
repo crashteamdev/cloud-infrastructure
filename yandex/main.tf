@@ -25,23 +25,6 @@ resource "yandex_vpc_subnet" "subnet-mng" {
   network_id     = yandex_vpc_network.network-1.id
 }
 
-resource "yandex_vpc_gateway" "nat-gateway" {
-  folder_id      = var.yc_folder_id
-  name = "nat-gateway"
-  shared_egress_gateway {}
-}
-
-resource "yandex_vpc_route_table" "service-rt" {
-  folder_id      = var.yc_folder_id
-  name           = "service-route-table"
-  network_id     = yandex_vpc_network.network-1.id
-
-  static_route {
-    destination_prefix = "0.0.0.0/0"
-    gateway_id         = yandex_vpc_gateway.nat-gateway.id
-  }
-}
-
 resource "yandex_iam_service_account" "marketdb-tf" {
   name        = "marketdb-tf"
   description = "service account for terraform"
