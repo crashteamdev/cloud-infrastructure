@@ -316,7 +316,6 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
   folder_id   = var.yc_folder_id
-  security_group_ids = [yandex_vpc_security_group.pg_sg.id]
 
   config {
     version = "14"
@@ -344,6 +343,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   host {
     zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.pg-a.id
+    security_group_ids = [yandex_vpc_security_group.pg_sg.id]
     assign_public_ip = true
   }
 }
@@ -395,7 +395,6 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   network_id  = yandex_vpc_network.network-1.id
   folder_id   = var.yc_folder_id
   tls_enabled = true
-  security_group_ids = [yandex_vpc_security_group.redis_sg.id]
 
   config {
     password = var.db_password
@@ -410,6 +409,7 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   host {
     zone      = var.yc_region
     subnet_id = yandex_vpc_subnet.redis-a.id
+    security_group_ids = [yandex_vpc_security_group.redis_sg.id]
     assign_public_ip = true
   }
 
@@ -437,7 +437,6 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   environment        = "PRODUCTION"
   network_id         = yandex_vpc_network.network-1.id
   version = "23.8"
-  security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
   #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
 
   clickhouse {
@@ -452,6 +451,7 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
     type      = "CLICKHOUSE"
     zone      = "ru-central1-a"
     subnet_id = yandex_vpc_subnet.clickhouse-a.id
+    security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
     assign_public_ip = true
   }
 
