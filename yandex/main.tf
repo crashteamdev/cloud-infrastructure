@@ -298,12 +298,32 @@ resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   }
 }
 
+resource "yandex_vpc_security_group" "pg_sg" {
+  name       = "pg-security-group"
+  network_id = yandex_vpc_network.network-1.id
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow PostgreSQL access from service subnet"
+    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
+    port           = 6432
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow Redis access from any external IP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 6379
+  }
+}
+
 resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   name        = "pg_prod"
   description = "main database"
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
   folder_id   = var.yc_folder_id
+  security_group_ids = [yandex_vpc_security_group.pg_sg.id]
 
   config {
     version = "14"
@@ -364,12 +384,32 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
   }
 }
 
+resource "yandex_vpc_security_group" "redis_sg" {
+  name       = "redis-security-group"
+  network_id = yandex_vpc_network.network-1.id
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow Redis access from service subnet"
+    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
+    port           = 26379
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow Redis access from any external IP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 6379
+  }
+}
+
 resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   name        = "redis_mdb"
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
   folder_id   = var.yc_folder_id
   tls_enabled = true
+  security_group_ids = [yandex_vpc_security_group.redis_sg.id]
 
   config {
     password = var.db_password
@@ -394,11 +434,31 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   }
 }
 
+resource "yandex_vpc_security_group" "clickhouse_sg" {
+  name       = "clickhouse-security-group"
+  network_id = yandex_vpc_network.network-1.id
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow ClickHouse access from service subnet"
+    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
+    port           = 9440
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow Redis access from any external IP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 6379
+  }
+}
+
 resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   name               = "marketdb-clickhouse"
   environment        = "PRODUCTION"
   network_id         = yandex_vpc_network.network-1.id
   version = "23.8"
+  security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
   #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
 
   clickhouse {
