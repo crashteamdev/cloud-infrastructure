@@ -17,3 +17,5 @@ clickhouse_dbs = [
   "kazanex"
 ]
 db_password = "Str0ngPasswd"
+vm_user_nat = "vitaxa"
+nat_ssh_key_path = "./keys/yc-nat.pub"

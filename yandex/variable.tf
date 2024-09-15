@@ -41,3 +41,11 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "vm_user_nat" {
+  type = string
+}
+
+variable "nat_ssh_key_path" {
+  type = string
+}
