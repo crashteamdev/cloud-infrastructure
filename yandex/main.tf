@@ -219,7 +219,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
   scale_policy {
     fixed_scale {
-      size = 3
+      size = 2
     }
   }
   deploy_policy {
