@@ -20,6 +20,13 @@ resource "yandex_vpc_subnet" "subnet-service" {
   route_table_id = yandex_vpc_route_table.nat-instance-route.id
 }
 
+resource "yandex_vpc_subnet" "subnet-nat" {
+  v4_cidr_blocks = ["10.1.100.0/24"]
+  name           = "nat-subnet"
+  zone           = var.yc_region
+  network_id     = yandex_vpc_network.network-1.id
+}
+
 resource "yandex_vpc_subnet" "subnet-mng" {
   v4_cidr_blocks = ["10.1.3.0/24"]
   name           = "k8s-cluster"
@@ -87,7 +94,7 @@ resource "yandex_compute_instance" "nat-instance" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.subnet-microservices.id
+    subnet_id          = yandex_vpc_subnet.subnet-nat.id
     security_group_ids = [yandex_vpc_security_group.nat-instance-sg.id]
     nat                = true
   }
