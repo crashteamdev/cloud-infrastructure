@@ -398,14 +398,14 @@ resource "yandex_vpc_security_group" "redis_sg" {
     protocol       = "TCP"
     description    = "Allow Redis access from service subnet"
     v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
-    port           = 26379
+    port           = 6380
   }
 
   ingress {
     protocol       = "TCP"
     description    = "Allow Redis access from any external IP"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 26379
+    port           = 6380
   }
 
   egress {
@@ -454,14 +454,14 @@ resource "yandex_vpc_security_group" "clickhouse_sg" {
     protocol       = "TCP"
     description    = "Allow ClickHouse access from service subnet"
     v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
-    port           = 9440
+    port           = 8443
   }
 
   ingress {
     protocol       = "TCP"
     description    = "Allow ClickHouse access from any external IP"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 9440
+    port           = 8443
   }
 
   egress {
