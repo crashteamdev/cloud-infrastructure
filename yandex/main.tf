@@ -313,7 +313,7 @@ resource "yandex_vpc_security_group" "pg_sg" {
     protocol       = "TCP"
     description    = "Allow PostgreSQL access from any external IP"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 6379
+    port           = 6432
   }
 
   egress {
@@ -405,7 +405,7 @@ resource "yandex_vpc_security_group" "redis_sg" {
     protocol       = "TCP"
     description    = "Allow Redis access from any external IP"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 6379
+    port           = 26379
   }
 
   egress {
@@ -461,7 +461,7 @@ resource "yandex_vpc_security_group" "clickhouse_sg" {
     protocol       = "TCP"
     description    = "Allow ClickHouse access from any external IP"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 6379
+    port           = 9440
   }
 
   egress {
