@@ -303,7 +303,7 @@ resource "yandex_vpc_security_group" "pg_sg" {
   network_id = yandex_vpc_network.network-1.id
 
   ingress {
-    protocol       = "TCP"
+    protocol       = "ANY"
     description    = "Allow PostgreSQL access from service subnet"
     v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
     port           = 6432
@@ -395,7 +395,7 @@ resource "yandex_vpc_security_group" "redis_sg" {
   network_id = yandex_vpc_network.network-1.id
 
   ingress {
-    protocol       = "TCP"
+    protocol       = "ANY"
     description    = "Allow Redis access from service subnet"
     v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
     port           = 6380
@@ -451,7 +451,7 @@ resource "yandex_vpc_security_group" "clickhouse_sg" {
   network_id = yandex_vpc_network.network-1.id
 
   ingress {
-    protocol       = "TCP"
+    protocol       = "ANY"
     description    = "Allow ClickHouse access from service subnet"
     v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
     port           = 8443
