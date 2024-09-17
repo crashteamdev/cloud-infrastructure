@@ -13,6 +13,19 @@ spring:
     port: 6380
     username: default
     ssl: true
+  quartz:
+    job-store-type: jdbc
+    properties:
+      org:
+        quartz:
+          threadPool:
+            threadCount: 15
+            class: org.quartz.simpl.SimpleThreadPool
+          jobStore:
+            misfireThreshold: 60000
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            isClustered: true
+            useProperties: true
 
 
 management:
@@ -46,8 +59,8 @@ app:
       category-job: 0 0 1 ? * * *
   integration:
     timeout:
-      from: 1400
-      to: 2900
+      from: 2400
+      to: 3900
     kazan:
       token: Basic a2F6YW5leHByZXNzLWN1c3RvbWVyOmN1c3RvbWVyU2VjcmV0S2V5
     styx: http://styx:8080
