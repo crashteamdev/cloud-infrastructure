@@ -233,7 +233,7 @@ resource "yandex_compute_instance" "nat-instance" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.subnet-microservices.id
+    subnet_id          = yandex_vpc_subnet.subnet-nat.id
     security_group_ids = [yandex_vpc_security_group.nat-instance-sg.id]
     nat                = true
   }
