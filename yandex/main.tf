@@ -287,7 +287,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
 
     network_interface {
       nat        = false
-      subnet_ids = [yandex_vpc_subnet.subnet-microservices.id]
+      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
     }
 
     resources {
@@ -337,7 +337,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-node-group" {
 
     network_interface {
       nat        = true
-      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+      subnet_ids = [yandex_vpc_subnet.subnet-microservices.id]
     }
 
     resources {
