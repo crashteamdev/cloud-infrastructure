@@ -238,6 +238,56 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
 }
 
+resource "yandex_kubernetes_node_group" "mdb-spot-group" {
+  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
+  name = "mdb-spot-group"
+  version = local.k8s_version
+  node_labels = {
+    spot-node = "true"
+  }
+  instance_template {
+    platform_id = "standard-v2"
+
+    network_interface {
+      nat        = true
+      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+    }
+
+    resources {
+      memory = 12
+      cores  = 4
+    }
+
+    boot_disk {
+      type = "network-hdd"
+      size = 50
+    }
+
+    scheduling_policy {
+      preemptible = true
+    }
+  }
+  scale_policy {
+    fixed_scale {
+      size = 3
+    }
+  }
+  deploy_policy {
+    max_unavailable = 1
+    max_expansion   = 1
+  }
+  maintenance_policy {
+    auto_upgrade = true
+    auto_repair  = true
+
+    maintenance_window {
+      day        = "monday"
+      start_time = "05:00"
+      duration   = "2h"
+    }
+  }
+}
+
 resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name       = "mdb-sup-service"
