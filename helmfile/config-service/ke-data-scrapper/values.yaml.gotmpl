@@ -29,7 +29,7 @@ env:
     value: {{ .Values.services.postgres.uniPassword }}
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx121M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=111M
+      -Xmx122M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=111M
   - name: SPRING_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_REDIS_PASSWORD
