@@ -336,8 +336,8 @@ resource "yandex_kubernetes_node_group" "mdb-spot-node-group" {
     platform_id = "standard-v2"
 
     network_interface {
-      nat        = false
-      subnet_ids = [yandex_vpc_subnet.subnet-microservices.id]
+      nat        = true
+      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
     }
 
     resources {
