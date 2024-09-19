@@ -216,14 +216,6 @@ resource "yandex_compute_disk" "boot-disk-nat" {
   image_id = yandex_compute_image.nat-instance-ubuntu.id
 }
 
-resource "yandex_compute_disk" "boot-disk-nat" {
-  name     = "boot-disk-nat"
-  type     = "network-hdd"
-  zone     = "ru-central1-a"
-  size     = "20"
-  image_id = yandex_compute_image.nat-instance-ubuntu.id
-}
-
 resource "yandex_compute_instance" "nat-instance" {
   name        = "nat-instance"
   platform_id = "standard-v3"
