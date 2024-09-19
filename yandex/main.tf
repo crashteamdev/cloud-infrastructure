@@ -9,6 +9,7 @@ resource "yandex_vpc_subnet" "subnet-microservices" {
   name           = "microservices-subnet"
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
+  route_table_id = yandex_vpc_route_table.nat-instance-route.id
 }
 
 resource "yandex_vpc_subnet" "subnet-nat" {
@@ -232,7 +233,7 @@ resource "yandex_compute_instance" "nat-instance" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.subnet-nat.id
+    subnet_id          = yandex_vpc_subnet.subnet-microservices.id
     security_group_ids = [yandex_vpc_security_group.nat-instance-sg.id]
     nat                = true
   }
@@ -249,12 +250,6 @@ resource "yandex_vpc_route_table" "nat-instance-route" {
     destination_prefix = "0.0.0.0/0"
     next_hop_address   = yandex_compute_instance.nat-instance.network_interface.0.ip_address
   }
-}
-
-resource "yandex_vpc_gateway" "nat-gateway" {
-  folder_id      = var.yc_folder_id
-  name = "nat-gateway"
-  shared_egress_gateway {}
 }
 
 resource "yandex_kubernetes_cluster" "prod_cluster" {
@@ -292,7 +287,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
 
     network_interface {
       nat        = false
-      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+      subnet_ids = [yandex_vpc_subnet.subnet-microservices.id]
     }
 
     resources {
@@ -311,7 +306,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
   scale_policy {
     fixed_scale {
-      size = 3
+      size = 2
     }
   }
   deploy_policy {
