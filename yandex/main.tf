@@ -238,7 +238,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
 }
 
-resource "yandex_kubernetes_node_group" "mdb-spot-group" {
+resource "yandex_kubernetes_node_group" "mdb-spot-node-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name = "mdb-spot-group"
   version = local.k8s_version
