@@ -3,7 +3,7 @@
 replicaCount: 2
 
 nodeSelector:
-  spot-node: "true"
+  mdb-service: "true"
 
 podAnnotations:
   prometheus.io/path: "/actuator/prometheus"
@@ -29,7 +29,7 @@ env:
     value: {{ .Values.services.postgres.uniPassword }}
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx121M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=111M
+      -Xmx121M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=112M
   - name: SPRING_REDIS_HOST
     value: {{ .Values.services.redis.endpoint }}
   - name: SPRING_REDIS_PASSWORD
