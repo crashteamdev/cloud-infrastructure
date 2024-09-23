@@ -4,7 +4,7 @@
 replicaCount: 1
 
 nodeSelector:
-  spot-node: "true"
+  mdb-service: "true"
 
 podAnnotations:
   prometheus.io/path: "/actuator/prometheus"
@@ -24,7 +24,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1560M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=222M
+      -Xmx1570M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=100M -XX:MaxMetaspaceSize=222M
       -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
       -XX:+UseParallelGC
       -Dcom.amazonaws.sdk.disableCertChecking
