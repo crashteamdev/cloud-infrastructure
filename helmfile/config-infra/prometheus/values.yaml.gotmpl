@@ -1,5 +1,9 @@
 namespaceOverride: "monitoring"
 
+alertmanagerSpec:
+  nodeSelector:
+    monitoring: "true"
+
 prometheus:
   prometheusSpec:
     storageSpec:
@@ -154,6 +158,23 @@ grafana:
         hosts:
           - grafana.crashteam.dev
   {{- end }}
+
+prometheusOperator:
+  admissionWebhooks:
+    deployment:
+      nodeSelector:
+        monitoring: "true"
+    path:
+      nodeSelector:
+        monitoring: "true"
+  nodeSelector:
+    monitoring: "true"
+
+thanosRuler:
+  thanosRulerSpec:
+    nodeSelector:
+      monitoring: "true"
+
 
 kubeScheduler:
   enabled: false
