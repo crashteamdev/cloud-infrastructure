@@ -74,6 +74,7 @@ grafana:
   replicas: 1
   adminPassword: {{ .Values.prometheus.grafana.password }}
   create: true
+  assertNoLeakedSecrets: false
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
   # useExistingRole: name-of-some-(cluster)role
   rbac:
