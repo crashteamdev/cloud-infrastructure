@@ -1,6 +1,7 @@
 namespaceOverride: "monitoring"
 
 alertmanagerSpec:
+  pspEnabled: false
   nodeSelector:
     monitoring: "true"
 
@@ -78,7 +79,7 @@ grafana:
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
   # useExistingRole: name-of-some-(cluster)role
   rbac:
-    create: true
+    create: false
     pspEnabled: false
     pspUseAppArmor: false
     namespaced: false
