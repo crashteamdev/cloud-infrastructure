@@ -3,6 +3,8 @@ loki:
   persistence:
     size: 20Gi
     storageClassName: yc-network-hdd
+  nodeSelector:
+    monitoring: "true"
   config:
     compactor:
       retention_enabled: true
@@ -27,6 +29,8 @@ loki:
 
 promtail:
   enabled: true
+  nodeSelector:
+    monitoring: "true"
   pipelineStages:
     - docker: {}
     - drop:
