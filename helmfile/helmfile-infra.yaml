@@ -49,5 +49,5 @@ releases:
 #  needs:
 #    - {{ .Namespace | default "default" }}/prometheus
 #    - {{ .Namespace | default "default" }}/certmanager
-  version: 2.9.10
+  version: 2.10.2
 {{- end }}
