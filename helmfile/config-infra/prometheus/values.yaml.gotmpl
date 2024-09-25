@@ -1,9 +1,9 @@
 namespaceOverride: "monitoring"
 
-alertmanagerSpec:
-  pspEnabled: false
-  nodeSelector:
-    monitoring: "true"
+{{/*alertmanagerSpec:*/}}
+{{/*  pspEnabled: false*/}}
+{{/*  nodeSelector:*/}}
+{{/*    monitoring: "true"*/}}
 
 prometheus:
   prometheusSpec:
@@ -161,21 +161,21 @@ grafana:
           - grafana.crashteam.dev
   {{- end }}
 
-prometheusOperator:
-  admissionWebhooks:
-    deployment:
-      nodeSelector:
-        monitoring: "true"
-    path:
-      nodeSelector:
-        monitoring: "true"
-  nodeSelector:
-    monitoring: "true"
+{{/*prometheusOperator:*/}}
+{{/*  admissionWebhooks:*/}}
+{{/*    deployment:*/}}
+{{/*      nodeSelector:*/}}
+{{/*        monitoring: "true"*/}}
+{{/*    path:*/}}
+{{/*      nodeSelector:*/}}
+{{/*        monitoring: "true"*/}}
+{{/*  nodeSelector:*/}}
+{{/*    monitoring: "true"*/}}
 
-thanosRuler:
-  thanosRulerSpec:
-    nodeSelector:
-      monitoring: "true"
+{{/*thanosRuler:*/}}
+{{/*  thanosRulerSpec:*/}}
+{{/*    nodeSelector:*/}}
+{{/*      monitoring: "true"*/}}
 
 
 kubeScheduler:
