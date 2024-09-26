@@ -1,5 +1,10 @@
 namespaceOverride: "monitoring"
 
+{{/*alertmanagerSpec:*/}}
+{{/*  pspEnabled: false*/}}
+{{/*  nodeSelector:*/}}
+{{/*    monitoring: "true"*/}}
+
 prometheus:
   prometheusSpec:
     storageSpec:
@@ -70,12 +75,13 @@ grafana:
   replicas: 1
   adminPassword: {{ .Values.prometheus.grafana.password }}
   create: true
+  assertNoLeakedSecrets: false
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
   # useExistingRole: name-of-some-(cluster)role
   rbac:
     create: true
-    pspEnabled: true
-    pspUseAppArmor: true
+    pspEnabled: false
+    pspUseAppArmor: false
     namespaced: false
     extraClusterRoleRules:
     - apiGroups: [""]
@@ -154,6 +160,23 @@ grafana:
         hosts:
           - grafana.crashteam.dev
   {{- end }}
+
+{{/*prometheusOperator:*/}}
+{{/*  admissionWebhooks:*/}}
+{{/*    deployment:*/}}
+{{/*      nodeSelector:*/}}
+{{/*        monitoring: "true"*/}}
+{{/*    path:*/}}
+{{/*      nodeSelector:*/}}
+{{/*        monitoring: "true"*/}}
+{{/*  nodeSelector:*/}}
+{{/*    monitoring: "true"*/}}
+
+{{/*thanosRuler:*/}}
+{{/*  thanosRulerSpec:*/}}
+{{/*    nodeSelector:*/}}
+{{/*      monitoring: "true"*/}}
+
 
 kubeScheduler:
   enabled: false
