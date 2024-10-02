@@ -62,8 +62,8 @@ app:
       category-job: 0 0 1 ? * * *
   integration:
     timeout:
-      from: 5500
-      to: 6500
+      from: 3500
+      to: 4500
     uzum:
       token: Basic YjJjLWZyb250OmNsaWVudFNlY3JldA==
     styx: http://styx:8080
