@@ -63,7 +63,7 @@ app:
   integration:
     timeout:
       from: 4700
-      to: 5500
+      to: 5400
     uzum:
       token: Basic YjJjLWZyb250OmNsaWVudFNlY3JldA==
     styx: http://styx:8080
