@@ -12,6 +12,8 @@ repositories:
     url: https://crashteamdev.github.io/charts/
   - name: requarks
     url: https://charts.js.wiki
+  - name: ksandermann
+    url: http://charts.sandermann.cloud
 
 releases:
   - name: ke-analytics
@@ -46,3 +48,6 @@ releases:
     <<: *default
     chart: crashteamdev/strapi-chart
     version: 0.1.1
+  - name: teamspeak
+    <<: *default
+    chart: teamspeak/teamspeak
