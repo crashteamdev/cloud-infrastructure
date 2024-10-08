@@ -50,4 +50,4 @@ releases:
     version: 0.1.1
   - name: teamspeak
     <<: *default
-    chart: teamspeak/teamspeak
+    chart: ksandermann/teamspeak
