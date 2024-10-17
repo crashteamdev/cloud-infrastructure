@@ -445,6 +445,9 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
   extension {
     name = "pg_trgm"
   }
+  extension {
+    name = "btree_gin"
+  }
 }
 
 resource "yandex_vpc_security_group" "redis_sg" {
