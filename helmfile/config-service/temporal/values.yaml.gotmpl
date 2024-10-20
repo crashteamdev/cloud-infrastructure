@@ -3,9 +3,9 @@ server:
   config:
     persistence:
       default:
-        driver: "sql"
+        driver: "postgres"
         sql:
-          driver: "postgres12"
+          driver: "postgres"
           host: {{ .Values.services.postgres.endpoint }}
           port: 6432
           database: temporal
@@ -19,7 +19,7 @@ server:
       visibility:
         driver: "sql"
         sql:
-          driver: "postgres12"
+          driver: "postgres"
           host: {{ .Values.services.postgres.endpoint }}
           port: 6432
           database: temporal_visibility
