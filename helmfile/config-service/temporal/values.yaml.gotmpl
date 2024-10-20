@@ -1,0 +1,56 @@
+server:
+  replicas: 2
+  config:
+    persistence:
+      default:
+        driver: "sql"
+        sql:
+          driver: "postgres12"
+          host: {{ .Values.services.postgres.endpoint }}
+          port: 6432
+          database: temporal
+          user: {{ .Values.services.postgres.uniUser }}
+          password: {{ .Values.services.postgres.uniPassword }}
+          maxConns: 20
+          maxConnLifetime: "1h"
+      visibility:
+        driver: "sql"
+        sql:
+          driver: "postgres12"
+          host: {{ .Values.services.postgres.endpoint }}
+          port: 5432
+          database: temporal_visibility
+          user: {{ .Values.services.postgres.uniUser }}
+          password: {{ .Values.services.postgres.uniPassword }}
+          maxConns: 20
+          maxConnLifetime: "1h"
+  nodeSelector:
+    mdb-service: "true"
+  frontend:
+    nodeSelector:
+      mdb-service: "true"
+  history:
+    nodeSelector:
+      mdb-service: "true"
+  matching:
+    nodeSelector:
+      mdb-service: "true"
+  worker:
+    nodeSelector:
+      mdb-service: "true"
+admintools:
+  nodeSelector:
+    mdb-service: "true"
+web:
+  nodeSelector:
+    ingress: "true"
+elasticsearch:
+  enabled: false
+prometheus:
+  enabled: false
+grafana:
+  enabled: false
+cassandra:
+  enabled: false
+postgresql:
+  enabled: false
