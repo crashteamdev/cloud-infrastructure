@@ -3,7 +3,7 @@ server:
   config:
     persistence:
       default:
-        driver: "postgres"
+        driver: "sql"
         sql:
           driver: "postgres"
           host: {{ .Values.services.postgres.endpoint }}
