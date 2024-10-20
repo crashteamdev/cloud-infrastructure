@@ -15,7 +15,7 @@ server:
           maxConnLifetime: "1h"
           tls:
             enabled: false
-            enableHostVerification: true
+            enableHostVerification: false
       visibility:
         driver: "sql"
         sql:
@@ -29,7 +29,7 @@ server:
           maxConnLifetime: "1h"
           tls:
             enabled: false
-            enableHostVerification: true
+            enableHostVerification: false
   nodeSelector:
     mdb-service: "true"
   frontend:
