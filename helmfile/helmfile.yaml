@@ -51,3 +51,4 @@ releases:
   - name: temporal
     <<: *default
     chart: temporal/temporal
+    version: 0.50.0
