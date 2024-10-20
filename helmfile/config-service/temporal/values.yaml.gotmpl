@@ -15,7 +15,7 @@ server:
           maxConnLifetime: "1h"
           tls:
             enabled: false
-            enableHostVerification: false
+            enableHostVerification: true
       visibility:
         driver: "sql"
         sql:
@@ -29,7 +29,7 @@ server:
           maxConnLifetime: "1h"
           tls:
             enabled: false
-            enableHostVerification: false
+            enableHostVerification: true
   nodeSelector:
     mdb-service: "true"
   frontend:
@@ -60,3 +60,11 @@ cassandra:
   enabled: false
 postgresql:
   enabled: false
+
+schema:
+  createDatabase:
+    enabled: false
+  setup:
+    enabled: false
+  update:
+    enabled: false
