@@ -21,7 +21,7 @@ server:
         sql:
           driver: "postgres12"
           host: {{ .Values.services.postgres.endpoint }}
-          port: 5432
+          port: 6432
           database: temporal_visibility
           user: {{ .Values.services.postgres.uniUser }}
           password: {{ .Values.services.postgres.uniPassword }}
