@@ -48,6 +48,8 @@ integration:
 application:
   forbidden-expire: 3
   scheduler:
+    mobile-proxy:
+      change-ip-cron: 0/8 * * ? * *
     redis:
       forbidden-url-cron: 0/10 * * * * ?
       update-user-agents: 0 0 3 * * ?
