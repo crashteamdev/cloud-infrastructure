@@ -28,6 +28,7 @@ env:
       -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
       -XX:+UseParallelGC
       -Dcom.amazonaws.sdk.disableCertChecking
+      -Djavax.net.debug=ssl
   - name: CLICKHOUSE_HOST
     value: {{ .Values.services.clickhouse.host }}
   - name: CLICKHOUSE_PASSWORD
