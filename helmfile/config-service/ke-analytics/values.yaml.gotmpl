@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-af0a987
+  tag: sha-b39886b
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -28,6 +28,7 @@ env:
       -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
       -XX:+UseParallelGC
       -Dcom.amazonaws.sdk.disableCertChecking
+      -Djavax.net.debug=ssl
   - name: CLICKHOUSE_HOST
     value: {{ .Values.services.clickhouse.host }}
   - name: CLICKHOUSE_PASSWORD
