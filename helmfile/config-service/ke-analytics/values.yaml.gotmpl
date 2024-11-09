@@ -1,7 +1,7 @@
 {{- $applicationName := .Release.Name -}}
 {{- $grpcPort := 9090 }}
 
-replicaCount: 1
+replicaCount: 2
 
 nodeSelector:
   mdb-service: "true"
@@ -28,7 +28,6 @@ env:
       -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
       -XX:+UseParallelGC
       -Dcom.amazonaws.sdk.disableCertChecking
-      -Djavax.net.debug=ssl
   - name: CLICKHOUSE_HOST
     value: {{ .Values.services.clickhouse.host }}
   - name: CLICKHOUSE_PASSWORD
