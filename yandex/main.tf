@@ -1,5 +1,5 @@
 locals {
-  k8s_version = "1.23"
+  k8s_version = "1.28"
 }
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
@@ -72,13 +72,6 @@ resource "yandex_vpc_subnet" "redis-a" {
   zone           = var.yc_region
   network_id     = yandex_vpc_network.network-1.id
   v4_cidr_blocks = ["10.2.0.0/24"]
-}
-
-resource "yandex_vpc_subnet" "mongo-a" {
-  name           = "mongonet-a"
-  zone           = var.yc_region
-  network_id     = yandex_vpc_network.network-1.id
-  v4_cidr_blocks = ["10.3.0.0/24"]
 }
 
 resource "yandex_vpc_subnet" "clickhouse-a" {
@@ -198,7 +191,7 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
 resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name = "mdb-service-spot"
-  version = "1.23"
+  version = local.k8s_version
   node_labels = {
     mdb-service = "true"
   }
@@ -230,8 +223,8 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
     }
   }
   deploy_policy {
-    max_unavailable = 2
-    max_expansion   = 2
+    max_unavailable = 1
+    max_expansion   = 1
   }
   maintenance_policy {
     auto_upgrade = true
@@ -245,10 +238,68 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
 }
 
+resource "yandex_kubernetes_node_group" "steambuddy-service" {
+  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
+  name       = "steambuddy-service"
+  version    = local.k8s_version
+  node_labels = {
+    steambuddy = "true"
+  }
+
+  instance_template {
+    platform_id = "standard-v2"
+
+    network_interface {
+      nat        = true
+      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
+    }
+
+    resources {
+      memory = 2
+      cores  = 2
+      core_fraction = 50
+    }
+
+    boot_disk {
+      type = "network-hdd"
+      size = 50
+    }
+  }
+
+  scale_policy {
+    fixed_scale {
+      size = 1
+    }
+  }
+
+  allocation_policy {
+    location {
+      zone = var.yc_region
+    }
+  }
+
+  maintenance_policy {
+    auto_upgrade = true
+    auto_repair  = true
+
+    maintenance_window {
+      day        = "monday"
+      start_time = "15:00"
+      duration   = "3h"
+    }
+
+    maintenance_window {
+      day        = "friday"
+      start_time = "10:00"
+      duration   = "4h30m"
+    }
+  }
+}
+
 resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name       = "mdb-sup-service"
-  version    = "1.23"
+  version    = local.k8s_version
 
   instance_template {
     platform_id = "standard-v2"
@@ -305,12 +356,37 @@ resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   }
 }
 
+resource "yandex_vpc_security_group" "pg_sg" {
+  name       = "pg-security-group"
+  network_id = yandex_vpc_network.network-1.id
+
+  ingress {
+    protocol       = "ANY"
+    description    = "Allow PostgreSQL access from service subnet"
+    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow PostgreSQL access from any external IP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 6432
+  }
+
+  egress {
+    protocol       = "ANY"
+    description    = "Allow all outbound traffic"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   name        = "pg_prod"
   description = "main database"
   environment = "PRODUCTION"
   network_id  = yandex_vpc_network.network-1.id
   folder_id   = var.yc_folder_id
+  security_group_ids = [yandex_vpc_security_group.pg_sg.id]
 
   config {
     version = "14"
@@ -369,6 +445,33 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
   extension {
     name = "pg_trgm"
   }
+  extension {
+    name = "btree_gin"
+  }
+}
+
+resource "yandex_vpc_security_group" "redis_sg" {
+  name       = "redis-security-group"
+  network_id = yandex_vpc_network.network-1.id
+
+  ingress {
+    protocol       = "ANY"
+    description    = "Allow Redis access from service subnet"
+    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow Redis access from any external IP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 6380
+  }
+
+  egress {
+    protocol       = "ANY"
+    description    = "Allow all outbound traffic"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
@@ -377,6 +480,7 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   network_id  = yandex_vpc_network.network-1.id
   folder_id   = var.yc_folder_id
   tls_enabled = true
+  security_group_ids = [yandex_vpc_security_group.redis_sg.id]
 
   config {
     password = var.db_password
@@ -401,63 +505,27 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   }
 }
 
+resource "yandex_vpc_security_group" "clickhouse_sg" {
+  name       = "clickhouse-security-group"
+  network_id = yandex_vpc_network.network-1.id
 
-resource "yandex_mdb_mongodb_cluster" "mongodb_database" {
-  name        = "marketdb"
-  environment = "PRODUCTION"
-  network_id  = yandex_vpc_network.network-1.id
-
-  cluster_config {
-    version = "6.0"
+  ingress {
+    protocol       = "ANY"
+    description    = "Allow ClickHouse access from service subnet"
+    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
   }
 
-  dynamic "database" {
-    for_each = var.mongo_dbs
-    content {
-      name = database.value
-    }
+  ingress {
+    protocol       = "TCP"
+    description    = "Allow ClickHouse access from any external IP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 8443
   }
 
-  user {
-    name     = "dbuser"
-    password = var.db_password
-    dynamic "permission" {
-      for_each = var.mongo_dbs
-      content {
-        database_name = permission.value
-        roles = ["readWrite"]
-      }
-    }
-  }
-
-  user {
-    name     = "support"
-    password = var.db_password
-    dynamic "permission" {
-      for_each = var.mongo_dbs
-      content {
-        database_name = permission.value
-        roles = ["read"]
-      }
-    }
-  }
-
-  resources {
-    resource_preset_id = "b3-c1-m4"
-    disk_type_id       = "network-ssd"
-    disk_size          = 250
-  }
-
-  host {
-    zone_id   = "ru-central1-a"
-    subnet_id = yandex_vpc_subnet.mongo-a.id
-    assign_public_ip = true
-  }
-
-  maintenance_window {
-    day  = "SUN"
-    hour = 2
-    type = "WEEKLY"
+  egress {
+    protocol       = "ANY"
+    description    = "Allow all outbound traffic"
+    v4_cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -466,7 +534,8 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   environment        = "PRODUCTION"
   network_id         = yandex_vpc_network.network-1.id
   version = "23.8"
-#  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
+  security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
+  #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
 
   clickhouse {
     resources {

@@ -32,10 +32,6 @@ variable "pg_dbs" {
   description = ""
 }
 
-variable "mongo_dbs" {
-  description = ""
-}
-
 variable "clickhouse_dbs" {
   description = ""
 }
@@ -44,4 +40,12 @@ variable "db_password" {
   description = "Database administrator password"
   type        = string
   sensitive   = true
+}
+
+variable "vm_user_nat" {
+  type = string
+}
+
+variable "nat_ssh_key_path" {
+  type = string
 }
