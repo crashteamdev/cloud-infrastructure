@@ -1,7 +1,7 @@
 {{- $applicationName := .Release.Name -}}
 {{- $grpcPort := 9090 }}
 
-replicaCount: 2
+replicaCount: 1
 
 nodeSelector:
   mdb-service: "true"
