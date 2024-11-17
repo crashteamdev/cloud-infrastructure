@@ -35,9 +35,15 @@ env:
   - name: SPRING_REDIS_PASSWORD
     value: {{ .Values.services.redis.password }}
   - name: APP_AWS-STREAM_ACCESSKEY
-    value: {{ .Values.services.aws.accesskey }}
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: aws_stream_access_key
   - name: APP_AWS-STREAM_SECRETKEY
-    value: {{ .Values.services.aws.secretkey }}
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: aws_stream_secret_key
 
 configMap:
   data:
