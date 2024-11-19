@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-d0916ec
+  tag: sha-8814325
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -46,6 +46,11 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: charon_lava_secretkey
+  - name: APP_INTEGRATION_YOOKASSA_SECRETKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_yookassa_secretkey
   - name: FREEKASSA_SECRETWORDSECOND
     valueFrom:
       secretKeyRef:
