@@ -86,6 +86,12 @@ clickhouse:
 aws-stream:
   kinesisEndpoint: 'yds.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
   dinamoDbEndpoint: 'docapi.serverless.yandexcloud.net/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57'
+  ke-stream:
+    name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/ke-stream'
+    maxRecords: 250
+    timeoutInSec: 60
+    failOverTimeMillis: 60000
+    consumerName: ke-analytics-consumer
   payment-stream:
     name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/mdb-payment'
     maxRecords: 50
