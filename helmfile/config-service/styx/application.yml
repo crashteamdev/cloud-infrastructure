@@ -61,6 +61,6 @@ app:
       timeout: 1000
       attempts: 3
       exponent: 1.5
-    timeout: 10000
+    timeout: 12000
     proxy-line:
       url: https://panel.proxyline.net/api/
