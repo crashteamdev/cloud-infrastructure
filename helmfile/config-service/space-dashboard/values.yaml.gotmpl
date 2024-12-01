@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/space-dashboard
-  tag: sha-c84695a
+  tag: sha-ddfbadd
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -65,7 +65,7 @@ readinessProbe:
 
 resources:
   requests:
-    memory: 75Mi
+    memory: 74Mi
 
 {{ $domainWithNamespace := printf "%s.%s" .Release.Namespace .Values.services.ingress.rootDomain }}
 {{ $ingressDomain := .Values.services.ingress.namespacedDomain | ternary $domainWithNamespace .Values.services.ingress.rootDomain }}
