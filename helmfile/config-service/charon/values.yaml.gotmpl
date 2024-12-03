@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-8814325
+  tag: sha-053bdbe
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -82,6 +82,11 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: charon_enot_secretkey
+  - name: APP_INTEGRATION_POSTHOG_API-KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_posthog_apikey
 
 configMap:
   data:
