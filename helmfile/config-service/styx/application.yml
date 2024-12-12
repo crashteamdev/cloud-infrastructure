@@ -55,7 +55,7 @@ application:
       update-user-agents: 0 0 3 * * ?
 
 app:
-  timeout-handler: 17
+  timeout-handler: 20
   proxy:
     retries:
       timeout: 1100
