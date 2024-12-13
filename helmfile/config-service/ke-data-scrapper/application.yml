@@ -19,10 +19,10 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 10
+            threadCount: 20
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
-            misfireThreshold: 37000
+            misfireThreshold: 1200000
             driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
             isClustered: true
             useProperties: true
