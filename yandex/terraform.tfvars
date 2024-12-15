@@ -8,7 +8,8 @@ pg_dbs = [
   "ke-analytics",
   "uzum-analytics",
   "temporal",
-  "temporal_visibility"
+  "temporal_visibility",
+  "herald"
 ]
 mongo_dbs = [
   "kazanex",
