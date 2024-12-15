@@ -45,4 +45,4 @@ job:
     daily-notify-cron-job: 0 0 9 ? * * *
 
 bot:
-  username: @MarketDB_Super_Bot
+  username: '@MarketDB_Super_Bot'
