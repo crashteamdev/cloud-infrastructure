@@ -3,7 +3,7 @@
 replicaCount: 1
 
 nodeSelector:
-  mdb-service: "true"
+  steambuddy: "true"
 
 podAnnotations:
   prometheus.io/path: "/actuator/prometheus"
@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-5d47931
+  tag: sha-1d87d93
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -23,7 +23,7 @@ imagePullSecrets:
 env:
   - name: JDK_JAVA_OPTIONS
     value: >-
-      -Xmx1024M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=112M
+      -Xmx512M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=112M
       -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
       -XX:+UseParallelGC
   - name: SPRING_DATASOURCE_URL
@@ -79,7 +79,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 1512Mi
+    memory: 1024Mi
 
 metrics:
   serviceMonitor:
