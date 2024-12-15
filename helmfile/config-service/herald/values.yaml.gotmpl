@@ -1,0 +1,93 @@
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 1
+
+nodeSelector:
+  mdb-service: "true"
+
+podAnnotations:
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "{{ .Values.services.global.java.managementPort }}"
+  prometheus.io/scrape: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: sha-1d87d93
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+env:
+  - name: JDK_JAVA_OPTIONS
+    value: >-
+      -Xmx512M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=112M
+      -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
+      -XX:+UseParallelGC
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/herald?sslmode=require
+  - name: SPRING_DATASOURCE_USERNAME
+    value: {{ .Values.services.postgres.uniUser }}
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: {{ .Values.services.postgres.uniPassword }}
+  - name: BOT_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: tg_bot_token
+  - name: BOT_ENCRYPTION_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: profile_encryption_key
+
+configMap:
+  data:
+    application.yml: |
+      {{- tpl (readFile "application.yml") . | nindent 6 }}
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: {{ $applicationName }}
+      defaultMode: 0755
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /opt/{{ $applicationName }}/config/application.yml
+    subPath: application.yml
+    readOnly: true
+
+service:
+  ports:
+    - name: api
+      port: {{ .Values.services.global.java.apiPort }}
+    - name: management
+      port: {{ .Values.services.global.java.managementPort }}
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+resources:
+  limits:
+    memory: 1024Mi
+
+metrics:
+  serviceMonitor:
+    enabled: {{ .Values.services.global.metrics.enabled }}
+    namespace: {{ .Release.Namespace }}
+    additionalLabels:
+      release: prometheus
+    endpoints:
+      - port: "management"
+        path: /actuator/prometheus
+        scheme: http
