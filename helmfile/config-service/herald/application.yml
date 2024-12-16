@@ -46,3 +46,7 @@ job:
 
 bot:
   username: '@MarketDB_Super_Bot'
+
+service:
+  styx:
+    url: http://styx:8080
