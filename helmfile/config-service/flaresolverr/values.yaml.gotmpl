@@ -28,7 +28,10 @@ ingress:
     hosts:
       - host: "fs-api.marketdb.pro"
         paths:
-          - /
+          - path: /
+            pathType: Prefix
+            service:
+              port: 8191
 {{- if .Values.services.ingress.tls.enabled }}
     tls:
     {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
