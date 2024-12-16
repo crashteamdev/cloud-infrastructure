@@ -52,8 +52,8 @@ management:
 
 job:
   cron:
-    seller-collector-cron-job: 0 0 0 ? * * *
-    daily-notify-cron-job: 0 0 9 ? * * *
+    seller-collector-cron-job: 0 0 21 ? * * *
+    daily-notify-cron-job: 0 0 6 ? * * *
 
 bot:
   username: '@MarketDB_Super_Bot'
