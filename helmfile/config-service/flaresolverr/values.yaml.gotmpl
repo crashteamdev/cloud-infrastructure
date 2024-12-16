@@ -1,0 +1,42 @@
+# -*- mode: yaml -*-
+controller:
+  replicas: 1
+
+nodeSelector:
+  mdb-service: "true"
+
+env:
+  TZ: Europe/Moscow
+  PROMETHEUS_ENABLED: true
+  PROMETHEUS_PORTЖ 9090
+
+resources:
+  requests:
+    memory: 1Gi
+  limits:
+    memory: 3Gi
+
+ingress:
+  main:
+    enabled: true
+    primary: true
+    annotations:
+    {{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
+      cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+    {{- end }}
+      kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+    hosts:
+      - host: "fs-api.marketdb.pro"
+        paths:
+          - /
+{{- if .Values.services.ingress.tls.enabled }}
+    tls:
+    {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
+      - secretName: api-{{ .Values.services.ingress.tls.secretName }}
+    {{- else }}
+      - secretName: {{ .Values.services.ingress.tls.secretName }}
+    {{- end }}
+        hosts:
+          - "fs-api.marketdb.pro"
+{{- end }}
+    servicePort: 8191
