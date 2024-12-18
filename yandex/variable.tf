@@ -42,6 +42,12 @@ variable "db_password" {
   sensitive   = true
 }
 
+variable "db_dev_password" {
+  description = "Database developer password"
+  type        = string
+  sensitive   = true
+}
+
 variable "vm_user_nat" {
   type = string
 }
