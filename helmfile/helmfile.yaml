@@ -10,6 +10,8 @@ repositories:
     url: https://crashteamdev.github.io/charts/
   - name: requarks
     url: https://charts.js.wiki
+  - name: k8s-home-lab-repo
+    url: https://k8s-home-lab.github.io/helm-charts/
 
 releases:
   - name: ke-analytics
@@ -46,3 +48,7 @@ releases:
     version: 0.1.1
   - name: herald
     <<: *generic_stateless
+  - name: flaresolverr
+    <<: *default
+    chart: k8s-home-lab-repo/flaresolverr
+    version: 6.0.3
