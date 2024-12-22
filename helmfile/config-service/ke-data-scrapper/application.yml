@@ -60,7 +60,7 @@ app:
   integration:
     timeout:
       from: 1560
-      to: 2040
+      to: 2000
     kazan:
       token: Basic a2F6YW5leHByZXNzLWN1c3RvbWVyOmN1c3RvbWVyU2VjcmV0S2V5
     styx: http://styx:8080
