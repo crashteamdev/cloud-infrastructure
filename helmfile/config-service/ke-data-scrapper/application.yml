@@ -57,6 +57,7 @@ app:
       product-job: 0 0 0,18 ? * * *
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
+      clean-position-jobs: 0 0 14 ? * *
   integration:
     timeout:
       from: 1560
