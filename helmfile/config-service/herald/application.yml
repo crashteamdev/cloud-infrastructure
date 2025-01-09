@@ -62,6 +62,7 @@ job:
     monthly-notify-cron-job: 0 0 6 1 * ? *
 
 bot:
+  enable: true
   username: '@MarketDB_Super_Bot'
 
 service:
