@@ -19,6 +19,8 @@ spring:
 logging:
  level:
    dev.crashteam.herald.job: DEBUG
+   org.springframework.jdbc.core: DEBUG
+   org.springframework.jdbc.support: DEBUG
    # org.apache.http: DEBUG
    # org.apache.http.wire: TRACE
    # org.apache.hc.client5.http: DEBUG
