@@ -16,16 +16,20 @@ spring:
     change-log: 'classpath:db/changelog/main.xml'
     enabled: true
 
-#logging:
-#  level:
-#    org.apache.http: DEBUG
-#    org.apache.http.wire: TRACE
-#    org.apache.hc.client5.http: DEBUG
-#    org.apache.hc.client5.http.wire: TRACE
-#    org.apache.hc.core5.http: DEBUG
-#    org.apache.hc.core5.http.wire: TRACE
-#    org.springframework.web.client.RestTemplate: DEBUG
-#    org.springframework.web.client.HttpAccessor: DEBUG
+logging:
+ level:
+   dev.crashteam.herald.job: DEBUG
+   org.springframework.jdbc.core: DEBUG
+   org.springframework.jdbc.support: DEBUG
+   dev.crashteam.herald.repository.impl: INFO
+   # org.apache.http: DEBUG
+   # org.apache.http.wire: TRACE
+   # org.apache.hc.client5.http: DEBUG
+   # org.apache.hc.client5.http.wire: TRACE
+   # org.apache.hc.core5.http: DEBUG
+   # org.apache.hc.core5.http.wire: TRACE
+   # org.springframework.web.client.RestTemplate: DEBUG
+   # org.springframework.web.client.HttpAccessor: DEBUG
 
 management:
   server:
@@ -56,6 +60,7 @@ job:
     daily-notify-cron-job: 0 0 6 ? * * *
 
 bot:
+  enable: true
   username: '@MarketDB_Super_Bot'
 
 service:
