@@ -22,7 +22,7 @@ spring:
             threadCount: 12
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
-            misfireThreshold: 60000
+            misfireThreshold: 120000
             driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
             isClustered: true
             useProperties: true
@@ -62,8 +62,8 @@ app:
       category-job: 0 0 1 ? * * *
   integration:
     timeout:
-      from: 2700
-      to: 4400
+      from: 700
+      to: 2400
     uzum:
       token: Basic YjJjLWZyb250OmNsaWVudFNlY3JldA==
     styx: http://styx:8080
