@@ -61,7 +61,7 @@ job:
 
 bot:
   enable: true
-  username: '@MarketDB_Super_Bot'
+  username: '@MarketDBAnalyticsBot'
 
 service:
   styx:
