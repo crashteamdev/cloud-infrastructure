@@ -69,16 +69,10 @@ web:
         paths:
           - path: /
             pathType: ImplementationSpecific
-  {{- if .Values.services.ingress.tls.enabled }}
     tls:
-    {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
       - secretName: temporal-{{ .Values.services.ingress.tls.secretName }}
-    {{- else }}
-      - secretName: {{ .Values.services.ingress.tls.secretName }}
-    {{- end }}
       hosts:
         - "temporal.marketdb.pro"
-  {{- end }}
 elasticsearch:
   enabled: false
 prometheus:
