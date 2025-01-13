@@ -68,7 +68,7 @@ web:
       - host: "temporal.marketdb.pro"
         paths:
           - path: /
-            pathType: Prefix
+            pathType: ImplementationSpecific
   {{- if .Values.services.ingress.tls.enabled }}
     tls:
     {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
