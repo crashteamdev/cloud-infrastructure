@@ -65,7 +65,7 @@ web:
       nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
       nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
     hosts:
-      - host: "strapi.marketdb.pro"
+      - host: "temporal.marketdb.pro"
   {{- if .Values.services.ingress.tls.enabled }}
     tls:
     {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
