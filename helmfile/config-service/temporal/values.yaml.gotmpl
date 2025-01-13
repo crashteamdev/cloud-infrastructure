@@ -67,6 +67,9 @@ web:
       nginx.ingress.kubernetes.io/cors-allow-methods: "POST, GET, PUT"
       nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
       nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
+      nginx.ingress.kubernetes.io/auth-type: "basic"
+      nginx.ingress.kubernetes.io/auth-secret: "temporal-web-auth"
+      nginx.ingress.kubernetes.io/auth-realm: "Temporal Web UI Authentication"
     hosts:
       - "temporal.marketdb.pro"
     tls:
