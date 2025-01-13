@@ -49,6 +49,6 @@ releases:
   - name: temporal
     <<: *default
     chart: temporal/temporal
-    version: 0.50.0
+    version: 0.54.0
   - name: herald
     <<: *generic_stateless
