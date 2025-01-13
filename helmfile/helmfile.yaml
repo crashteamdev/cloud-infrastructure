@@ -4,8 +4,6 @@ bases:
 {{ readFile "hf-templates.yaml" }}
 
 repositories:
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
   - name: hashicorp
     url: https://helm.releases.hashicorp.com
   - name: crashteamdev
@@ -52,3 +50,5 @@ releases:
     <<: *default
     chart: temporal/temporal
     version: 0.50.0
+  - name: herald
+    <<: *generic_stateless

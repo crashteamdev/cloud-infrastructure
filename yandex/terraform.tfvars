@@ -8,7 +8,8 @@ pg_dbs = [
   "ke-analytics",
   "uzum-analytics",
   "temporal",
-  "temporal_visibility"
+  "temporal_visibility",
+  "herald"
 ]
 mongo_dbs = [
   "kazanex",
@@ -19,5 +20,6 @@ clickhouse_dbs = [
   "kazanex"
 ]
 db_password = "Str0ngPasswd"
+db_dev_password = "Str0ngPasswd"
 vm_user_nat = "vitaxa"
 nat_ssh_key_path = "./keys/yc-nat.pub"

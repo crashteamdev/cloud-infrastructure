@@ -1,6 +1,6 @@
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: 2
+replicaCount: 1
 
 nodeSelector:
   mdb-service: "true"
@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-d48f151
+  tag: sha-1334934
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,29 +21,27 @@ imagePullSecrets:
 {{ end }}
 
 env:
+  - name: JDK_JAVA_OPTIONS
+    value: >-
+      -Xmx512M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=242M
+      -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof -Djava.security.egd=/dev/zrandom
+      -XX:+UseParallelGC
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/ke-scrapper?sslmode=require
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/herald?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.uniUser }}
   - name: SPRING_DATASOURCE_PASSWORD
     value: {{ .Values.services.postgres.uniPassword }}
-  - name: JDK_JAVA_OPTIONS
-    value: >-
-      -Xmx121M -Xss1M -XX:ReservedCodeCacheSize=240M -XX:MaxDirectMemorySize=20M -XX:MaxMetaspaceSize=111M
-  - name: SPRING_REDIS_HOST
-    value: {{ .Values.services.redis.endpoint }}
-  - name: SPRING_REDIS_PASSWORD
-    value: {{ .Values.services.redis.password }}
-  - name: APP_AWS-STREAM_ACCESSKEY
+  - name: BOT_TOKEN
     valueFrom:
       secretKeyRef:
         name: {{ .Release.Name }}
-        key: aws_stream_access_key
-  - name: APP_AWS-STREAM_SECRETKEY
+        key: tg_bot_token
+  - name: BOT_ENCRYPTION_KEY
     valueFrom:
       secretKeyRef:
         name: {{ .Release.Name }}
-        key: aws_stream_secret_key
+        key: profile_encryption_key
 
 configMap:
   data:
@@ -81,7 +79,7 @@ readinessProbe:
 
 resources:
   limits:
-    memory: 512Mi
+    memory: 1024Mi
 
 metrics:
   serviceMonitor:
@@ -93,13 +91,3 @@ metrics:
       - port: "management"
         path: /actuator/prometheus
         scheme: http
-
-netPolicies:
-  - filters:
-    - port: 6379
-      type: TCP
-    name: redis
-  - filters:
-    - port: 8080
-      type: TCP
-    name: styx

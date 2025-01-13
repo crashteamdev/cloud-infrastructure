@@ -1,7 +1,7 @@
 {{- $applicationName := .Release.Name -}}
 
 {{/*replicaCount: {{ .Values.services.global.statelessReplicas }}*/}}
-replicaCount: 2
+replicaCount: 3
 
 nodeSelector:
   mdb-service: "true"
@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-f93fd1f
+  tag: sha-ebb78d3
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -41,6 +41,11 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: styx_proxysio_apikey
+  - name: INTEGRATION_MOBILE-PROXY_API-KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: styx_mobileproxy_apikey
 
 
 configMap:

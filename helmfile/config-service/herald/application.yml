@@ -1,0 +1,68 @@
+{{- $applicationName := .Release.Name -}}
+
+server:
+  port: {{ .Values.services.global.java.apiPort }}
+
+logback:
+  appender: JSON_K8S_CONSOLE
+
+spring:
+  application:
+    name: {{ $applicationName }}
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    change-log: 'classpath:db/changelog/main.xml'
+    enabled: true
+
+logging:
+ level:
+   dev.crashteam.herald.job: DEBUG
+   org.springframework.jdbc.core: INFO
+   org.springframework.jdbc.support: INFO
+   dev.crashteam.herald.repository.impl: INFO
+   # org.apache.http: DEBUG
+   # org.apache.http.wire: TRACE
+   # org.apache.hc.client5.http: DEBUG
+   # org.apache.hc.client5.http.wire: TRACE
+   # org.apache.hc.core5.http: DEBUG
+   # org.apache.hc.core5.http.wire: TRACE
+   # org.springframework.web.client.RestTemplate: DEBUG
+   # org.springframework.web.client.HttpAccessor: DEBUG
+
+management:
+  server:
+    port: {{ .Values.services.global.java.managementPort }}
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: {{ $applicationName }}
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+job:
+  cron:
+    seller-collector-cron-job: 0 0 21 ? * * *
+    daily-notify-cron-job: 0 0 6 ? * * *
+
+bot:
+  enable: true
+  username: '@MarketDBAnalyticsBot'
+
+service:
+  styx:
+    url: http://styx:8080

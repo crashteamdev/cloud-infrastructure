@@ -48,17 +48,19 @@ integration:
 application:
   forbidden-expire: 3
   scheduler:
+    mobile-proxy:
+      change-ip-cron: 0/8 * * ? * *
     redis:
       forbidden-url-cron: 0/10 * * * * ?
       update-user-agents: 0 0 3 * * ?
 
 app:
-  timeout-handler: 15
+  timeout-handler: 20
   proxy:
     retries:
-      timeout: 1000
+      timeout: 1100
       attempts: 3
       exponent: 1.5
-    timeout: 10000
+    timeout: 11000
     proxy-line:
       url: https://panel.proxyline.net/api/

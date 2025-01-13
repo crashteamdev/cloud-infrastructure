@@ -429,6 +429,17 @@ resource "yandex_mdb_postgresql_user" "pg_user" {
   }
 }
 
+resource "yandex_mdb_postgresql_user" "dev_user" {
+  cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
+  name       = "dev_user"
+  password   = var.db_dev_password
+  conn_limit = 50
+
+  settings = {
+    default_transaction_isolation = "read committed"
+  }
+}
+
 resource "yandex_mdb_postgresql_database" "pb_database" {
   for_each   = toset(var.pg_dbs)
   cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id

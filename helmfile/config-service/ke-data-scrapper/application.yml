@@ -19,7 +19,7 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 20
+            threadCount: 15
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
             misfireThreshold: 60000
@@ -54,12 +54,12 @@ management:
 app:
   job:
     cron:
-      product-job: 0 0 0,19 ? * * *
+      product-job: 0 0 0,18 ? * * *
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
   integration:
     timeout:
-      from: 2400
+      from: 2000
       to: 3000
     kazan:
       token: Basic a2F6YW5leHByZXNzLWN1c3RvbWVyOmN1c3RvbWVyU2VjcmV0S2V5
