@@ -31,6 +31,8 @@ server:
           tls:
             enabled: true
             enableHostVerification: false
+    namespaces:
+      create: true
   nodeSelector:
     mdb-service: "true"
   frontend:
