@@ -33,6 +33,9 @@ server:
             enableHostVerification: false
     namespaces:
       create: true
+      namespace:
+        - name: default
+          retention: 3d
   nodeSelector:
     mdb-service: "true"
   frontend:
