@@ -57,25 +57,18 @@ web:
   ingress:
     enabled: true
     annotations:
-  {{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
       cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
-  {{- end }}
       kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
       nginx.ingress.kubernetes.io/cors-allow-methods: "POST, GET, PUT"
       nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
       nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
     hosts:
-      - host: "temporal.marketdb.pro"
-  {{- if .Values.services.ingress.tls.enabled }}
+      - "temporal.marketdb.pro"
     tls:
-    {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
       - secretName: temporal-{{ .Values.services.ingress.tls.secretName }}
-    {{- else }}
       - secretName: {{ .Values.services.ingress.tls.secretName }}
-    {{- end }}
       hosts:
         - "temporal.marketdb.pro"
-  {{- end }}
 elasticsearch:
   enabled: false
 prometheus:
