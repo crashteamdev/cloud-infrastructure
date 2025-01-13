@@ -66,9 +66,8 @@ web:
       - "temporal.marketdb.pro"
     tls:
       - secretName: temporal-{{ .Values.services.ingress.tls.secretName }}
-      - secretName: {{ .Values.services.ingress.tls.secretName }}
-      hosts:
-        - "temporal.marketdb.pro"
+        hosts:
+          - "temporal.marketdb.pro"
 elasticsearch:
   enabled: false
 prometheus:
