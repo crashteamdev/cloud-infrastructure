@@ -65,14 +65,17 @@ web:
       nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
       nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
     hosts:
-      - host: "temporal.marketdb.pro"
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
+      - "temporal.marketdb.pro"
+  {{- if .Values.services.ingress.tls.enabled }}
     tls:
+    {{ if .Values.services.ingress.tls.letsEncrypt.enabled }}
       - secretName: temporal-{{ .Values.services.ingress.tls.secretName }}
+    {{- else }}
+      - secretName: {{ .Values.services.ingress.tls.secretName }}
+    {{- end }}
       hosts:
         - "temporal.marketdb.pro"
+  {{- end }}
 elasticsearch:
   enabled: false
 prometheus:
