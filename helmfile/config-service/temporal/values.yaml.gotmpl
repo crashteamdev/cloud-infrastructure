@@ -19,7 +19,7 @@ server:
       visibility:
         driver: "sql"
         sql:
-          driver: "postgres12"
+          driver: "postgres14"
           host: {{ .Values.services.postgres.endpoint }}
           port: 6432
           database: temporal_visibility
