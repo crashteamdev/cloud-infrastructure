@@ -1,0 +1,96 @@
+# -*- mode: yaml -*-
+server:
+  replicaCount: 2
+  config:
+    persistence:
+      default:
+        driver: "sql"
+        sql:
+          driver: "postgres12"
+          host: {{ .Values.services.postgres.endpoint }}
+          port: 6432
+          database: temporal
+          user: {{ .Values.services.postgres.uniUser }}
+          password: {{ .Values.services.postgres.uniPassword }}
+          maxConns: 20
+          maxConnLifetime: "1h"
+          tls:
+            enabled: true
+            enableHostVerification: false
+      visibility:
+        driver: "sql"
+        sql:
+          driver: "postgres12"
+          host: {{ .Values.services.postgres.endpoint }}
+          port: 6432
+          database: temporal_visibility
+          user: {{ .Values.services.postgres.uniUser }}
+          password: {{ .Values.services.postgres.uniPassword }}
+          maxConns: 20
+          maxConnLifetime: "1h"
+          tls:
+            enabled: true
+            enableHostVerification: false
+    namespaces:
+      create: true
+      namespace:
+        - name: default
+          retention: 3d
+  nodeSelector:
+    mdb-service: "true"
+  frontend:
+    nodeSelector:
+      mdb-service: "true"
+  history:
+    nodeSelector:
+      mdb-service: "true"
+  matching:
+    nodeSelector:
+      mdb-service: "true"
+  worker:
+    nodeSelector:
+      mdb-service: "true"
+admintools:
+  nodeSelector:
+    mdb-service: "true"
+web:
+  service:
+    type: ClusterIP
+    port: 8080
+  nodeSelector:
+    ingress: "true"
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+      kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+      nginx.ingress.kubernetes.io/cors-allow-methods: "POST, GET, PUT"
+      nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+      nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
+      nginx.ingress.kubernetes.io/auth-type: "basic"
+      nginx.ingress.kubernetes.io/auth-secret: "temporal-web-auth"
+      nginx.ingress.kubernetes.io/auth-realm: "Temporal Web UI Authentication"
+    hosts:
+      - "temporal.marketdb.pro"
+    tls:
+      - secretName: temporal-{{ .Values.services.ingress.tls.secretName }}
+        hosts:
+          - "temporal.marketdb.pro"
+elasticsearch:
+  enabled: false
+prometheus:
+  enabled: false
+grafana:
+  enabled: false
+cassandra:
+  enabled: false
+postgresql:
+  enabled: false
+
+schema:
+  createDatabase:
+    enabled: false
+  setup:
+    enabled: false
+  update:
+    enabled: false

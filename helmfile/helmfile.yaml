@@ -10,6 +10,8 @@ repositories:
     url: https://crashteamdev.github.io/charts/
   - name: requarks
     url: https://charts.js.wiki
+  - name: temporal
+    url: https://go.temporal.io/helm-charts
 
 releases:
   - name: ke-analytics
@@ -44,5 +46,9 @@ releases:
     <<: *default
     chart: crashteamdev/strapi-chart
     version: 0.1.1
+  - name: temporal
+    <<: *default
+    chart: temporal/temporal
+    version: 0.54.0
   - name: herald
     <<: *generic_stateless
