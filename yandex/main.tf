@@ -397,7 +397,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
     }
 
     postgresql_config = {
-      max_connections                   = 300
+      max_connections                   = 200
       enable_parallel_hash              = true
       vacuum_cleanup_index_scale_factor = 0.2
       autovacuum_vacuum_scale_factor    = 0.32
@@ -422,7 +422,7 @@ resource "yandex_mdb_postgresql_user" "pg_user" {
   cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
   name       = "dbuser"
   password   = var.db_password
-  conn_limit = 200
+  conn_limit = 150
   settings = {
     default_transaction_isolation = "read committed"
     log_min_duration_statement    = 5000
