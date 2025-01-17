@@ -422,7 +422,7 @@ resource "yandex_mdb_postgresql_user" "pg_user" {
   cluster_id = yandex_mdb_postgresql_cluster.pg_cluster.id
   name       = "dbuser"
   password   = var.db_password
-  conn_limit = 150
+  conn_limit = 130
   settings = {
     default_transaction_isolation = "read committed"
     log_min_duration_statement    = 5000
