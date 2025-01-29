@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-c43b5c7
+  tag: sha-62db686
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -44,6 +44,16 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: aws_stream_secret_key
+  - name: APP_INTEGRATION_PROXY_LOGIN
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: integration_proxy_login
+  - name: APP_INTEGRATION_PROXY_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: integration_proxy_password
 
 
 configMap:

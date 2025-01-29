@@ -19,10 +19,10 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 15
+            threadCount: 17
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
-            misfireThreshold: 60000
+            misfireThreshold: 1200001
             driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
             isClustered: true
             useProperties: true
@@ -57,10 +57,11 @@ app:
       product-job: 0 0 0,18 ? * * *
       position-job: 0 0 7 ? * * *
       category-job: 0 0 1 ? * * *
+      clean-position-jobs: 0 0 14 ? * *
   integration:
     timeout:
-      from: 2000
-      to: 3000
+      from: 1560
+      to: 2003
     kazan:
       token: Basic a2F6YW5leHByZXNzLWN1c3RvbWVyOmN1c3RvbWVyU2VjcmV0S2V5
     styx: http://styx:8080
