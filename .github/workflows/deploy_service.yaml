@@ -85,6 +85,8 @@ jobs:
         if: steps.files.outputs.any_changed == 'true'
         with:
           helmfile-version: "v0.148.1"
+        env:
+          OS: linux
 
       - name: Update deps
         if: steps.files.outputs.any_changed == 'true'
