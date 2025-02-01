@@ -81,12 +81,11 @@ jobs:
             helmfile/config-service/**
 
       - name: Setup helmfile
-        uses: mamezou-tech/setup-helmfile@v1.1.0
-        if: steps.files.outputs.any_changed == 'true'
+        uses: mamezou-tech/setup-helmfile@v2.0.0
         with:
-          helmfile-version: "v0.148.1"
-        env:
-          OS: linux
+          helm-s3-plugin-version: 'v0.16.2'
+          helmfile-version: 'v0.158.0'
+          helm-version: 'v3.13.1'
 
       - name: Update deps
         if: steps.files.outputs.any_changed == 'true'
