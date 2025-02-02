@@ -81,10 +81,11 @@ jobs:
             helmfile/config-service/**
 
       - name: Setup helmfile
-        uses: mamezou-tech/setup-helmfile@v1.1.0
-        if: steps.files.outputs.any_changed == 'true'
+        uses: mamezou-tech/setup-helmfile@v2.0.0
         with:
-          helmfile-version: "v0.148.1"
+          helm-s3-plugin-version: 'v0.16.2'
+          helmfile-version: 'v0.158.0'
+          helm-version: 'v3.13.1'
 
       - name: Update deps
         if: steps.files.outputs.any_changed == 'true'
@@ -92,19 +93,35 @@ jobs:
           cd helmfile
           helmfile -e $hm_env deps
 
+      - name: Diff for changes
+        if: steps.files.outputs.any_changed == 'true'
+        run: |
+          cd helmfile
+          releases_to_deploy=()
+          for changed_file in ${{ steps.files.outputs.all_changed_files }}; do
+            releasename=$(echo ${changed_file} | cut -f3 -d/)
+            if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
+              releases_to_deploy+=($releasename)
+              echo "Diff for release: $releasename"
+              helmfile -e $hm_env -l namespace=default,name=$releasename diff --suppress-secrets --skip-deps
+            else
+              echo "Release $releasename already processed for diff"
+            fi
+          done
+
       - name: Apply or Validate atomic changes services
         if: steps.files.outputs.any_changed == 'true'
         run: |
           cd helmfile
           releases_to_deploy=()
           for changed_file in ${{ steps.files.outputs.all_changed_files }}; do
-          releasename=$(echo ${changed_file} | cut -f3 -d/)
-          if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
-          releases_to_deploy+=($releasename)
-          helmfile -e $hm_env -l namespace=default,name=$releasename --allow-no-matching-release \
-          $values_set_list \
-          apply --args="--atomic" --suppress-secrets --skip-deps
-          else
-          echo "Release $releasename already been deployed"
-          fi
+            releasename=$(echo ${changed_file} | cut -f3 -d/)
+            if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
+              releases_to_deploy+=($releasename)
+              helmfile -e $hm_env -l namespace=default,name=$releasename --allow-no-matching-release \
+              $values_set_list \
+              apply --skip-diff-on-install --args="--atomic" --suppress-secrets --skip-deps
+            else
+              echo "Release $releasename already been deployed"
+            fi
           done
