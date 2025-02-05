@@ -87,6 +87,11 @@ jobs:
           helmfile-version: 'v0.170.1'
           helm-version: 'v3.13.1'
 
+      - name: Check Helmfile version
+        run: |
+          which helmfile
+          helmfile --version
+
       - name: Update deps
         if: steps.files.outputs.any_changed == 'true'
         run: |
