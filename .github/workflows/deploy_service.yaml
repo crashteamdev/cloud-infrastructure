@@ -84,7 +84,7 @@ jobs:
         uses: mamezou-tech/setup-helmfile@v2.0.0
         with:
           helm-s3-plugin-version: 'v0.16.2'
-          helmfile-version: 'v0.158.0'
+          helmfile-version: 'v0.170.1'
           helm-version: 'v3.13.1'
 
       - name: Update deps
@@ -118,9 +118,15 @@ jobs:
             releasename=$(echo ${changed_file} | cut -f3 -d/)
             if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
               releases_to_deploy+=($releasename)
-              helmfile -e $hm_env -l namespace=default,name=$releasename --allow-no-matching-release \
+              helmfile \
+              -e $hm_env \
+              -l namespace=default,name=$releasename \
+              --allow-no-matching-release \
               $values_set_list \
-              apply --skip-diff-on-install --args="--atomic" --suppress-secrets --skip-deps
+              sync \
+              --args="--atomic" \
+              --wait \
+              --skip-deps
             else
               echo "Release $releasename already been deployed"
             fi
