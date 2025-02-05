@@ -126,8 +126,6 @@ jobs:
               sync \
               --args="--atomic" \
               --wait \
-              --timeout 600 \
-              --suppress-secrets \
               --skip-deps
             else
               echo "Release $releasename already been deployed"
