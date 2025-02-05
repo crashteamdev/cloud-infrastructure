@@ -124,8 +124,7 @@ jobs:
               --allow-no-matching-release \
               $values_set_list \
               sync \
-              --atomic \
-              --skip-deps \
+              --args="--atomic" \
               --wait \
               --timeout 600 \
               --suppress-secrets \
