@@ -118,9 +118,18 @@ jobs:
             releasename=$(echo ${changed_file} | cut -f3 -d/)
             if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
               releases_to_deploy+=($releasename)
-              helmfile -e $hm_env -l namespace=default,name=$releasename --allow-no-matching-release \
+              helmfile \
+              -e $hm_env \
+              -l namespace=default,name=$releasename \
+              --allow-no-matching-release \
               $values_set_list \
-              apply --skip-diff-on-install --args="--atomic" --suppress-secrets --skip-deps
+              apply \
+              --skip-diff-on-install \
+              --atomic \
+              --wait \
+              --timeout 600 \
+              --suppress-secrets \
+              --skip-deps
             else
               echo "Release $releasename already been deployed"
             fi
