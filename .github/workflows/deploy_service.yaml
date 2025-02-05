@@ -124,8 +124,8 @@ jobs:
               --allow-no-matching-release \
               $values_set_list \
               sync \
-              --skip-diff-on-install \
               --atomic \
+              --skip-deps \
               --wait \
               --timeout 600 \
               --suppress-secrets \
