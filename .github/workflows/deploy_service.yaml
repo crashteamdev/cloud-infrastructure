@@ -84,7 +84,7 @@ jobs:
         uses: mamezou-tech/setup-helmfile@v2.0.0
         with:
           helm-s3-plugin-version: 'v0.16.2'
-          helmfile-version: 'v0.160.0'
+          helmfile-version: 'v0.170.1'
           helm-version: 'v3.13.1'
 
       - name: Update deps
