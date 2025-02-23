@@ -59,6 +59,22 @@ job:
     seller-collector-cron-job: 0 0 21 ? * * *
     daily-notify-cron-job: 0 0 6 ? * * *
 
+rate-limit:
+  general-thread-pool-size: 1
+  user-thread-pool-size: 10
+  user-clean-up-period-minutes: 10
+  bucket:
+    per-second:
+      capacity: 1
+      refill:
+        tokens: 7
+        period-seconds: 1
+    per-minutes:
+      capacity: 7
+      refill:
+        tokens: 7
+        period-minutes: 1
+
 bot:
   enable: true
   username: '@MarketDBAnalyticsBot'
