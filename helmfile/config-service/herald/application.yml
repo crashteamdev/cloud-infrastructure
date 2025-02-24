@@ -69,11 +69,11 @@ rate-limit:
       capacity: 1
       refill:
         tokens: 1
-        period-seconds: 2
+        period-seconds: 3
     per-minutes:
-      capacity: 15
+      capacity: 30
       refill:
-        tokens: 15
+        tokens: 30
         period-minutes: 1
 
 bot:
