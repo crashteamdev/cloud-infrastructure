@@ -69,7 +69,7 @@ rate-limit:
       capacity: 1
       refill:
         tokens: 1
-        period-seconds: 3
+        period-seconds: 5
     per-minutes:
       capacity: 30
       refill:
