@@ -19,7 +19,7 @@ spring:
       org:
         quartz:
           threadPool:
-            threadCount: 17
+            threadCount: 16
             class: org.quartz.simpl.SimpleThreadPool
           jobStore:
             misfireThreshold: 1200001
