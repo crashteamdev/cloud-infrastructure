@@ -272,6 +272,11 @@ resource "yandex_kubernetes_node_group" "steambuddy-service" {
     }
   }
 
+  deploy_policy {
+    max_expansion   = 0
+    max_unavailable = 1
+  }
+
   allocation_policy {
     location {
       zone = var.yc_region
