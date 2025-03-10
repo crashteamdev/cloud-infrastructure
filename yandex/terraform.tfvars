@@ -9,7 +9,8 @@ pg_dbs = [
   "uzum-analytics",
   "temporal",
   "temporal_visibility",
-  "herald"
+  "herald",
+  "steambuddy"
 ]
 mongo_dbs = [
   "kazanex",
