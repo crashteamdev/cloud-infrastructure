@@ -22,6 +22,7 @@ logging:
    org.springframework.jdbc.core: INFO
    org.springframework.jdbc.support: INFO
    dev.crashteam.herald.repository.impl: INFO
+   dev.crashteam.herald.client: DEBUG
    # org.apache.http: DEBUG
    # org.apache.http.wire: TRACE
    # org.apache.hc.client5.http: DEBUG
@@ -58,6 +59,22 @@ job:
   cron:
     seller-collector-cron-job: 0 0 21 ? * * *
     daily-notify-cron-job: 0 0 6 ? * * *
+
+rate-limit:
+  general-thread-pool-size: 1
+  user-thread-pool-size: 10
+  user-clean-up-period-minutes: 10
+  bucket:
+    per-second:
+      capacity: 1
+      refill:
+        tokens: 1
+        period-seconds: 5
+    per-minutes:
+      capacity: 30
+      refill:
+        tokens: 30
+        period-minutes: 1
 
 bot:
   enable: true
