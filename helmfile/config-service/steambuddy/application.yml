@@ -11,6 +11,9 @@ spring:
     name: {{ $applicationName }}
   liquibase:
     enabled: true
+  temporal:
+    connection:
+      target: "temporal-frontend:7233"
 
 management:
   server:
