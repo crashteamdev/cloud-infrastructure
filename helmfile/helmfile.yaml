@@ -52,3 +52,5 @@ releases:
     version: 0.54.0
   - name: herald
     <<: *generic_stateless
+  - name: steambuddy
+    <<: *generic_stateless

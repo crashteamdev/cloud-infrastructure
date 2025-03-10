@@ -1,0 +1,59 @@
+{{- $applicationName := .Release.Name -}}
+
+server:
+  port: {{ .Values.services.global.java.apiPort }}
+
+logback:
+  appender: JSON_K8S_CONSOLE
+
+spring:
+  application:
+    name: {{ $applicationName }}
+  liquibase:
+    enabled: true
+
+management:
+  server:
+    port: {{ .Values.services.global.java.managementPort }}
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: {{ $applicationName }}
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+paywallet:
+  url: https://merchant.playwallet.bot/api/merchant/
+
+tinkoff:
+  url: https://securepay.tinkoff.ru
+
+steambuddy:
+  telegramBot:
+    enable: true
+    username: '@SteamWalletBuddyBot'
+  steamBot:
+    admins:
+      - 76561197987106251
+      - 76561198037354459
+  scheduleEnable: false
+
+commission:
+  payment: 0.007
+  tax: 0.004
+  profit: 0.02
+  playwallet: 0.04
+  avgUsdCost: 90
