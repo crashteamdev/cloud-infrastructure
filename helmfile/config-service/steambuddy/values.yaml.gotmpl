@@ -32,7 +32,7 @@ env:
       -XX:HeapDumpPath=/tmp/dump.hprof
       -Djava.security.egd=file:/dev/./urandom
       -XX:+UseParallelGC
-  - name: SPRING_DATASOURCE_URL
+  - name: SPRING_DATASOURCE_JDBCURL
     value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/steambuddy?sslmode=require
   - name: SPRING_DATASOURCE_USERNAME
     value: {{ .Values.services.postgres.uniUser }}
