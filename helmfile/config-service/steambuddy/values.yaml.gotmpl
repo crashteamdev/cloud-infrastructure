@@ -47,7 +47,7 @@ env:
     valueFrom:
       secretKeyRef:
         name: {{ .Release.Name }}
-        key: tinkoff_terminal
+        key: tinkoff_terminal_key
   - name: TINKOFF_PASSWORD
     valueFrom:
       secretKeyRef:
