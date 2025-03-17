@@ -48,6 +48,8 @@ steambuddy:
   telegramBot:
     enable: true
     username: '@SteamWalletBuddyBot'
+    admins:
+      - 506658066
   steamBot:
     admins:
       - 76561197987106251
