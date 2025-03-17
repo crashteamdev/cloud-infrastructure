@@ -12,7 +12,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-073db29
+  tag: sha-c4e1ebc
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -59,6 +59,11 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: tg_token
+  - name: STEAMBUDDY_WALLET_TOPUP_P2P_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: p2p_secret
 
 configMap:
   data:
