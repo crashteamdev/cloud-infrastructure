@@ -64,6 +64,17 @@ rate-limit:
   general-thread-pool-size: 1
   user-thread-pool-size: 10
   user-clean-up-period-minutes: 10
+  global-bucket:
+    per-second:
+      capacity: 1
+      refill:
+        tokens: 1
+        period-seconds: 1
+    per-minutes:
+      capacity: 10
+      refill:
+        tokens: 10
+        period-minutes: 1
   bucket:
     per-second:
       capacity: 1
