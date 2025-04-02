@@ -1,0 +1,115 @@
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 1
+
+nodeSelector:
+  steambuddy: "true"
+
+podAnnotations:
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "{{ .Values.services.global.java.managementPort }}"
+  prometheus.io/scrape: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: sha-cf351a4
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+env:
+  - name: JDK_JAVA_OPTIONS
+    value: >-
+      -Xmx256M
+      -Xss512k
+      -XX:MaxRAMPercentage=50.0
+      -XX:ReservedCodeCacheSize=64M
+      -XX:MaxDirectMemorySize=64M
+      -XX:MaxMetaspaceSize=158M
+      -XX:+HeapDumpOnOutOfMemoryError
+      -XX:HeapDumpPath=/tmp/dump.hprof
+      -Djava.security.egd=file:/dev/./urandom
+      -XX:+UseParallelGC
+  - name: SPRING_DATASOURCE_JDBCURL
+    value: jdbc:postgresql://{{ .Values.services.postgres.endpoint }}:6432/steambuddy?sslmode=require
+  - name: SPRING_DATASOURCE_USERNAME
+    value: {{ .Values.services.postgres.uniUser }}
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: {{ .Values.services.postgres.uniPassword }}
+  - name: PAYWALLET_APIKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: pw_api_key
+  - name: TINKOFF_TERMINAL
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: tinkoff_terminal_key
+  - name: TINKOFF_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: tinkoff_password
+  - name: STEAMBUDDY_TELEGRAMBOT_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: tg_token
+  - name: STEAMBUDDY_WALLET_TOPUP_P2P_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: p2p_secret
+
+configMap:
+  data:
+    application.yml: |
+      {{- tpl (readFile "application.yml") . | nindent 6 }}
+
+volumes:
+  - name: config-volume
+    configMap:
+      name: {{ $applicationName }}
+      defaultMode: 0755
+
+volumeMounts:
+  - name: config-volume
+    mountPath: /opt/{{ $applicationName }}/config/application.yml
+    subPath: application.yml
+    readOnly: true
+
+service:
+  ports:
+    - name: api
+      port: {{ .Values.services.global.java.apiPort }}
+    - name: management
+      port: {{ .Values.services.global.java.managementPort }}
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: management
+
+resources:
+  limits:
+    memory: 512Mi
+
+metrics:
+  serviceMonitor:
+    enabled: {{ .Values.services.global.metrics.enabled }}
+    namespace: {{ .Release.Namespace }}
+    additionalLabels:
+      release: prometheus
+    endpoints:
+      - port: "management"
+        path: /actuator/prometheus
+        scheme: http
