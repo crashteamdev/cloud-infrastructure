@@ -71,9 +71,9 @@ rate-limit:
         tokens: 1
         period-seconds: 1
     per-minutes:
-      capacity: 25
+      capacity: 20
       refill:
-        tokens: 25
+        tokens: 20
         period-minutes: 1
   bucket:
     per-second:
