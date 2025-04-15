@@ -13,7 +13,7 @@ podAnnotations:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-b56acad
+  tag: sha-8a811e9
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -125,7 +125,7 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-headers: "content-type,content-disposition,authorization,x-request-id"
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
     nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
-    nginx.ingress.kubernetes.io/limit-rpm: "150"
+    nginx.ingress.kubernetes.io/limit-rpm: "160"
   hosts:
     - host: api.{{ $ingressDomain | default "crashteam.dev" }}
       paths:
