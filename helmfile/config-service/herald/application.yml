@@ -94,3 +94,11 @@ bot:
 service:
   styx:
     url: http://styx:8080
+
+demo:
+  url: https://space.marketdb.pro
+
+grpc:
+  client:
+    crmService.address: dns:///hermes:9090
+    crmService.negotiationType: PLAINTEXT
