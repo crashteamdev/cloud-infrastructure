@@ -46,3 +46,8 @@ app:
         demo: 5199
         feedback: 5755
         service: 5756
+
+grpc:
+  client:
+    keAnalyticsService.address: static://ke-analytics:9090
+    keAnalyticsService.negotiationType: PLAINTEXT
