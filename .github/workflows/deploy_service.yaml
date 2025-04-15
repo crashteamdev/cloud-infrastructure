@@ -41,8 +41,8 @@ jobs:
           --state-values-set services.mongodb.uniUser=${{secrets.MONGO_USER}}
           --state-values-set services.mongodb.uniPassword=${{secrets.MONGO_PASSWORD}}
           --state-values-set services.proxy.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
-          --state-values-set services.clickhouse.host=${{secrets.CLICKHOUSE_HOST}}
-          --state-values-set services.clickhouse.password=${{secrets.CLICKHOUSE_PASSWORD}}
+          --state-values-set services.clickhouse.endpoint=${{secrets.CLICKHOUSE_HOST}}
+          --state-values-set services.clickhouse.uniPassword=${{secrets.CLICKHOUSE_PASSWORD}}
           --state-values-set services.firebase.apikey=${{secrets.FIREBASE_API_KEY}}
           --state-values-set services.strapi.appKeys=${{secrets.STRAPI_APP_KEYS}}
           --state-values-set services.strapi.jwtAdminSecret=${{secrets.STRAPI_ADMIN_JWT_SECRET}}
