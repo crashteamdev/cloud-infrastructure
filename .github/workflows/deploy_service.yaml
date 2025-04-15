@@ -103,7 +103,7 @@ jobs:
             if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
               releases_to_deploy+=($releasename)
               echo "Diff for release: $releasename"
-              helmfile -e $hm_env -l namespace=default,name=$releasename diff --suppress-secrets --skip-deps
+              helmfile -e $hm_env -l namespace=default,name=$releasename $values_set_list diff --suppress-secrets --skip-deps
             else
               echo "Release $releasename already processed for diff"
             fi
