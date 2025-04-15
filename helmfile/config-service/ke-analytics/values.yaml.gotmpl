@@ -29,9 +29,9 @@ env:
       -XX:+UseParallelGC
       -Dcom.amazonaws.sdk.disableCertChecking
   - name: CLICKHOUSE_HOST
-    value: {{ .Values.services.clickhouse.endpoint }}
+    value: {{ .Values.services.clickhouse.host }}
   - name: CLICKHOUSE_PASSWORD
-    value: {{ .Values.services.clickhouse.uniPassword }}
+    value: {{ .Values.services.clickhouse.password }}
   - name: CLICKHOUSE_PORT
     value: "8443"
   - name: CLICKHOUSE_DB
