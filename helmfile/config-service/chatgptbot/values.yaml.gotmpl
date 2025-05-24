@@ -1,0 +1,117 @@
+# -*- mode: yaml -*-
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 1
+
+nodeSelector:
+  steambuddy: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/chatgptbot
+  tag: sha-996d69b
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3000
+
+env:
+  - name: BOT_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: bot-token
+  - name: OPENAI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: openai-api-key
+  - name: DEEPSEEK_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: deepseek-api-key
+  - name: STABILITY_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: stability-api-key
+  - name: AUDIO_AI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: audio-ai-api-key
+  - name: DATABASE_URL
+    value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/chainbrain
+  - name: TERMINALKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: terminal-key
+  - name: TERMINALTOKEN
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: terminal-token
+  - name: REDIS_URL
+    value: redis://default:{{ .Values.services.redis.password }}@{{ .Values.services.redis.endpoint }}:6380
+  - name: LOG_CHANNEL_ID
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: log-channel-id
+  - name: GEMENI_AI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: gemeni-ai-api-key
+  - name: GROK_AI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: grok-ai-api-key
+  - name: ISDEV
+    value: "false"
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 30
+  timeoutSeconds: 10
+  periodSeconds: 30
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+  periodSeconds: 10
+  failureThreshold: 3
+
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: 500m
+
+# Restart policy for long-running bot
+restartPolicy: Always
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false 
