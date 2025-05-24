@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/chatgptbot
-  tag: sha-a413b91
+  tag: sha-44fe063
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -77,6 +77,20 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}-secrets
         key: grok-ai-api-key
+  - name: PROXY_HOST
+    value: 141.98.184.138
+  - name: PROXY_PORT
+    value: 8000
+  - name: PROXY_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: proxy-username
+  - name: PROXY_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: proxy-password
   - name: ISDEV
     value: "false"
   - name: PORT
