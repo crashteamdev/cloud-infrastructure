@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/chatgptbot
-  tag: sha-996d69b
+  tag: sha-e63e25a
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -79,6 +79,8 @@ env:
         key: grok-ai-api-key
   - name: ISDEV
     value: "false"
+  - name: PORT
+    value: "3000"
 
 livenessProbe:
   httpGet:
@@ -93,10 +95,19 @@ readinessProbe:
   httpGet:
     path: /health
     port: 3000
-  initialDelaySeconds: 5
+  initialDelaySeconds: 15
   timeoutSeconds: 5
   periodSeconds: 10
   failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 10
+  timeoutSeconds: 5
+  periodSeconds: 5
+  failureThreshold: 30
 
 resources:
   requests:
