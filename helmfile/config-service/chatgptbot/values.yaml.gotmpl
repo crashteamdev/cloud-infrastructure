@@ -105,13 +105,3 @@ resources:
   limits:
     memory: 512Mi
     cpu: 500m
-
-# Restart policy for long-running bot
-restartPolicy: Always
-
-# Security context
-securityContext:
-  runAsNonRoot: true
-  runAsUser: 1001
-  readOnlyRootFilesystem: false
-  allowPrivilegeEscalation: false 
