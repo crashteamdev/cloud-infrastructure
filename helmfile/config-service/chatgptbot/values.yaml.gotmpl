@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/chatgptbot
-  tag: sha-e63e25a
+  tag: sha-a59b135
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -61,7 +61,7 @@ env:
         name: {{ .Release.Name }}-secrets
         key: terminal-token
   - name: REDIS_URL
-    value: redis://default:{{ .Values.services.redis.password }}@{{ .Values.services.redis.endpoint }}:6380
+    value: rediss://default:{{ .Values.services.redis.password }}@{{ .Values.services.redis.endpoint }}:6380
   - name: LOG_CHANNEL_ID
     valueFrom:
       secretKeyRef:
