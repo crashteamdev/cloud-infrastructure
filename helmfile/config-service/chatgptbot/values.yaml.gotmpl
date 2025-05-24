@@ -78,9 +78,9 @@ env:
         name: {{ .Release.Name }}-secrets
         key: grok-ai-api-key
   - name: PROXY_HOST
-    value: 141.98.184.138
+    value: "141.98.184.138"
   - name: PROXY_PORT
-    value: 8000
+    value: "8000"
   - name: PROXY_USERNAME
     valueFrom:
       secretKeyRef:
