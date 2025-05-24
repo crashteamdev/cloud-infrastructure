@@ -10,7 +10,8 @@ pg_dbs = [
   "temporal",
   "temporal_visibility",
   "herald",
-  "steambuddy"
+  "steambuddy",
+  "chainbrain"
 ]
 mongo_dbs = [
   "kazanex",
