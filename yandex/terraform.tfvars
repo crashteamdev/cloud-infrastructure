@@ -11,7 +11,8 @@ pg_dbs = [
   "temporal_visibility",
   "herald",
   "steambuddy",
-  "chainbrain"
+  "chainbrain",
+  "chainbrain-agent"
 ]
 mongo_dbs = [
   "kazanex",
