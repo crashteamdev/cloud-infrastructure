@@ -465,7 +465,7 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
     name = "btree_gin"
   }
   extension {
-    name = "pgvector"
+    name = "vector"
   }
 }
 
