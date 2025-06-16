@@ -394,7 +394,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   security_group_ids = [yandex_vpc_security_group.pg_sg.id]
 
   config {
-    version = "14"
+    version = "15"
     resources {
       resource_preset_id = "b2.medium"
       disk_size          = 10
