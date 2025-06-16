@@ -54,3 +54,5 @@ releases:
     <<: *generic_stateless
   - name: chatgptbot
     <<: *generic_stateless
+  - name: chanbrain-agent
+    <<: *generic_stateless
