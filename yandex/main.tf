@@ -464,6 +464,9 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
   extension {
     name = "btree_gin"
   }
+  extension {
+    name = "pgvector"
+  }
 }
 
 resource "yandex_vpc_security_group" "redis_sg" {
