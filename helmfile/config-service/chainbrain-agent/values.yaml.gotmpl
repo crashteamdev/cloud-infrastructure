@@ -56,6 +56,13 @@ env:
       secretKeyRef:
         name: chatgptbot-secrets
         key: grok-ai-api-key
+  - name: GEMINI_BASE_URL
+    value: "https://charon.chainbrain.pro/gemini"
+  - name: GEMINI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: chatgptbot-secrets
+        key: gemeni-ai-api-key
 
 configMap:
   data:
