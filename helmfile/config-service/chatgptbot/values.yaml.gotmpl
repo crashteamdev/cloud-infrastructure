@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/chatgptbot
-  tag: sha-6e8aecd
+  tag: sha-f3223ee
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -81,6 +81,8 @@ env:
     value: "false"
   - name: PORT
     value: "3000"
+  - name: CHAINBRAIN_AGENT_URL
+    value: chainbrain-agent:9090
 
 livenessProbe:
   httpGet:
