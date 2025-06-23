@@ -1,14 +1,14 @@
 # -*- mode: yaml -*-
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: 1
+replicaCount: 2
 
 nodeSelector:
-  steambuddy: "true"
+  mdb-service: "true"
 
 image:
   repository: ghcr.io/crashteamdev/chatgptbot
-  tag: sha-f3223ee
+  tag: sha-2008889
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -23,6 +23,10 @@ service:
       port: 3000
 
 env:
+  - name: HOSTNAME
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.name
   - name: BOT_TOKEN
     valueFrom:
       secretKeyRef:
