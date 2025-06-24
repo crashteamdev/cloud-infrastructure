@@ -238,69 +238,6 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
 }
 
-resource "yandex_kubernetes_node_group" "steambuddy-service" {
-  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name       = "steambuddy-service"
-  version    = local.k8s_version
-  node_labels = {
-    steambuddy = "true"
-  }
-
-  instance_template {
-    platform_id = "standard-v2"
-
-    network_interface {
-      nat        = true
-      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
-    }
-
-    resources {
-      memory = 4
-      cores  = 2
-      core_fraction = 20
-    }
-
-    boot_disk {
-      type = "network-hdd"
-      size = 50
-    }
-  }
-
-  scale_policy {
-    fixed_scale {
-      size = 1
-    }
-  }
-
-  deploy_policy {
-    max_expansion   = 0
-    max_unavailable = 1
-  }
-
-  allocation_policy {
-    location {
-      zone = var.yc_region
-    }
-  }
-
-  maintenance_policy {
-    auto_upgrade = true
-    auto_repair  = true
-
-    maintenance_window {
-      day        = "monday"
-      start_time = "15:00"
-      duration   = "3h"
-    }
-
-    maintenance_window {
-      day        = "friday"
-      start_time = "10:00"
-      duration   = "4h30m"
-    }
-  }
-}
-
 resource "yandex_kubernetes_node_group" "mdb-sup-service" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
   name       = "mdb-sup-service"
