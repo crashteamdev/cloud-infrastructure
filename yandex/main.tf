@@ -495,7 +495,7 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
 
   clickhouse {
     resources {
-      resource_preset_id = "s3-c4-m16"
+      resource_preset_id = "m3-c2-m16"
       disk_type_id       = "network-ssd"
       disk_size          = 200
     }
