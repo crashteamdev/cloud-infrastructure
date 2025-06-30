@@ -68,8 +68,8 @@ env:
   - name: APP_MASTER_KEY
     valueFrom:
       secretKeyRef:
-      name: chatgptbot-secrets
-      key: message-encryption-key
+        name: chatgptbot-secrets
+        key: message-encryption-key
 
 configMap:
   data:
