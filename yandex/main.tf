@@ -493,7 +493,7 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
   #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
 
-  clickhouse {.
+  clickhouse {
     resources {
       resource_preset_id = "m3-c2-m16"
       disk_type_id       = "network-ssd"
