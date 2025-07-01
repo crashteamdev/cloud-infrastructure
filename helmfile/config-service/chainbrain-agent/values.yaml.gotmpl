@@ -68,7 +68,7 @@ env:
   - name: APP_MASTER_KEY
     valueFrom:
       secretKeyRef:
-        name: chatgptbot-secrets
+        name: {{ .Release.Name }}
         key: message-encryption-key
 
 configMap:
