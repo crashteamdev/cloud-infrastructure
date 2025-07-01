@@ -124,7 +124,7 @@ jobs:
               --allow-no-matching-release \
               $values_set_list \
               sync \
-              --args="--atomic --timeout 20m" \
+              --args="--atomic" \
               --wait \
               --skip-deps
             else
