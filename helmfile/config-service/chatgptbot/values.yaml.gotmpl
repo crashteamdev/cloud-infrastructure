@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/chatgptbot
-  tag: sha-d9621af
+  tag: sha-5035493
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -87,12 +87,19 @@ env:
     value: "3000"
   - name: CHAINBRAIN_AGENT_URL
     value: chainbrain-agent:9090
+  - name: ENCRYPTION_ENABLED
+    value: "true"
+  - name: CHATGPT_BOT_MASTER_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: message-encryption-key
 
 livenessProbe:
   httpGet:
     path: /health
     port: 3000
-  initialDelaySeconds: 30
+  initialDelaySeconds: 20
   timeoutSeconds: 10
   periodSeconds: 30
   failureThreshold: 3
@@ -101,7 +108,7 @@ readinessProbe:
   httpGet:
     path: /health
     port: 3000
-  initialDelaySeconds: 15
+  initialDelaySeconds: 12
   timeoutSeconds: 5
   periodSeconds: 10
   failureThreshold: 3
