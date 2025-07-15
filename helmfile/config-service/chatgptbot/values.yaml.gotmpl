@@ -94,6 +94,8 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}-secrets
         key: message-encryption-key
+  - name: CHANNEL_ID
+    value: "-1002769141534"
 
 livenessProbe:
   httpGet:
