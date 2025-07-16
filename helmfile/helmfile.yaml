@@ -13,7 +13,7 @@ repositories:
   - name: temporal
     url: https://go.temporal.io/helm-charts
   - name: open-8gears
-    url: https://8gears.github.io/n8n-helm-chart/
+    url: https://8gears.container-registry.dev/chartrepo/library
 
 releases:
   - name: ke-analytics
