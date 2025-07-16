@@ -489,7 +489,7 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   name               = "marketdb-clickhouse"
   environment        = "PRODUCTION"
   network_id         = yandex_vpc_network.network-1.id
-  version = "24.3"
+  version = "24.8"
   security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
   #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
 
