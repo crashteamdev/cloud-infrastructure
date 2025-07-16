@@ -13,7 +13,7 @@ repositories:
   - name: temporal
     url: https://go.temporal.io/helm-charts
   - name: open-8gears
-    url: https://8gears.container-registry.dev/chartrepo/library
+    url: https://8gears.github.io/n8n-helm-chart/
 
 releases:
   - name: ke-analytics
@@ -60,5 +60,5 @@ releases:
     <<: *generic_stateless
   - name: n8n
     <<: *default
-    chart: open-8gears/n8n
+    chart: oci://ghcr.io/8gears/n8n-helm-chart/n8n
     version: 1.0.10
