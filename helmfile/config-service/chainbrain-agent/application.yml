@@ -36,3 +36,55 @@ management:
     web:
       exposure:
         include: health,info,prometheus
+
+model:
+  scoring:
+    task-type:
+      code-generation:
+        deepseek-coder: 30.0
+        deepseek: 25.0
+        openai-gpt4: 25.0
+        gemini: 22.0
+        openai: 20.0
+        grok: 15.0
+      simple-chat:
+        code-model-penalty: -30.0
+        grok-low-cost: 30.0
+        deepseek-non-coder: 25.0
+        gemini: 22.0
+        openai-gpt35: 20.0
+        openai: 15.0
+      general-conversation:
+        code-model-penalty: -30.0
+        grok: 25.0
+        gemini: 23.0
+        deepseek-non-coder: 22.0
+        openai-gpt35: 20.0
+        openai: 18.0
+      image-analysis:
+        openai-gpt4-vision: 50.0
+        openai-gpt4o: 45.0
+        openai-gpt4o-mini: 40.0
+        openai-gpt4: 35.0
+        gemini-vision: 30.0
+        gemini: 25.0
+        deepseek: -50.0
+        deepseek-coder: -50.0
+        grok: -30.0
+    cost:
+      economy:
+        very-cheap: 25.0
+        cheap: 15.0
+        neutral: 0.0
+        medium-penalty: -20.0
+        expensive-penalty: -40.0
+    characteristics:
+      code-related: 15.0
+      complex-reasoning: 10.0
+      creative-task: 8.0
+    penalties:
+      code-model-for-non-code: -15.0
+      expensive-for-simple: -10.0
+      incompatible-capabilities: -50.0
+      wrong-specialization: -40.0
+      token-limit-exceeded: -20.0
