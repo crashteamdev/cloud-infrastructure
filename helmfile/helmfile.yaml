@@ -58,5 +58,5 @@ releases:
     <<: *generic_stateless
   - name: n8n
     <<: *default
-    chart: oci://ghcr.io/8gears/n8n-helm-chart/n8n
+    chart: oci://8gears.container-registry.com/library/n8n
     version: 1.0.10
