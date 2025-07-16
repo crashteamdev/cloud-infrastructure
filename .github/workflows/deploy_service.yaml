@@ -87,6 +87,13 @@ jobs:
           helmfile-version: 'v0.170.1'
           helm-version: 'v3.13.1'
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Update deps
         if: steps.files.outputs.any_changed == 'true'
         run: |
