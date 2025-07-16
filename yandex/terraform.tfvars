@@ -12,7 +12,8 @@ pg_dbs = [
   "herald",
   "steambuddy",
   "chainbrain",
-  "chainbrain-agent"
+  "chainbrain-agent",
+  "n8n"
 ]
 mongo_dbs = [
   "kazanex",
