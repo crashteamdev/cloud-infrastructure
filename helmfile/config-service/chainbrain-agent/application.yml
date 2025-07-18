@@ -10,6 +10,20 @@ grpc:
 logback:
   appender: JSON_K8S_CONSOLE
 
+logging:
+  level:
+    dev.crashteam.cbagent: INFO
+    org.jooq: WARN
+    org.jooq.tools.LoggerListener: WARN
+    dev.langchain4j: DEBUG
+    dev.langchain4j.http: DEBUG
+    dev.langchain4j.model.openai: DEBUG
+    dev.langchain4j.internal: DEBUG
+    org.springframework.web: WARN
+    org.apache.catalina: WARN
+    dev.crashteam.cbagent.service: DEBUG
+    dev.crashteam.cbagent.agent: DEBUG
+
 spring:
   application:
     name: {{ $applicationName }}
