@@ -96,6 +96,11 @@ env:
         key: message-encryption-key
   - name: ID_CHANNEL
     value: "-1002769141534"
+  - name: AIMLAPI_AI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: aimlapi-api-key
 
 livenessProbe:
   httpGet:
