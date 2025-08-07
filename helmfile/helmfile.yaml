@@ -60,3 +60,5 @@ releases:
     <<: *default
     chart: oci://8gears.container-registry.com/library/n8n
     version: 1.0.10
+  - name: chatgptwebapp
+    <<: *generic_stateless
