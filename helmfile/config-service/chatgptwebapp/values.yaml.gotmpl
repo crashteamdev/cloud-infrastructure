@@ -22,6 +22,15 @@ service:
     - name: http
       port: 3000
 
+env:
+  - name: BOT_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: chatgptbot-secrets
+        key: bot-token
+  - name: DATABASE_URL
+    value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/chainbrain
+
 configMap:
   data:
     appConfig.json: |
