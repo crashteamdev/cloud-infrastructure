@@ -121,6 +121,8 @@ env:
         key: aws_stream_secret_key
   - name: APP_URL
     value: "https://cbp.marketdb.pro/"
+  - name: PAYMENT_EVENTS_LOG_LEVEL
+    value: "debug"
 
 livenessProbe:
   httpGet:
