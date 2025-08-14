@@ -30,6 +30,8 @@ env:
         key: bot-token
   - name: DATABASE_URL
     value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/chainbrain
+  - name: CHARON_HOST
+    value: charon:9090
 
 configMap:
   data:
