@@ -119,6 +119,8 @@ env:
       secretKeyRef:
         name: charon
         key: aws_stream_secret_key
+  - name: APP_URL
+    value: "https://cbp.marketdb.pro/"
 
 livenessProbe:
   httpGet:
