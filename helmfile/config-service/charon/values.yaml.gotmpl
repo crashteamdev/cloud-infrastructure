@@ -87,6 +87,16 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}
         key: charon_posthog_apikey
+  - name: APP_INTEGRATION_TINKOFF_SHOPID
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_tinkoff_shop_id
+  - name: APP_INTEGRATION_TINKOFF_SECRETKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}
+        key: charon_tinkoff_secret_key
 
 configMap:
   data:
@@ -128,7 +138,7 @@ resources:
   limits:
     memory: 512Mi
   requests:
-    memory: 255Mi
+    memory: 256Mi
 
 metrics:
   serviceMonitor:
