@@ -81,7 +81,7 @@ jobs:
             helmfile/config-service/**
 
       - name: Setup helmfile
-        uses: mamezou-tech/setup-helmfile@v2.0.0
+        uses: mamezou-tech/setup-helmfile@v2.1.0
         with:
           helm-s3-plugin-version: 'v0.16.2'
           helmfile-version: 'v0.170.1'
