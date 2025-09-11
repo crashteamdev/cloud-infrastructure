@@ -121,6 +121,11 @@ env:
         key: aws_stream_secret_key
   - name: APP_URL
     value: "https://cbp.marketdb.pro/"
+  - name: POSTHOG_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: posthog-api-key
 
 livenessProbe:
   httpGet:
