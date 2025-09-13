@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/chatgptbot
-  tag: sha-622ad8e
+  tag: sha-e953d49
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -101,6 +101,31 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}-secrets
         key: aimlapi-api-key
+  - name: ENABLE_CONSUMER
+    value: "true"
+  - name: YDS_STREAM_NAME
+    value: "/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/mdb-payment"
+  - name: YDS_REGION
+    value: "ru-central1"
+  - name: YDS_ENDPOINT
+    value: "https://yds.serverless.yandexcloud.net"
+  - name: YC_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: charon
+        key: aws_stream_access_key
+  - name: YC_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: charon
+        key: aws_stream_secret_key
+  - name: APP_URL
+    value: "https://cbp.marketdb.pro/"
+  - name: POSTHOG_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: posthog-api-key
 
 livenessProbe:
   httpGet:
@@ -131,7 +156,7 @@ startupProbe:
 
 resources:
   requests:
-    memory: 128Mi
+    memory: 132Mi
     cpu: 100m
   limits:
     memory: 512Mi

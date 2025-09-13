@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-76cd9f4
+  tag: sha-f2a885f
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -21,6 +21,17 @@ service:
   ports:
     - name: http
       port: 3000
+
+env:
+  - name: BOT_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: chatgptbot-secrets
+        key: bot-token
+  - name: DATABASE_URL
+    value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/chainbrain
+  - name: CHARON_HOST
+    value: charon:9090
 
 configMap:
   data:
