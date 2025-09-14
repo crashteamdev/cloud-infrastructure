@@ -71,7 +71,7 @@ env:
       secretKeyRef:
         name: {{ .Release.Name }}-secrets
         key: log-channel-id
-  - name: GEMENI_AI_API_KEY
+  - name: GEMINI_AI_API_KEY
     valueFrom:
       secretKeyRef:
         name: {{ .Release.Name }}-secrets
