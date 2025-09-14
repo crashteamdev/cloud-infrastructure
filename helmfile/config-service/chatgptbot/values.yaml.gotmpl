@@ -1,14 +1,14 @@
 # -*- mode: yaml -*-
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: 1
+replicaCount: 2
 
 nodeSelector:
   mdb-service: "true"
 
 image:
   repository: ghcr.io/crashteamdev/chatgptbot
-  tag: sha-e6ac378
+  tag: sha-219d3d7
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
