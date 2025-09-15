@@ -54,3 +54,12 @@ app:
   aws-stream:
     uzum-stream:
       name: '/ru-central1/b1gtojcphtuae1n9siie/etnvck8jo3kuh0vilc57/mdb-payment'
+
+logging:
+  level:
+    dev:
+      crashteam:
+        charon:
+          service:
+            feign:
+              TBankClient: DEBUG
