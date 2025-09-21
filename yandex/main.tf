@@ -334,7 +334,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
     version = "15"
     resources {
       resource_preset_id = "b2.medium"
-      disk_size          = 10
+      disk_size          = 20
       disk_type_id       = "network-ssd"
     }
 
