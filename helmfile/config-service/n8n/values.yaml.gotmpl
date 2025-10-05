@@ -40,6 +40,8 @@ main:
       value: "true"
     - name: N8N_METRICS_PORT
       value: "5678"
+    - name: N8N_RUNNERS_ENABLED
+      value: "true"
 
   persistence:
     enabled: true
@@ -93,7 +95,7 @@ ingress:
       paths:
         - /
   tls:
-    - secretName: n8n-tls
+    - secretName: flow-tls
       hosts:
         - "flow.crashteam.dev"
 
