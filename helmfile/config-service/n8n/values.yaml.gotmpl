@@ -42,7 +42,7 @@ main:
       value: "5678"
 
   persistence:
-    enabled: false
+    enabled: true
     accessMode: ReadWriteOnce
     size: 10Gi
     storageClass: yc-network-hdd
@@ -89,13 +89,13 @@ ingress:
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
   hosts:
-    - host: "n8n.crashteam.dev"
+    - host: "flow.crashteam.dev"
       paths:
         - /
   tls:
     - secretName: n8n-tls
       hosts:
-        - "n8n.crashteam.dev"
+        - "flow.crashteam.dev"
 
 postgresql:
   enabled: false
