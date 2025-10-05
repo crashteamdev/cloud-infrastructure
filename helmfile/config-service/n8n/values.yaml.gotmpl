@@ -47,9 +47,11 @@ main:
 
   persistence:
     enabled: true
-    accessMode: ReadWriteOnce
+    accessModes:
+      - ReadWriteOnce
     size: 10Gi
     storageClass: yc-network-hdd
+    mountPath: /home/node/.n8n
 
   resources:
     requests:
