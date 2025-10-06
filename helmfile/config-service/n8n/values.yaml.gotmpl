@@ -40,10 +40,16 @@ main:
       value: "true"
     - name: N8N_METRICS_PORT
       value: "5678"
+    - name: N8N_RUNNERS_ENABLED
+      value: "true"
+    - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+      value: "true"
 
   persistence:
-    enabled: false
-    accessMode: ReadWriteOnce
+    enabled: true
+    type: dynamic
+    accessModes:
+      - ReadWriteOnce
     size: 10Gi
     storageClass: yc-network-hdd
 
@@ -89,13 +95,13 @@ ingress:
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
   hosts:
-    - host: "n8n.crashteam.dev"
+    - host: "flow.crashteam.dev"
       paths:
         - /
   tls:
-    - secretName: n8n-tls
+    - secretName: flow-tls
       hosts:
-        - "n8n.crashteam.dev"
+        - "flow.crashteam.dev"
 
 postgresql:
   enabled: false
