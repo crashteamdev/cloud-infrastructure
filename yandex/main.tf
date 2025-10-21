@@ -440,7 +440,7 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
 
   config {
     password = var.db_password
-    version  = "7.2"
+    version  = "7.2-valkey"
   }
 
   resources {
@@ -495,7 +495,7 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
 
   clickhouse {
     resources {
-      resource_preset_id = "m3-c2-m16"
+      resource_preset_id = "s3-c4-m16"
       disk_type_id       = "network-ssd"
       disk_size          = 200
     }
