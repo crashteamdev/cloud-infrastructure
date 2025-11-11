@@ -1,12 +1,14 @@
 # -*- mode: yaml -*-
 replicaCount: 1
 
+strategy: Recreate
+
 nodeSelector:
   mdb-service: "true"
 
 image:
   repository: ghcr.io/crashteamdev/strapi-mdb
-  tag: sha-12d58bc
+  tag: sha-da662b2
 
 {{ if .Values.services.global.registry.imagePullSecret }}
   imagePullSecrets:
