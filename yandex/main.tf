@@ -334,7 +334,7 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
     version = "15"
     resources {
       resource_preset_id = "b2.medium"
-      disk_size          = 10
+      disk_size          = 20
       disk_type_id       = "network-ssd"
     }
 
@@ -440,7 +440,7 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
 
   config {
     password = var.db_password
-    version  = "7.2"
+    version  = "7.2-valkey"
   }
 
   resources {
@@ -489,13 +489,13 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   name               = "marketdb-clickhouse"
   environment        = "PRODUCTION"
   network_id         = yandex_vpc_network.network-1.id
-  version = "24.8"
+  version = "25.8"
   security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
   #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
 
   clickhouse {
     resources {
-      resource_preset_id = "m3-c2-m16"
+      resource_preset_id = "s3-c4-m16"
       disk_type_id       = "network-ssd"
       disk_size          = 200
     }
