@@ -1,9 +1,9 @@
-main:
-  image:
-    repository: n8nio/n8n
-    tag: "1.123.16"
-    pullPolicy: IfNotPresent
+image:
+  repository: n8nio/n8n
+  tag: "1.123.16"
+  pullPolicy: IfNotPresent
 
+main:
   env:
     - name: N8N_BASIC_AUTH_ACTIVE
       value: "true"
