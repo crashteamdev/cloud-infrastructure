@@ -4,54 +4,46 @@ image:
   pullPolicy: IfNotPresent
 
 main:
-  env:
-    - name: N8N_BASIC_AUTH_ACTIVE
-      value: "true"
-    - name: N8N_BASIC_AUTH_USER
-      valueFrom:
-        secretKeyRef:
-          name: n8n-secrets
-          key: basic-auth-user
-    - name: N8N_BASIC_AUTH_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: n8n-secrets
-          key: basic-auth-password
-    - name: DB_TYPE
-      value: postgres
-    - name: DB_POSTGRESDB_HOST
-      value: {{ .Values.services.postgres.endpoint }}
-    - name: DB_POSTGRESDB_PORT
-      value: "6432"
-    - name: DB_POSTGRESDB_DATABASE
-      value: n8n
-    - name: DB_POSTGRESDB_USER
-      value: {{ .Values.services.postgres.uniUser }}
-    - name: DB_POSTGRESDB_PASSWORD
-      value: {{ .Values.services.postgres.uniPassword }}
-    - name: N8N_ENCRYPTION_KEY
-      valueFrom:
-        secretKeyRef:
-          name: n8n-secrets
-          key: encryption-key
-    - name: N8N_LOG_LEVEL
-      value: info
-    - name: N8N_METRICS
-      value: "true"
-    - name: N8N_METRICS_PORT
-      value: "5678"
-    - name: N8N_RUNNERS_ENABLED
-      value: "true"
-    - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
-      value: "true"
-    - name: N8N_HOST
-      value: "flow.crashteam.dev"
-    - name: N8N_EDITOR_BASE_URL
-      value: "https://flow.crashteam.dev/"
-    - name: WEBHOOK_URL
-      value: "https://flow.crashteam.dev/"
-    - name: N8N_PROXY_HOPS
-      value: "1"
+  config:
+    n8n:
+      host: "flow.crashteam.dev"
+      protocol: "https"
+      port: 443
+      editor_base_url: "https://flow.crashteam.dev/"
+      proxy_hops: 1
+      enforce_settings_file_permissions: true
+      log_level: "info"
+      metrics: true
+      metrics_port: 5678
+      runners_enabled: true
+      basic_auth_active: true
+    extraEnv:
+      WEBHOOK_URL:
+        value: "https://flow.crashteam.dev/"
+
+      N8N_BASIC_AUTH_USER:
+        valueFrom:
+          secretKeyRef:
+            name: n8n-secrets
+            key: basic-auth-user
+
+      N8N_BASIC_AUTH_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: n8n-secrets
+            key: basic-auth-password
+
+      N8N_ENCRYPTION_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: n8n-secrets
+            key: encryption-key
+
+      DB_POSTGRESDB_PASSWORD:
+        valueFrom:
+          secretKeyRef:
+            name: n8n-secrets
+            key: db-password
 
   persistence:
     enabled: true
