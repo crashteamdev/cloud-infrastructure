@@ -29,35 +29,35 @@ env:
   - name: SPRING_DATASOURCE_PASSWORD
     value: {{ .Values.services.postgres.uniPassword }}
   - name: OPENAI_BASE_URL
-    value: "https://charon.chainbrain.pro/openai/v1"
+    value: "https://ai-proxy.chainbrain.pro/openai/v1"
   - name: OPENAI_API_KEY
     valueFrom:
       secretKeyRef:
         name: chatgptbot-secrets
         key: openai-api-key
   - name: DEEPSEEK_BASE_URL
-    value: "https://charon.chainbrain.pro/deepseek"
+    value: "https://ai-proxy.chainbrain.pro/deepseek"
   - name: DEEPSEEK_API_KEY
     valueFrom:
       secretKeyRef:
         name: chatgptbot-secrets
         key: deepseek-api-key
   - name: STABILITY_BASE_URL
-    value: "https://charon.chainbrain.pro/stability"
+    value: "https://ai-proxy.chainbrain.pro/stability"
   - name: STABILITY_API_KEY
     valueFrom:
       secretKeyRef:
         name: chatgptbot-secrets
         key: stability-api-key
   - name: GROK_BASE_URL
-    value: "https://charon.chainbrain.pro/grok/v1"
+    value: "https://ai-proxy.chainbrain.pro/grok/v1"
   - name: GROK_API_KEY
     valueFrom:
       secretKeyRef:
         name: chatgptbot-secrets
         key: grok-ai-api-key
   - name: GEMINI_BASE_URL
-    value: "https://charon.chainbrain.pro/gemini"
+    value: "https://ai-proxy.chainbrain.pro/gemini"
   - name: GEMINI_API_KEY
     valueFrom:
       secretKeyRef:
