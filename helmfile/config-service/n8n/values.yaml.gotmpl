@@ -5,6 +5,7 @@ image:
 
 main:
   config:
+    webhook_url: "https://flow.crashteam.dev/"
     n8n:
       host: "flow.crashteam.dev"
       protocol: "https"
@@ -16,33 +17,29 @@ main:
       metrics_port: 5678
       runners_enabled: true
       basic_auth_active: true
-    extraEnv:
-      WEBHOOK_URL:
-        value: "https://flow.crashteam.dev/"
-
-      N8N_BASIC_AUTH_USER:
-        valueFrom:
-          secretKeyRef:
-            name: n8n-secrets
-            key: basic-auth-user
-
-      N8N_BASIC_AUTH_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: n8n-secrets
-            key: basic-auth-password
-
-      N8N_ENCRYPTION_KEY:
-        valueFrom:
-          secretKeyRef:
-            name: n8n-secrets
-            key: encryption-key
-
-      DB_POSTGRESDB_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: n8n-secrets
-            key: db-password
+  extraEnv:
+    WEBHOOK_URL:
+      value: "https://flow.crashteam.dev/"
+{{/*    N8N_BASIC_AUTH_USER:*/}}
+{{/*      valueFrom:*/}}
+{{/*        secretKeyRef:*/}}
+{{/*          name: n8n-secrets*/}}
+{{/*          key: basic-auth-user*/}}
+{{/*    N8N_BASIC_AUTH_PASSWORD:*/}}
+{{/*      valueFrom:*/}}
+{{/*        secretKeyRef:*/}}
+{{/*          name: n8n-secrets*/}}
+{{/*          key: basic-auth-password*/}}
+{{/*    N8N_ENCRYPTION_KEY:*/}}
+{{/*      valueFrom:*/}}
+{{/*        secretKeyRef:*/}}
+{{/*          name: n8n-secrets*/}}
+{{/*          key: encryption-key*/}}
+{{/*    DB_POSTGRESDB_PASSWORD:*/}}
+{{/*      valueFrom:*/}}
+{{/*        secretKeyRef:*/}}
+{{/*          name: n8n-secrets*/}}
+{{/*          key: db-password*/}}
 
   persistence:
     enabled: true
