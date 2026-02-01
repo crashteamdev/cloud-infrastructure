@@ -86,6 +86,17 @@ rate-limit:
       refill:
         tokens: 30
         period-minutes: 1
+  auth:
+    per-second:
+      capacity: 1
+      refill:
+        tokens: 1
+        period-seconds: 1
+    per-minutes:
+      capacity: 5
+      refill:
+        tokens: 5
+        period-minutes: 1
 
 bot:
   enable: true
