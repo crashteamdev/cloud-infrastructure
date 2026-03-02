@@ -22,7 +22,7 @@ logging:
    org.springframework.jdbc.core: INFO
    org.springframework.jdbc.support: INFO
    dev.crashteam.herald.repository.impl: INFO
-   dev.crashteam.herald.client: DEBUG
+   dev.crashteam.herald.client: INFO
    # org.apache.http: DEBUG
    # org.apache.http.wire: TRACE
    # org.apache.hc.client5.http: DEBUG
@@ -85,6 +85,17 @@ rate-limit:
       capacity: 30
       refill:
         tokens: 30
+        period-minutes: 1
+  auth:
+    per-second:
+      capacity: 1
+      refill:
+        tokens: 1
+        period-seconds: 1
+    per-minutes:
+      capacity: 5
+      refill:
+        tokens: 5
         period-minutes: 1
 
 bot:
