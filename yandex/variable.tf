@@ -25,7 +25,7 @@ variable "cluster_name" {
 
 variable "yc_debian_image_id" {
   default = "fd8987mnac4uroc0d16s"
-  type = string
+  type    = string
 }
 
 variable "pg_dbs" {
@@ -54,4 +54,9 @@ variable "vm_user_nat" {
 
 variable "nat_ssh_key_path" {
   type = string
+}
+
+variable "endmake_public_ingress_ipv4" {
+  description = "Public ingress IPv4 for app.endmake records"
+  type        = string
 }
