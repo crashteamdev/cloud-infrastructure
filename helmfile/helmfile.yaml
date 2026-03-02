@@ -62,3 +62,7 @@ releases:
     version: 1.0.15
   - name: chatgptwebapp
     <<: *generic_stateless
+  - name: endmake-web
+    <<: *generic_stateless
+  - name: endmake-worker
+    <<: *generic_stateless

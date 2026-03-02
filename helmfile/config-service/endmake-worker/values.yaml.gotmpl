@@ -1,0 +1,114 @@
+# -*- mode: yaml -*-
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 1
+
+nodeSelector:
+  mdb-service: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: main
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+service:
+  type: ClusterIP
+  ports:
+    - name: worker
+      port: 3000
+
+env:
+  - name: NODE_ENV
+    value: production
+  - name: APP_URL
+    value: https://app.endmake.com
+  - name: AUTH_URL
+    value: https://app.endmake.com
+  - name: S3_FORCE_PATH_STYLE
+    value: "true"
+  - name: OPENAI_BASE_URL
+    value: https://api.openai.com/v1
+  - name: OPENAI_TEXT_LOW_COST_MODEL
+    value: gpt-4.1-nano
+  - name: GOOGLE_GENAI_BASE_URL
+    value: https://generativelanguage.googleapis.com/v1beta
+  - name: CREDITS_PER_USD
+    value: "1000"
+  - name: PRICING_SIGNUP_CREDITS
+    value: "1000"
+  - name: PRICING_TAX_RATE
+    value: "0"
+  - name: PRICING_HOSTING_RATE
+    value: "0.15"
+  - name: PRICING_MARGIN_RATE
+    value: "0.30"
+  - name: PRICING_VERSION
+    value: v2
+  - name: FAL_QUEUE_BASE_URL
+    value: https://queue.fal.run
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: endmake-runtime-env
+        key: database-url
+  - name: REDIS_URL
+    valueFrom:
+      secretKeyRef:
+        name: endmake-runtime-env
+        key: redis-url
+  - name: S3_ENDPOINT
+    valueFrom:
+      secretKeyRef:
+        name: endmake-runtime-env
+        key: s3-endpoint
+  - name: S3_REGION
+    valueFrom:
+      secretKeyRef:
+        name: endmake-runtime-env
+        key: s3-region
+  - name: S3_BUCKET
+    valueFrom:
+      secretKeyRef:
+        name: endmake-runtime-env
+        key: s3-bucket
+  - name: S3_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: endmake-runtime-env
+        key: s3-access-key-id
+  - name: S3_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-runtime-env
+        key: s3-secret-access-key
+  - name: OPENAI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: openai-api-key
+  - name: GOOGLE_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: google-api-key
+  - name: FAL_KEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Release.Name }}-secrets
+        key: fal-key
+
+livenessProbe: null
+readinessProbe: null
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+ingress:
+  enabled: false
