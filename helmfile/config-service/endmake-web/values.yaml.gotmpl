@@ -164,3 +164,17 @@ ingress:
         - app.endmake.ru
 {{- end }}
   servicePort: 3000
+
+hook:
+  enabled: true
+  kind: "pre-install,pre-upgrade"
+  image:
+    repository: ghcr.io/crashteamdev/endmake-db-init
+    tag: sha-0ccc956
+    pullPolicy: IfNotPresent
+  command: "npm run db:init"
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: DATABASE_URL
+      value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/endmake?uselibpqcompat=true&sslmode=require
