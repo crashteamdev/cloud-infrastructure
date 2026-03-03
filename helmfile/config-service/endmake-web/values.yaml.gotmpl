@@ -1,14 +1,14 @@
 # -*- mode: yaml -*-
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: 1
+replicaCount: 2
 
 nodeSelector:
   ingress: "true"
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: main
+  tag: sha-b6ae9b9
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -31,12 +31,8 @@ env:
     value: https://app.endmake.com
   - name: S3_FORCE_PATH_STYLE
     value: "true"
-  - name: OPENAI_BASE_URL
-    value: https://api.openai.com/v1
   - name: OPENAI_TEXT_LOW_COST_MODEL
-    value: gpt-4.1-nano
-  - name: GOOGLE_GENAI_BASE_URL
-    value: https://generativelanguage.googleapis.com/v1beta
+    value: "gpt-4.1-nano"
   - name: CREDITS_PER_USD
     value: "1000"
   - name: PRICING_SIGNUP_CREDITS
@@ -46,11 +42,9 @@ env:
   - name: PRICING_HOSTING_RATE
     value: "0.15"
   - name: PRICING_MARGIN_RATE
-    value: "0.30"
+    value: "0.15"
   - name: PRICING_VERSION
     value: v2
-  - name: FAL_QUEUE_BASE_URL
-    value: https://queue.fal.run
   - name: AUTH_SECRET
     valueFrom:
       secretKeyRef:
@@ -77,15 +71,9 @@ env:
         name: endmake-secrets
         key: auth-yandex-secret
   - name: DATABASE_URL
-    valueFrom:
-      secretKeyRef:
-        name: endmake-secrets
-        key: database-url
+    value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/endmake
   - name: REDIS_URL
-    valueFrom:
-      secretKeyRef:
-        name: endmake-secrets
-        key: redis-url
+    value: rediss://default:{{ .Values.services.redis.password }}@{{ .Values.services.redis.endpoint }}:6380
   - name: S3_ENDPOINT
     valueFrom:
       secretKeyRef:
@@ -126,6 +114,12 @@ env:
       secretKeyRef:
         name: endmake-secrets
         key: fal-key
+  - name: OPENAI_BASE_URL
+    value: "https://ai-proxy.chainbrain.pro/openai/v1"
+  - name: GOOGLE_GENAI_BASE_URL
+    value: "https://ai-proxy.chainbrain.pro/gemini/v1beta"
+  - name: FAL_QUEUE_BASE_UR
+    value: "https://ai-proxy.chainbrain.pro/fal"
 
 livenessProbe:
   httpGet:
