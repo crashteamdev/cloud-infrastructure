@@ -396,6 +396,9 @@ resource "yandex_mdb_postgresql_database" "pb_database" {
     name = "xml2"
   }
   extension {
+    name = "pgcrypto"
+  }
+  extension {
     name = "pg_trgm"
   }
   extension {
@@ -541,4 +544,3 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
     }
   }
 }
-
