@@ -71,7 +71,7 @@ env:
         name: endmake-secrets
         key: auth-yandex-secret
   - name: DATABASE_URL
-    value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/endmake
+    value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/endmake?uselibpqcompat=true&sslmode=require
   - name: REDIS_URL
     value: rediss://default:{{ .Values.services.redis.password }}@{{ .Values.services.redis.endpoint }}:6380
   - name: S3_ENDPOINT
