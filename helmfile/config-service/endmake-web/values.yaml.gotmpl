@@ -1,0 +1,180 @@
+# -*- mode: yaml -*-
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 2
+
+nodeSelector:
+  mdb-service: "true"
+
+image:
+  repository: ghcr.io/crashteamdev/{{ $applicationName }}
+  tag: sha-f35bdf5
+  pullPolicy: IfNotPresent
+
+{{ if .Values.services.global.registry.imagePullSecret }}
+imagePullSecrets:
+  - name: {{ .Values.services.global.registry.imagePullSecret }}
+{{ end }}
+
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3000
+
+env:
+  - name: NODE_ENV
+    value: production
+  - name: APP_URL
+    value: https://app.endmake.com
+  - name: AUTH_URL
+    value: https://app.endmake.com
+  - name: S3_FORCE_PATH_STYLE
+    value: "true"
+  - name: OPENAI_TEXT_LOW_COST_MODEL
+    value: "gpt-4.1-nano"
+  - name: CREDITS_PER_USD
+    value: "1000"
+  - name: PRICING_SIGNUP_CREDITS
+    value: "1000"
+  - name: PRICING_TAX_RATE
+    value: "0"
+  - name: PRICING_HOSTING_RATE
+    value: "0.15"
+  - name: PRICING_MARGIN_RATE
+    value: "0.15"
+  - name: PRICING_VERSION
+    value: v2
+  - name: AUTH_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: auth-secret
+  - name: AUTH_GOOGLE_ID
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: auth-google-id
+  - name: AUTH_GOOGLE_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: auth-google-secret
+  - name: AUTH_YANDEX_ID
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: auth-yandex-id
+  - name: AUTH_YANDEX_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: auth-yandex-secret
+  - name: DATABASE_URL
+    value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/endmake?uselibpqcompat=true&sslmode=require
+  - name: REDIS_URL
+    value: rediss://default:{{ .Values.services.redis.password }}@{{ .Values.services.redis.endpoint }}:6380
+  - name: S3_ENDPOINT
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-endpoint
+  - name: S3_REGION
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-region
+  - name: S3_BUCKET
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-bucket
+  - name: S3_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-access-key-id
+  - name: S3_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-secret-access-key
+  - name: OPENAI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: openai-api-key
+  - name: GOOGLE_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: google-api-key
+  - name: FAL_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: fal-key
+  - name: OPENAI_BASE_URL
+    value: "https://ai-proxy.chainbrain.pro/openai/v1"
+  - name: GOOGLE_GENAI_BASE_URL
+    value: "https://ai-proxy.chainbrain.pro/gemini/v1beta"
+  - name: FAL_QUEUE_BASE_UR
+    value: "https://ai-proxy.chainbrain.pro/fal"
+
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+ingress:
+  enabled: true
+  annotations:
+{{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
+    cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+{{- end }}
+    kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+  hosts:
+    - host: app.endmake.com
+      paths:
+        - /
+    - host: app.endmake.ru
+      paths:
+        - /
+{{- if .Values.services.ingress.tls.enabled }}
+  tls:
+    - secretName: endmake-web-app-endmake-com-tls
+      hosts:
+        - app.endmake.com
+    - secretName: endmake-web-app-endmake-ru-tls
+      hosts:
+        - app.endmake.ru
+{{- end }}
+  servicePort: 3000
+
+hook:
+  enabled: true
+  kind: "pre-install,pre-upgrade"
+  image:
+    repository: ghcr.io/crashteamdev/endmake-db-init
+    tag: sha-ec46a9e
+    pullPolicy: IfNotPresent
+  command: "npm run db:init"
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: DATABASE_URL
+      value: postgresql://{{ .Values.services.postgres.uniUser }}:{{ .Values.services.postgres.uniPassword }}@{{ .Values.services.postgres.endpoint }}:6432/endmake?uselibpqcompat=true&sslmode=require
