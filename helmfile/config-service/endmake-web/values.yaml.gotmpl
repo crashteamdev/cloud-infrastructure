@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-207a24b
+  tag: sha-c346d4e
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -170,7 +170,7 @@ hook:
   kind: "pre-install,pre-upgrade"
   image:
     repository: ghcr.io/crashteamdev/endmake-db-init
-    tag: sha-0ccc956
+    tag: sha-c346d4e
     pullPolicy: IfNotPresent
   command: "npm run db:init"
   env:
