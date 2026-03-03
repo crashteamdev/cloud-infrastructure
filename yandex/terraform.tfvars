@@ -13,7 +13,8 @@ pg_dbs = [
   "steambuddy",
   "chainbrain",
   "chainbrain-agent",
-  "n8n"
+  "n8n",
+  "endmake"
 ]
 mongo_dbs = [
   "kazanex",
