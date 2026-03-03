@@ -54,77 +54,77 @@ env:
   - name: AUTH_SECRET
     valueFrom:
       secretKeyRef:
-        name: {{ .Release.Name }}-secrets
+        name: endmake-secrets
         key: auth-secret
   - name: AUTH_GOOGLE_ID
     valueFrom:
       secretKeyRef:
-        name: {{ .Release.Name }}-secrets
+        name: endmake-secrets
         key: auth-google-id
   - name: AUTH_GOOGLE_SECRET
     valueFrom:
       secretKeyRef:
-        name: {{ .Release.Name }}-secrets
+        name: endmake-secrets
         key: auth-google-secret
   - name: AUTH_YANDEX_ID
     valueFrom:
       secretKeyRef:
-        name: {{ .Release.Name }}-secrets
+        name: endmake-secrets
         key: auth-yandex-id
   - name: AUTH_YANDEX_SECRET
     valueFrom:
       secretKeyRef:
-        name: {{ .Release.Name }}-secrets
+        name: endmake-secrets
         key: auth-yandex-secret
   - name: DATABASE_URL
     valueFrom:
       secretKeyRef:
-        name: endmake-runtime-env
+        name: endmake-secrets
         key: database-url
   - name: REDIS_URL
     valueFrom:
       secretKeyRef:
-        name: endmake-runtime-env
+        name: endmake-secrets
         key: redis-url
   - name: S3_ENDPOINT
     valueFrom:
       secretKeyRef:
-        name: endmake-runtime-env
+        name: endmake-secrets
         key: s3-endpoint
   - name: S3_REGION
     valueFrom:
       secretKeyRef:
-        name: endmake-runtime-env
+        name: endmake-secrets
         key: s3-region
   - name: S3_BUCKET
     valueFrom:
       secretKeyRef:
-        name: endmake-runtime-env
+        name: endmake-secrets
         key: s3-bucket
   - name: S3_ACCESS_KEY_ID
     valueFrom:
       secretKeyRef:
-        name: endmake-runtime-env
+        name: endmake-secrets
         key: s3-access-key-id
   - name: S3_SECRET_ACCESS_KEY
     valueFrom:
       secretKeyRef:
-        name: endmake-runtime-env
+        name: endmake-secrets
         key: s3-secret-access-key
   - name: OPENAI_API_KEY
     valueFrom:
       secretKeyRef:
-        name: {{ .Release.Name }}-secrets
+        name: endmake-secrets
         key: openai-api-key
   - name: GOOGLE_API_KEY
     valueFrom:
       secretKeyRef:
-        name: {{ .Release.Name }}-secrets
+        name: endmake-secrets
         key: google-api-key
   - name: FAL_KEY
     valueFrom:
       secretKeyRef:
-        name: {{ .Release.Name }}-secrets
+        name: endmake-secrets
         key: fal-key
 
 livenessProbe:
