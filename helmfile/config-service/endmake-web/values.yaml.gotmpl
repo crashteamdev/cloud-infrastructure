@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-88a46b7
+  tag: sha-14a6516
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -147,6 +147,11 @@ ingress:
     cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
 {{- end }}
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($host = app.endmake.ru) {
+        return 301 https://app.endmake.com$request_uri;
+      }
   hosts:
     - host: app.endmake.com
       paths:
@@ -170,7 +175,7 @@ hook:
   kind: "pre-install,pre-upgrade"
   image:
     repository: ghcr.io/crashteamdev/endmake-db-init
-    tag: sha-ec46a9e
+    tag: sha-1e3de25
     pullPolicy: IfNotPresent
   command: "npm run db:init"
   env:
