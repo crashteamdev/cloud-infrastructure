@@ -73,15 +73,6 @@ data "http" "endroom_cdn_public_nets" {
   }
 }
 
-resource "time_sleep" "endroom_storage_ready" {
-  depends_on = [
-    yandex_resourcemanager_folder_iam_member.endmake_storage_admin,
-    yandex_iam_service_account_static_access_key.endmake_storage
-  ]
-
-  create_duration = "45s"
-}
-
 resource "yandex_dns_zone" "endroom_dev" {
   name   = local.endroom_zone_name
   zone   = "${local.endroom_root_domain}."
@@ -111,9 +102,6 @@ resource "yandex_dns_recordset" "endroom_certificate_validation" {
 }
 
 resource "yandex_storage_bucket" "endroom_root" {
-  depends_on    = [time_sleep.endroom_storage_ready]
-  access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
-  secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_root_bucket_name
   force_destroy = false
   max_size      = local.endroom_bucket_max_size
@@ -158,9 +146,6 @@ resource "yandex_storage_bucket" "endroom_root" {
 }
 
 resource "yandex_storage_bucket" "endroom_www" {
-  depends_on    = [time_sleep.endroom_storage_ready]
-  access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
-  secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_www_bucket_name
   force_destroy = false
   max_size      = local.endroom_bucket_max_size

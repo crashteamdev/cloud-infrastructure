@@ -15,6 +15,12 @@ resource "yandex_resourcemanager_folder_iam_member" "endmake_storage_admin" {
   member    = "serviceAccount:${yandex_iam_service_account.endmake_storage.id}"
 }
 
+resource "yandex_resourcemanager_folder_iam_member" "github_deploy_storage_admin" {
+  folder_id = var.yc_folder_id
+  role      = "storage.admin"
+  member    = "serviceAccount:ajevao7t27aim25olhi1"
+}
+
 resource "yandex_iam_service_account_static_access_key" "endmake_storage" {
   service_account_id = yandex_iam_service_account.endmake_storage.id
   description        = "Static access key for endmake object storage"

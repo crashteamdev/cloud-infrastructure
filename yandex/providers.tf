@@ -5,11 +5,6 @@ terraform {
       version = "~> 3.4"
     }
 
-    time = {
-      source  = "hashicorp/time"
-      version = "~> 0.11"
-    }
-
     yandex = {
       source  = "yandex-cloud/yandex"
       version = "0.99.1"
@@ -29,7 +24,9 @@ terraform {
 }
 
 provider "yandex" {
-  zone      = var.yc_region
-  cloud_id  = var.yc_cloud_id
-  folder_id = var.yc_folder_id
+  zone               = var.yc_region
+  cloud_id           = var.yc_cloud_id
+  folder_id          = var.yc_folder_id
+  storage_access_key = var.storage_access_key
+  storage_secret_key = var.storage_secret_key
 }

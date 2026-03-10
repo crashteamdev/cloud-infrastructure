@@ -60,3 +60,15 @@ variable "endmake_public_ingress_ipv4" {
   description = "Public ingress IPv4 for app.endmake records"
   type        = string
 }
+
+variable "storage_access_key" {
+  description = "Object Storage access key used by the Yandex provider default storage client."
+  type        = string
+  sensitive   = true
+}
+
+variable "storage_secret_key" {
+  description = "Object Storage secret key used by the Yandex provider default storage client."
+  type        = string
+  sensitive   = true
+}
