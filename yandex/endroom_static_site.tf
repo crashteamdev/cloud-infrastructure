@@ -30,12 +30,6 @@ variable "endroom_cdn_provider_cname" {
   nullable    = true
 }
 
-variable "endroom_enable_origin_lockdown" {
-  description = "Apply the restrictive origin bucket policy only after CDN and DNS cutover are complete."
-  type        = bool
-  default     = false
-}
-
 locals {
   endroom_zone_name           = "endroom-dev"
   endroom_root_domain         = "endroom.dev"
@@ -53,11 +47,6 @@ locals {
     var.endroom_existing_cm_certificate_id,
     try(yandex_cm_certificate.endroom[0].id, null)
   )
-
-  endroom_cdn_public_nets = distinct(concat(
-    try(jsondecode(data.http.endroom_cdn_public_nets.response_body).addresses, []),
-    try(jsondecode(data.http.endroom_cdn_public_nets.response_body).addresses_v6, [])
-  ))
 }
 
 import {
@@ -65,11 +54,11 @@ import {
   id = "endroom.dev"
 }
 
-data "http" "endroom_cdn_public_nets" {
-  url = "https://api.edgecenter.ru/cdn/public_net_list"
+removed {
+  from = yandex_storage_bucket.endroom_www
 
-  request_headers = {
-    Accept = "application/json"
+  lifecycle {
+    destroy = false
   }
 }
 
@@ -144,42 +133,6 @@ resource "yandex_storage_bucket" "endroom_root" {
       condition     = !var.endroom_enable_apex_redirect || local.endroom_certificate_id != null
       error_message = "Enable apex redirect only after a Yandex Certificate Manager certificate is available."
     }
-  }
-}
-
-resource "yandex_storage_bucket" "endroom_www" {
-  access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
-  secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
-  bucket        = local.endroom_www_bucket_name
-  force_destroy = false
-  max_size      = local.endroom_bucket_max_size
-  policy = var.endroom_enable_origin_lockdown ? jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "AllowGetObjectFromCloudCDN"
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = ["s3:GetObject"]
-        Resource  = ["arn:aws:s3:::${local.endroom_www_bucket_name}/*"]
-        Condition = {
-          IpAddress = {
-            "aws:SourceIp" = local.endroom_cdn_public_nets
-          }
-        }
-      }
-    ]
-  }) : null
-
-  anonymous_access_flags {
-    read        = !var.endroom_enable_origin_lockdown
-    list        = false
-    config_read = false
-  }
-
-  website {
-    index_document = "index.html"
-    error_document = "404.html"
   }
 }
 

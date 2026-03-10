@@ -29,5 +29,4 @@ endmake_public_ingress_ipv4 = "51.250.10.12"
 endroom_enable_cdn_resources   = true
 endroom_enable_www_cutover     = true
 endroom_enable_apex_redirect   = true
-endroom_enable_origin_lockdown = false
 endroom_cdn_provider_cname     = "43fb6b1550305dfd.topology.gslb.yccdn.ru"

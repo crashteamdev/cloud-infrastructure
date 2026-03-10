@@ -20,7 +20,7 @@ output "endmake_s3_secret_access_key" {
 }
 
 output "endroom_www_bucket" {
-  value = yandex_storage_bucket.endroom_www.bucket
+  value = "www.endroom.dev"
 }
 
 output "endroom_certificate_id" {
