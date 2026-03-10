@@ -54,14 +54,6 @@ import {
   id = "endroom.dev"
 }
 
-removed {
-  from = yandex_storage_bucket.endroom_www
-
-  lifecycle {
-    destroy = false
-  }
-}
-
 resource "yandex_dns_zone" "endroom_dev" {
   name   = local.endroom_zone_name
   zone   = "${local.endroom_root_domain}."
