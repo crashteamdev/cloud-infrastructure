@@ -30,8 +30,14 @@ variable "endroom_cdn_provider_cname" {
   nullable    = true
 }
 
+variable "endroom_enable_origin_lockdown" {
+  description = "Apply the restrictive origin bucket policy only after CDN and DNS cutover are complete."
+  type        = bool
+  default     = false
+}
+
 locals {
-  endroom_zone_id             = "dnsc9g6hbdqsu8dg0cb9"
+  endroom_zone_name           = "endroom-dev"
   endroom_root_domain         = "endroom.dev"
   endroom_www_domain          = "www.endroom.dev"
   endroom_certificate_domains = [local.endroom_root_domain, local.endroom_www_domain]
@@ -52,16 +58,6 @@ locals {
     try(jsondecode(data.http.endroom_cdn_public_nets.response_body).addresses, []),
     try(jsondecode(data.http.endroom_cdn_public_nets.response_body).addresses_v6, [])
   ))
-}
-
-import {
-  to = yandex_dns_recordset.endroom_dev_apex_aname
-  id = "dnsc9g6hbdqsu8dg0cb9/endroom.dev./ANAME"
-}
-
-import {
-  to = yandex_dns_recordset.endroom_dev_www_cname
-  id = "dnsc9g6hbdqsu8dg0cb9/www.endroom.dev./CNAME"
 }
 
 import {
@@ -86,6 +82,12 @@ resource "time_sleep" "endroom_storage_ready" {
   create_duration = "45s"
 }
 
+resource "yandex_dns_zone" "endroom_dev" {
+  name   = local.endroom_zone_name
+  zone   = "${local.endroom_root_domain}."
+  public = true
+}
+
 resource "yandex_cm_certificate" "endroom" {
   count = var.endroom_existing_cm_certificate_id == null ? 1 : 0
 
@@ -101,7 +103,7 @@ resource "yandex_cm_certificate" "endroom" {
 resource "yandex_dns_recordset" "endroom_certificate_validation" {
   count = var.endroom_existing_cm_certificate_id == null ? length(local.endroom_certificate_domains) : 0
 
-  zone_id = local.endroom_zone_id
+  zone_id = yandex_dns_zone.endroom_dev.id
   name    = yandex_cm_certificate.endroom[0].challenges[count.index].dns_name
   type    = yandex_cm_certificate.endroom[0].challenges[count.index].dns_type
   ttl     = 60
@@ -151,7 +153,7 @@ resource "yandex_storage_bucket" "endroom_www" {
   bucket        = local.endroom_www_bucket_name
   force_destroy = false
   max_size      = local.endroom_bucket_max_size
-  policy = jsonencode({
+  policy = var.endroom_enable_origin_lockdown ? jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -167,10 +169,10 @@ resource "yandex_storage_bucket" "endroom_www" {
         }
       }
     ]
-  })
+  }) : null
 
   anonymous_access_flags {
-    read        = true
+    read        = !var.endroom_enable_origin_lockdown
     list        = false
     config_read = false
   }
@@ -224,7 +226,7 @@ resource "yandex_cdn_resource" "endroom_www" {
 }
 
 resource "yandex_dns_recordset" "endroom_dev_apex_aname" {
-  zone_id = local.endroom_zone_id
+  zone_id = yandex_dns_zone.endroom_dev.id
   name    = "${local.endroom_root_domain}."
   type    = "ANAME"
   ttl     = 600
@@ -232,7 +234,7 @@ resource "yandex_dns_recordset" "endroom_dev_apex_aname" {
 }
 
 resource "yandex_dns_recordset" "endroom_dev_www_cname" {
-  zone_id = local.endroom_zone_id
+  zone_id = yandex_dns_zone.endroom_dev.id
   name    = "${local.endroom_www_domain}."
   type    = "CNAME"
   ttl     = 600
