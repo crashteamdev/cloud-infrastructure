@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-d5999a4
+  tag: sha-821ad07
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -38,7 +38,7 @@ env:
   - name: PRICING_SIGNUP_CREDITS
     value: "400"
   - name: PRICING_TAX_RATE
-    value: "0.8"
+    value: "0.08"
   - name: PRICING_HOSTING_RATE
     value: "0.10"
   - name: PRICING_MARGIN_RATE
@@ -183,7 +183,7 @@ hook:
   kind: "pre-install,pre-upgrade"
   image:
     repository: ghcr.io/crashteamdev/endmake-db-init
-    tag: sha-d5999a4
+    tag: sha-821ad07
     pullPolicy: IfNotPresent
   command: "npm run db:init"
   env:
