@@ -1,5 +1,10 @@
 terraform {
   required_providers {
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.4"
+    }
+
     yandex = {
       source  = "yandex-cloud/yandex"
       version = "0.99.1"
