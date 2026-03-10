@@ -31,7 +31,7 @@ variable "endroom_cdn_provider_cname" {
 }
 
 locals {
-  endroom_zone_name           = "dnsc9g6hbdqsu8dg0cb9"
+  endroom_zone_id             = "dnsc9g6hbdqsu8dg0cb9"
   endroom_root_domain         = "endroom.dev"
   endroom_www_domain          = "www.endroom.dev"
   endroom_certificate_domains = [local.endroom_root_domain, local.endroom_www_domain]
@@ -52,13 +52,6 @@ locals {
     try(jsondecode(data.http.endroom_cdn_public_nets.response_body).addresses, []),
     try(jsondecode(data.http.endroom_cdn_public_nets.response_body).addresses_v6, [])
   ))
-}
-
-# Import block IDs must stay literal values.
-# dnsc9g6hbdqsu8dg0cb9 is the existing Yandex Cloud DNS zone ID for endroom.dev.
-import {
-  to = yandex_dns_zone.endroom_dev
-  id = "dnsc9g6hbdqsu8dg0cb9"
 }
 
 import {
@@ -84,12 +77,6 @@ data "http" "endroom_cdn_public_nets" {
   }
 }
 
-resource "yandex_dns_zone" "endroom_dev" {
-  name   = local.endroom_zone_name
-  zone   = "${local.endroom_root_domain}."
-  public = true
-}
-
 resource "yandex_cm_certificate" "endroom" {
   count = var.endroom_existing_cm_certificate_id == null ? 1 : 0
 
@@ -105,7 +92,7 @@ resource "yandex_cm_certificate" "endroom" {
 resource "yandex_dns_recordset" "endroom_certificate_validation" {
   count = var.endroom_existing_cm_certificate_id == null ? length(local.endroom_certificate_domains) : 0
 
-  zone_id = yandex_dns_zone.endroom_dev.id
+  zone_id = local.endroom_zone_id
   name    = yandex_cm_certificate.endroom[0].challenges[count.index].dns_name
   type    = yandex_cm_certificate.endroom[0].challenges[count.index].dns_type
   ttl     = 60
@@ -113,6 +100,7 @@ resource "yandex_dns_recordset" "endroom_certificate_validation" {
 }
 
 resource "yandex_storage_bucket" "endroom_root" {
+  depends_on    = [yandex_resourcemanager_folder_iam_member.endmake_storage_admin]
   access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
   secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_root_bucket_name
@@ -148,6 +136,7 @@ resource "yandex_storage_bucket" "endroom_root" {
 }
 
 resource "yandex_storage_bucket" "endroom_www" {
+  depends_on    = [yandex_resourcemanager_folder_iam_member.endmake_storage_admin]
   access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
   secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_www_bucket_name
@@ -226,7 +215,7 @@ resource "yandex_cdn_resource" "endroom_www" {
 }
 
 resource "yandex_dns_recordset" "endroom_dev_apex_aname" {
-  zone_id = yandex_dns_zone.endroom_dev.id
+  zone_id = local.endroom_zone_id
   name    = "${local.endroom_root_domain}."
   type    = "ANAME"
   ttl     = 600
@@ -234,7 +223,7 @@ resource "yandex_dns_recordset" "endroom_dev_apex_aname" {
 }
 
 resource "yandex_dns_recordset" "endroom_dev_www_cname" {
-  zone_id = yandex_dns_zone.endroom_dev.id
+  zone_id = local.endroom_zone_id
   name    = "${local.endroom_www_domain}."
   type    = "CNAME"
   ttl     = 600
