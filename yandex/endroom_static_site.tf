@@ -203,7 +203,7 @@ resource "yandex_cdn_resource" "endroom_www" {
   origin_protocol = "http"
 
   ssl_certificate {
-    type                   = "custom"
+    type                   = "certificate_manager"
     certificate_manager_id = local.endroom_certificate_id
   }
 

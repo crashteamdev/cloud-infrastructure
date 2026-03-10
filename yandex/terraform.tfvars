@@ -26,7 +26,7 @@ vm_user_nat                 = "vitaxa"
 nat_ssh_key_path            = "./keys/yc-nat.pub"
 endmake_public_ingress_ipv4 = "51.250.10.12"
 
-endroom_enable_cdn_resources  = true
-endroom_enable_www_cutover    = false
-endroom_enable_apex_redirect  = false
+endroom_enable_cdn_resources   = true
+endroom_enable_www_cutover     = false
+endroom_enable_apex_redirect   = false
 endroom_enable_origin_lockdown = false
