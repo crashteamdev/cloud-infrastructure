@@ -124,10 +124,21 @@ resource "yandex_storage_bucket" "endroom_root" {
     config_read = false
   }
 
-  website {
-    index_document           = "index.html"
-    error_document           = "404.html"
-    redirect_all_requests_to = var.endroom_enable_apex_redirect ? "https://${local.endroom_www_domain}" : null
+  dynamic "website" {
+    for_each = var.endroom_enable_apex_redirect ? [] : [1]
+
+    content {
+      index_document = "index.html"
+      error_document = "404.html"
+    }
+  }
+
+  dynamic "website" {
+    for_each = var.endroom_enable_apex_redirect ? [1] : []
+
+    content {
+      redirect_all_requests_to = "https://${local.endroom_www_domain}"
+    }
   }
 
   dynamic "https" {
