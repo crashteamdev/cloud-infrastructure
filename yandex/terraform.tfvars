@@ -16,10 +16,6 @@ pg_dbs = [
   "n8n",
   "endmake"
 ]
-mongo_dbs = [
-  "kazanex",
-  "uzum",
-]
 clickhouse_dbs = [
   "uzum",
   "kazanex"

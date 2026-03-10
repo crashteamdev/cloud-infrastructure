@@ -34,6 +34,7 @@ locals {
   endroom_zone_name           = "dnsc9g6hbdqsu8dg0cb9"
   endroom_root_domain         = "endroom.dev"
   endroom_www_domain          = "www.endroom.dev"
+  endroom_certificate_domains = [local.endroom_root_domain, local.endroom_www_domain]
   endroom_root_bucket_name    = local.endroom_root_domain
   endroom_www_bucket_name     = local.endroom_www_domain
   endroom_bucket_max_size     = 10737418240
@@ -93,15 +94,16 @@ resource "yandex_cm_certificate" "endroom" {
   count = var.endroom_existing_cm_certificate_id == null ? 1 : 0
 
   name    = "endroom-dev-cdn"
-  domains = [local.endroom_root_domain, local.endroom_www_domain]
+  domains = local.endroom_certificate_domains
 
   managed {
-    challenge_type = "DNS_CNAME"
+    challenge_type  = "DNS_CNAME"
+    challenge_count = length(local.endroom_certificate_domains)
   }
 }
 
 resource "yandex_dns_recordset" "endroom_certificate_validation" {
-  count = var.endroom_existing_cm_certificate_id == null ? length(yandex_cm_certificate.endroom[0].challenges) : 0
+  count = var.endroom_existing_cm_certificate_id == null ? length(local.endroom_certificate_domains) : 0
 
   zone_id = yandex_dns_zone.endroom_dev.id
   name    = yandex_cm_certificate.endroom[0].challenges[count.index].dns_name
@@ -111,6 +113,8 @@ resource "yandex_dns_recordset" "endroom_certificate_validation" {
 }
 
 resource "yandex_storage_bucket" "endroom_root" {
+  access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
+  secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_root_bucket_name
   force_destroy = false
   max_size      = local.endroom_bucket_max_size
@@ -144,6 +148,8 @@ resource "yandex_storage_bucket" "endroom_root" {
 }
 
 resource "yandex_storage_bucket" "endroom_www" {
+  access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
+  secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_www_bucket_name
   force_destroy = false
   max_size      = local.endroom_bucket_max_size
