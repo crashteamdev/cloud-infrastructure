@@ -102,6 +102,8 @@ resource "yandex_dns_recordset" "endroom_certificate_validation" {
 }
 
 resource "yandex_storage_bucket" "endroom_root" {
+  access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
+  secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_root_bucket_name
   force_destroy = false
   max_size      = local.endroom_bucket_max_size
@@ -146,6 +148,8 @@ resource "yandex_storage_bucket" "endroom_root" {
 }
 
 resource "yandex_storage_bucket" "endroom_www" {
+  access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
+  secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_www_bucket_name
   force_destroy = false
   max_size      = local.endroom_bucket_max_size
