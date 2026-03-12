@@ -19,6 +19,10 @@ output "endmake_s3_secret_access_key" {
   sensitive = true
 }
 
+output "endmake_image_cdn_cname" {
+  value = yandex_cdn_resource.endmake_img.cname
+}
+
 output "endroom_www_bucket" {
   value = "www.endroom.dev"
 }

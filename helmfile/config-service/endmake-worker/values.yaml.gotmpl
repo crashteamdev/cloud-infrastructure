@@ -1,14 +1,14 @@
 # -*- mode: yaml -*-
 {{- $applicationName := .Release.Name -}}
 
-replicaCount: 1
+replicaCount: 2
 
 nodeSelector:
   mdb-service: "true"
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-88a46b7
+  tag: sha-51cc69e
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -99,6 +99,15 @@ env:
       secretKeyRef:
         name: endmake-secrets
         key: s3-secret-access-key
+  - name: IMAGE_CDN_ENABLED
+    value: "true"
+  - name: IMAGE_CDN_BASE_URL
+    value: "https://img.endmake.com"
+  - name: IMAGE_CDN_SIGNING_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: image-cdn-signing-key
   - name: OPENAI_API_KEY
     valueFrom:
       secretKeyRef:
