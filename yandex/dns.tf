@@ -39,7 +39,7 @@ resource "yandex_dns_recordset" "endmake_com_img_cname" {
   name    = "img.endmake.com."
   type    = "CNAME"
   ttl     = 600
-  data    = [yandex_cdn_resource.endmake_img.cname]
+  data    = [yandex_cdn_resource.endmake_img.provider_cname]
 }
 resource "yandex_dns_recordset" "endmake_ru_app_a" {
   zone_id = yandex_dns_zone.endmake_ru.id

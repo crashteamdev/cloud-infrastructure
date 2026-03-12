@@ -20,7 +20,7 @@ output "endmake_s3_secret_access_key" {
 }
 
 output "endmake_image_cdn_cname" {
-  value = yandex_cdn_resource.endmake_img.cname
+  value = yandex_cdn_resource.endmake_img.provider_cname
 }
 
 output "endroom_www_bucket" {

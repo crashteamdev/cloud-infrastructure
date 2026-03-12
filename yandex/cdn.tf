@@ -33,13 +33,10 @@ resource "yandex_cdn_origin_group" "endmake_img" {
 }
 
 resource "yandex_cdn_resource" "endmake_img" {
+  cname           = "img.endmake.com"
   active          = true
   origin_group_id = yandex_cdn_origin_group.endmake_img.id
   origin_protocol = "https"
-
-  secondary_hostnames = [
-    "img.endmake.com"
-  ]
 
   options {
     browser_cache_settings = 3600
