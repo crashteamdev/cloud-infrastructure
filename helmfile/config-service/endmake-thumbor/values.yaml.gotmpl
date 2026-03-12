@@ -1,0 +1,110 @@
+# -*- mode: yaml -*-
+{{- $applicationName := .Release.Name -}}
+
+replicaCount: 2
+
+nodeSelector:
+  mdb-service: "true"
+
+image:
+  repository: beeyev/thumbor-s3
+  tag: 7.7-slim-alpine
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8888
+
+env:
+  - name: PORT
+    value: "8888"
+  - name: LOG_LEVEL
+    value: "warning"
+  - name: NUM_PROCESSES
+    value: "2"
+  - name: SECURITY_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: image-cdn-signing-key
+  - name: ALLOW_UNSAFE_URL
+    value: "False"
+  - name: MAX_AGE
+    value: "86400"
+  - name: QUALITY
+    value: "82"
+  - name: AUTO_WEBP
+    value: "True"
+  - name: MAX_WIDTH
+    value: "1600"
+  - name: MAX_HEIGHT
+    value: "1600"
+  - name: AWS_LOADER_REGION_NAME
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-region
+  - name: AWS_LOADER_BUCKET_NAME
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-bucket
+  - name: AWS_LOADER_S3_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-access-key-id
+  - name: AWS_LOADER_S3_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-secret-access-key
+  - name: AWS_LOADER_S3_ENDPOINT_URL
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: s3-endpoint
+  - name: AWS_LOADER_ROOT_PATH
+    value: ""
+
+livenessProbe:
+  httpGet:
+    path: /healthcheck/
+    port: http
+  initialDelaySeconds: 20
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /healthcheck/
+    port: http
+  initialDelaySeconds: 20
+  timeoutSeconds: 5
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    memory: 768Mi
+
+ingress:
+  enabled: true
+  annotations:
+{{- if .Values.services.ingress.tls.letsEncrypt.enabled }}
+    cert-manager.io/cluster-issuer: {{ .Values.services.ingress.tls.letsEncrypt.issuer }}
+{{- end }}
+    kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
+  hosts:
+    - host: img-origin.endmake.com
+      paths:
+        - /
+{{- if .Values.services.ingress.tls.enabled }}
+  tls:
+    - secretName: endmake-thumbor-img-origin-endmake-com-tls
+      hosts:
+        - img-origin.endmake.com
+{{- end }}
+  servicePort: 8888

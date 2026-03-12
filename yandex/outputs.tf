@@ -18,3 +18,7 @@ output "endmake_s3_secret_access_key" {
   value     = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   sensitive = true
 }
+
+output "endmake_image_cdn_cname" {
+  value = yandex_cdn_resource.endmake_img.cname
+}
