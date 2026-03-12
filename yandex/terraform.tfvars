@@ -30,3 +30,4 @@ endroom_enable_cdn_resources   = true
 endroom_enable_www_cutover     = true
 endroom_enable_apex_redirect   = true
 endroom_cdn_provider_cname     = "43fb6b1550305dfd.topology.gslb.yccdn.ru"
+endmake_image_cdn_provider_cname = "43fb6b1550305dfd.topology.gslb.yccdn.ru"
