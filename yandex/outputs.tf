@@ -20,7 +20,11 @@ output "endmake_s3_secret_access_key" {
 }
 
 output "endmake_image_cdn_cname" {
-  value = yandex_cdn_resource.endmake_img.provider_cname
+  value = coalesce(var.endmake_image_cdn_provider_cname, "img-origin.endmake.com")
+}
+
+output "endmake_image_cdn_resource_id" {
+  value = yandex_cdn_resource.endmake_img.id
 }
 
 output "endroom_www_bucket" {

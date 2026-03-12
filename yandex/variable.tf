@@ -61,6 +61,13 @@ variable "endmake_public_ingress_ipv4" {
   type        = string
 }
 
+variable "endmake_image_cdn_provider_cname" {
+  description = "Provider CNAME returned by Yandex Cloud CDN for img.endmake.com. Leave null until the CDN resource is created, then set it to cut DNS over from img-origin.endmake.com to the CDN."
+  type        = string
+  default     = null
+  nullable    = true
+}
+
 variable "storage_access_key" {
   description = "Object Storage access key used by the Yandex provider default storage client."
   type        = string
