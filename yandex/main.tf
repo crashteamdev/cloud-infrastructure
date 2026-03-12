@@ -108,15 +108,15 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     to_port           = 65535
   }
   ingress {
-    protocol       = "ANY"
-    description    = "Правило разрешает взаимодействие под-под и сервис-сервис. Укажите подсети вашего кластера и сервисов."
+    protocol    = "ANY"
+    description = "Правило разрешает взаимодействие под-под и сервис-сервис. Укажите подсети вашего кластера и сервисов."
     v4_cidr_blocks = concat(
       yandex_vpc_subnet.subnet-microservices.v4_cidr_blocks,
       yandex_vpc_subnet.subnet-service.v4_cidr_blocks,
       yandex_vpc_subnet.subnet-mng.v4_cidr_blocks,
     )
-    from_port      = 0
-    to_port        = 65535
+    from_port = 0
+    to_port   = 65535
   }
   ingress {
     protocol       = "ICMP"
@@ -131,18 +131,18 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     to_port        = 32767
   }
   ingress {
-    protocol = "TCP"
-    description = "Правило для доступа в кластер Kubernetes"
+    protocol       = "TCP"
+    description    = "Правило для доступа в кластер Kubernetes"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    from_port = 443
-    to_port = 443
+    from_port      = 443
+    to_port        = 443
   }
   ingress {
-    protocol = "TCP"
-    description = "Правило для доступа в кластер Kubernetes"
+    protocol       = "TCP"
+    description    = "Правило для доступа в кластер Kubernetes"
     v4_cidr_blocks = ["0.0.0.0/0"]
-    from_port = 6443
-    to_port = 6443
+    from_port      = 6443
+    to_port        = 6443
   }
   ingress {
     description    = "HTTPS (secure)"
@@ -167,9 +167,9 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
 
 resource "yandex_kubernetes_cluster" "prod_cluster" {
   network_id = yandex_vpc_network.network-1.id
-  name = var.cluster_name
+  name       = var.cluster_name
   master {
-    version = local.k8s_version
+    version   = local.k8s_version
     public_ip = true
     zonal {
       zone      = yandex_vpc_subnet.subnet-mng.zone
@@ -190,8 +190,8 @@ resource "yandex_kubernetes_cluster" "prod_cluster" {
 
 resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name = "mdb-service-spot"
-  version = local.k8s_version
+  name       = "mdb-service-spot"
+  version    = local.k8s_version
   node_labels = {
     mdb-service = "true"
   }
@@ -252,8 +252,8 @@ resource "yandex_kubernetes_node_group" "mdb-sup-service" {
     }
 
     resources {
-      memory = 2
-      cores  = 2
+      memory        = 2
+      cores         = 2
       core_fraction = 20
     }
 
@@ -271,7 +271,7 @@ resource "yandex_kubernetes_node_group" "mdb-sup-service" {
 
   node_labels = {
     monitoring = "true"
-    ingress = "true"
+    ingress    = "true"
   }
 
   allocation_policy {
@@ -323,11 +323,11 @@ resource "yandex_vpc_security_group" "pg_sg" {
 }
 
 resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
-  name        = "pg_prod"
-  description = "main database"
-  environment = "PRODUCTION"
-  network_id  = yandex_vpc_network.network-1.id
-  folder_id   = var.yc_folder_id
+  name               = "pg_prod"
+  description        = "main database"
+  environment        = "PRODUCTION"
+  network_id         = yandex_vpc_network.network-1.id
+  folder_id          = var.yc_folder_id
   security_group_ids = [yandex_vpc_security_group.pg_sg.id]
 
   config {
@@ -354,8 +354,8 @@ resource "yandex_mdb_postgresql_cluster" "pg_cluster" {
   }
 
   host {
-    zone      = var.yc_region
-    subnet_id = yandex_vpc_subnet.pg-a.id
+    zone             = var.yc_region
+    subnet_id        = yandex_vpc_subnet.pg-a.id
     assign_public_ip = true
   }
 }
@@ -434,11 +434,11 @@ resource "yandex_vpc_security_group" "redis_sg" {
 }
 
 resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
-  name        = "redis_mdb"
-  environment = "PRODUCTION"
-  network_id  = yandex_vpc_network.network-1.id
-  folder_id   = var.yc_folder_id
-  tls_enabled = true
+  name               = "redis_mdb"
+  environment        = "PRODUCTION"
+  network_id         = yandex_vpc_network.network-1.id
+  folder_id          = var.yc_folder_id
+  tls_enabled        = true
   security_group_ids = [yandex_vpc_security_group.redis_sg.id]
 
   config {
@@ -452,8 +452,8 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
   }
 
   host {
-    zone      = var.yc_region
-    subnet_id = yandex_vpc_subnet.redis-a.id
+    zone             = var.yc_region
+    subnet_id        = yandex_vpc_subnet.redis-a.id
     assign_public_ip = true
   }
 
@@ -492,7 +492,7 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   name               = "marketdb-clickhouse"
   environment        = "PRODUCTION"
   network_id         = yandex_vpc_network.network-1.id
-  version = "25.8"
+  version            = "25.8"
   security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
   #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
 
@@ -505,9 +505,9 @@ resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
   }
 
   host {
-    type      = "CLICKHOUSE"
-    zone      = "ru-central1-a"
-    subnet_id = yandex_vpc_subnet.clickhouse-a.id
+    type             = "CLICKHOUSE"
+    zone             = "ru-central1-a"
+    subnet_id        = yandex_vpc_subnet.clickhouse-a.id
     assign_public_ip = true
   }
 

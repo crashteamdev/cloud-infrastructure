@@ -67,4 +67,5 @@ releases:
   - name: endmake-worker
     <<: *generic_stateless
   - name: endmake-thumbor
+  - name: endmake-landing
     <<: *generic_stateless

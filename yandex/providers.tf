@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.7.0, < 2.0.0"
+
   required_providers {
     yandex = {
       source  = "yandex-cloud/yandex"
@@ -19,7 +21,9 @@ terraform {
 }
 
 provider "yandex" {
-  zone      = var.yc_region
-  cloud_id  = var.yc_cloud_id
-  folder_id = var.yc_folder_id
+  zone               = var.yc_region
+  cloud_id           = var.yc_cloud_id
+  folder_id          = var.yc_folder_id
+  storage_access_key = var.storage_access_key
+  storage_secret_key = var.storage_secret_key
 }

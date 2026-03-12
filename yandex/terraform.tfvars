@@ -16,10 +16,6 @@ pg_dbs = [
   "n8n",
   "endmake"
 ]
-mongo_dbs = [
-  "kazanex",
-  "uzum",
-]
 clickhouse_dbs = [
   "uzum",
   "kazanex"
@@ -29,3 +25,8 @@ db_dev_password             = "Str0ngPasswd"
 vm_user_nat                 = "vitaxa"
 nat_ssh_key_path            = "./keys/yc-nat.pub"
 endmake_public_ingress_ipv4 = "51.250.10.12"
+
+endroom_enable_cdn_resources   = true
+endroom_enable_www_cutover     = true
+endroom_enable_apex_redirect   = true
+endroom_cdn_provider_cname     = "43fb6b1550305dfd.topology.gslb.yccdn.ru"
