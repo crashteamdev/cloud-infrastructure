@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-1e3bd14
+  tag: sha-f15a690
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -137,6 +137,16 @@ env:
     value: "https://proxy.endroom.dev/gemini/v1beta"
   - name: FAL_QUEUE_BASE_UR
     value: "https://proxy.endroom.dev/fal"
+  - name: TBANK_TERMINAL_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: tbank-terminal-key
+  - name: TBANK_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: tbank-password
 
 livenessProbe:
   httpGet:
