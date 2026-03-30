@@ -124,11 +124,21 @@ env:
         name: endmake-secrets
         key: fal-key
   - name: OPENAI_BASE_URL
-    value: "https://ai-proxy.chainbrain.pro/openai/v1"
+    value: "https://proxy.endroom.dev/openai/v1"
   - name: GOOGLE_GENAI_BASE_URL
-    value: "https://ai-proxy.chainbrain.pro/gemini/v1beta"
+    value: "https://proxy.endroom.dev/gemini/v1beta"
   - name: FAL_QUEUE_BASE_UR
-    value: "https://ai-proxy.chainbrain.pro/fal"
+    value: "https://proxy.endroom.dev/fal"
+  - name: TBANK_TERMINAL_KEY
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: tbank-terminal-key
+  - name: TBANK_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: endmake-secrets
+        key: tbank-password
 
 livenessProbe: null
 readinessProbe: null
