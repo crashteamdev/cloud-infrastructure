@@ -40,14 +40,15 @@ resource "yandex_cdn_resource" "endmake_img" {
 
   options {
     browser_cache_settings = 3600
-    edge_cache_settings    = 86400
-    fetched_compressed     = true
-    forward_host_header    = false
-    gzip_on                = true
-    ignore_cookie          = true
-    ignore_query_params    = false
-    custom_host_header     = "img-origin.endmake.com"
-    custom_server_name     = "img-origin.endmake.com"
+    # Thumbor URLs are immutable per asset/variant, so keeping them longer at the edge is safe.
+    edge_cache_settings = 604800
+    fetched_compressed  = true
+    forward_host_header = false
+    gzip_on             = true
+    ignore_cookie       = true
+    ignore_query_params = false
+    custom_host_header  = "img-origin.endmake.com"
+    custom_server_name  = "img-origin.endmake.com"
   }
 
   ssl_certificate {
