@@ -88,6 +88,7 @@ jobs:
           mkdir -p "${HOME}/.kube"
           echo "${{ secrets.KUBE_CONFIG_CA }}" | base64 --decode > "${HOME}/.kube/ca.pem"
           echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > "${HOME}/.kube/config"
+          chmod 600 "${HOME}/.kube/config"
           kubectl config use-context default
 
       - name: Setup helmfile
@@ -97,6 +98,19 @@ jobs:
           helm-s3-plugin-version: "v0.16.2"
           helmfile-version: "v0.170.1"
           helm-version: "v3.13.1"
+
+      - name: Update Helm repositories
+        if: ${{ inputs.cleanup_kubernetes_releases || inputs.apply_active_kubernetes_releases }}
+        run: |
+          helm repo add crashteamdev https://crashteamdev.github.io/charts/ --force-update
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx --force-update
+          helm repo add certmanager https://charts.jetstack.io --force-update
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
+          helm repo add grafana https://grafana.github.io/helm-charts --force-update
+          helm repo add hashicorp https://helm.releases.hashicorp.com --force-update
+          helm repo add requarks https://charts.js.wiki --force-update
+          helm repo add temporal https://go.temporal.io/helm-charts --force-update
+          helm repo update
 
       - name: Prepare Helm state values
         if: ${{ inputs.cleanup_kubernetes_releases || inputs.apply_active_kubernetes_releases }}
