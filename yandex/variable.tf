@@ -24,13 +24,13 @@ variable "cluster_name" {
 }
 
 variable "k8s_version" {
-  description = "Target Managed Kubernetes version. Use 1.32 as the intermediate upgrade from 1.30 before moving to 1.33."
+  description = "Target Managed Kubernetes version. Upgrade one minor version at a time: 1.31, then 1.32, then 1.33."
   type        = string
   default     = "1.33"
 
   validation {
-    condition     = contains(["1.32", "1.33"], var.k8s_version)
-    error_message = "k8s_version must be either 1.32 or 1.33."
+    condition     = contains(["1.31", "1.32", "1.33"], var.k8s_version)
+    error_message = "k8s_version must be one of 1.31, 1.32, or 1.33."
   }
 }
 

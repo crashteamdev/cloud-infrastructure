@@ -12,11 +12,12 @@ on:
           - plan
           - apply
       kubernetes_version:
-        description: Target Kubernetes version. Use 1.32 first, then rerun with 1.33.
+        description: "Target Kubernetes version. Upgrade one minor at a time: 1.31, then 1.32, then 1.33."
         required: true
-        default: "1.32"
+        default: "1.31"
         type: choice
         options:
+          - "1.31"
           - "1.32"
           - "1.33"
       cleanup_kubernetes_releases:
