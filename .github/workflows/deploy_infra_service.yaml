@@ -74,11 +74,9 @@ jobs:
 
       - name: Setup helmfile
         if: steps.files.outputs.any_changed == 'true'
-        uses: mamezou-tech/setup-helmfile@v2.1.0
+        uses: mamezou-tech/setup-helmfile@v1.1.0
         with:
-          helm-s3-plugin-version: "v0.16.2"
-          helmfile-version: "v0.170.1"
-          helm-version: "v3.13.1"
+          helmfile-version: "v0.148.1"
 
       - name: Setup kustomize
         if: steps.files.outputs.any_changed == 'true'
