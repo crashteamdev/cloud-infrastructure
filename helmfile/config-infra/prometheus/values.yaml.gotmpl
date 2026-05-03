@@ -11,9 +11,9 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 20Gi
-    retention: 20d
-    retentionSize: ""
+              storage: 30Gi
+    retention: 7d
+    retentionSize: 12GB
     additionalScrapeConfigs:
       - job_name: 'yc-metrics'
         static_configs:
