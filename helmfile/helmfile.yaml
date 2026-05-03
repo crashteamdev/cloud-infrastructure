@@ -16,3 +16,7 @@ releases:
     <<: *generic_stateless
   - name: endmake-landing
     <<: *generic_stateless
+  - name: endmake-ru-redirect
+    <<: *default
+    chart: crashteamdev/raw
+    version: 1.0.0

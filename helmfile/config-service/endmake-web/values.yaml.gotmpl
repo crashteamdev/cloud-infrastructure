@@ -179,17 +179,11 @@ ingress:
     - host: app.endmake.com
       paths:
         - /
-    - host: app.endmake.ru
-      paths:
-        - /
 {{- if .Values.services.ingress.tls.enabled }}
   tls:
     - secretName: endmake-web-app-endmake-com-tls
       hosts:
         - app.endmake.com
-    - secretName: endmake-web-app-endmake-ru-tls
-      hosts:
-        - app.endmake.ru
 {{- end }}
   servicePort: 3000
 
