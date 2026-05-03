@@ -37,17 +37,6 @@ jobs:
           --state-values-set services.postgres.endpoint=${{secrets.PG_HOST}}
           --state-values-set services.postgres.uniUser=${{secrets.PG_USER}}
           --state-values-set services.postgres.uniPassword=${{secrets.PG_PASSWORD}}
-          --state-values-set services.mongodb.host=${{secrets.MONGO_HOST}}
-          --state-values-set services.mongodb.uniUser=${{secrets.MONGO_USER}}
-          --state-values-set services.mongodb.uniPassword=${{secrets.MONGO_PASSWORD}}
-          --state-values-set services.proxy.proxyLineApiKey=${{secrets.PROXY_LINE_API_KEY}}
-          --state-values-set services.clickhouse.host=${{secrets.CLICKHOUSE_HOST}}
-          --state-values-set services.clickhouse.password=${{secrets.CLICKHOUSE_PASSWORD}}
-          --state-values-set services.firebase.apikey=${{secrets.FIREBASE_API_KEY}}
-          --state-values-set services.strapi.appKeys=${{secrets.STRAPI_APP_KEYS}}
-          --state-values-set services.strapi.jwtAdminSecret=${{secrets.STRAPI_ADMIN_JWT_SECRET}}
-          --state-values-set services.strapi.jwtSecret=${{secrets.STRAPI_JWT_SECRET}}
-          --state-values-set services.strapi.apiTokenSalt=${{secrets.STRAPI_API_TOKEN_SALT}}
           EOF
           )
           echo "values_set_list<<EOF" >> $GITHUB_ENV
@@ -67,6 +56,7 @@ jobs:
           mkdir ${HOME}/.kube
           echo ${{ secrets.KUBE_CONFIG_CA }} | base64 --decode > ${HOME}/.kube/ca.pem
           echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+          chmod 600 ${HOME}/.kube/config
 
       - name: Kubectl use context
         run: |

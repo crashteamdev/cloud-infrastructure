@@ -9,10 +9,12 @@ terraform {
   }
 
   backend "s3" {
-    endpoint = "https://storage.yandexcloud.net"
-    bucket   = "marketdb-tf-state"
-    region   = "ru-central1"
-    key      = "marketdb-tf.tfstate"
+    endpoints = {
+      s3 = "https://storage.yandexcloud.net"
+    }
+    bucket = "marketdb-tf-state"
+    region = "ru-central1"
+    key    = "marketdb-tf.tfstate"
 
     skip_region_validation      = true
     skip_credentials_validation = true

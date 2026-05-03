@@ -1,7 +1,7 @@
 netpolicy:
   enabled: true
 prometheus:
-  enabled: false
+  enabled: true
   grafana:
     password: MyStrongPassword
 ingresscontroller:
@@ -11,27 +11,13 @@ certmanager:
 
 services:
   global:
-    java:
-      rpcPort: 8022
-      managementPort: 8023
-      apiPort: 8080
-    ipv6only: false
-    metrics:
-      enabled: true
     registry:
       repository: docker.io/crashteamdev
       imagePullSecret: { }
-    statelessReplicas: 2
 
   postgres:
     external: true
-    # Values below uses only if postgres.external is true
     endpoint: { }
-    uniUser: { }
-    uniPassword: { }
-
-  mongodb:
-    host: { }
     uniUser: { }
     uniPassword: { }
 
@@ -39,9 +25,6 @@ services:
     endpoint: { }
     user: { }
     password: { }
-
-  postgresReplica:
-    endpoint: { }
 
   ingress:
     class: "nginx"

@@ -1,10 +1,5 @@
 namespaceOverride: "monitoring"
 
-{{/*alertmanagerSpec:*/}}
-{{/*  pspEnabled: false*/}}
-{{/*  nodeSelector:*/}}
-{{/*    monitoring: "true"*/}}
-
 prometheus:
   prometheusSpec:
     storageSpec:
@@ -19,13 +14,6 @@ prometheus:
               storage: 20Gi
     retention: 20d
     retentionSize: ""
-    nodeSelector:
-      monitoring: "true"
-    tolerations:
-      - key: "role"
-        operator: "Equal"
-        value: "mon"
-        effect: "NoExecute"
     additionalScrapeConfigs:
       - job_name: 'yc-metrics'
         static_configs:
@@ -74,6 +62,12 @@ grafana:
   enabled: true
   replicas: 1
   adminPassword: {{ .Values.prometheus.grafana.password }}
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki-gateway.monitoring.svc.cluster.local
+      isDefault: false
   create: true
   assertNoLeakedSecrets: false
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
@@ -160,23 +154,6 @@ grafana:
         hosts:
           - grafana.crashteam.dev
   {{- end }}
-
-{{/*prometheusOperator:*/}}
-{{/*  admissionWebhooks:*/}}
-{{/*    deployment:*/}}
-{{/*      nodeSelector:*/}}
-{{/*        monitoring: "true"*/}}
-{{/*    path:*/}}
-{{/*      nodeSelector:*/}}
-{{/*        monitoring: "true"*/}}
-{{/*  nodeSelector:*/}}
-{{/*    monitoring: "true"*/}}
-
-{{/*thanosRuler:*/}}
-{{/*  thanosRulerSpec:*/}}
-{{/*    nodeSelector:*/}}
-{{/*      monitoring: "true"*/}}
-
 
 kubeScheduler:
   enabled: false
