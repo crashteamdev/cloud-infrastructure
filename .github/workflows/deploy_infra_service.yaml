@@ -18,11 +18,11 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     if: ${{ github.event.label.name == 'deploy_infra' || github.ref_name == 'main' }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check for hanging whitespaces
         uses: raisedevs/find-trailing-whitespace@restrict-to-plaintext-only
@@ -74,7 +74,7 @@ jobs:
 
       - name: Setup helmfile
         if: steps.files.outputs.any_changed == 'true'
-        uses: mamezou-tech/setup-helmfile@v1.1.0
+        uses: mamezou-tech/setup-helmfile@v2.1.0
         with:
           helm-s3-plugin-version: "v0.16.2"
           helmfile-version: "v0.170.1"
