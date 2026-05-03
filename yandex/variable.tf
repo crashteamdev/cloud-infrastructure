@@ -23,6 +23,17 @@ variable "cluster_name" {
   type    = string
 }
 
+variable "k8s_version" {
+  description = "Target Managed Kubernetes version. Use 1.32 as the intermediate upgrade from 1.30 before moving to 1.33."
+  type        = string
+  default     = "1.33"
+
+  validation {
+    condition     = contains(["1.32", "1.33"], var.k8s_version)
+    error_message = "k8s_version must be either 1.32 or 1.33."
+  }
+}
+
 variable "yc_debian_image_id" {
   default = "fd8987mnac4uroc0d16s"
   type    = string
