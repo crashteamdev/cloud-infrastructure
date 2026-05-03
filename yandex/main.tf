@@ -1,5 +1,5 @@
 locals {
-  k8s_version = "1.30"
+  k8s_version = "1.33"
 }
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
@@ -74,13 +74,6 @@ resource "yandex_vpc_subnet" "redis-a" {
   v4_cidr_blocks = ["10.2.0.0/24"]
 }
 
-resource "yandex_vpc_subnet" "clickhouse-a" {
-  name           = "clickhousenet-a"
-  zone           = var.yc_region
-  network_id     = yandex_vpc_network.network-1.id
-  v4_cidr_blocks = ["10.4.0.0/24"]
-}
-
 resource "yandex_kms_symmetric_key_iam_binding" "viewer" {
   symmetric_key_id = yandex_kms_symmetric_key.kms-key.id
   role             = "viewer"
@@ -144,18 +137,6 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     from_port      = 6443
     to_port        = 6443
   }
-  ingress {
-    description    = "HTTPS (secure)"
-    port           = 8443
-    protocol       = "TCP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description    = "clickhouse-client (secure)"
-    port           = 9440
-    protocol       = "TCP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-  }
   egress {
     protocol       = "ANY"
     description    = "Правило разрешает весь исходящий трафик. Узлы могут связаться с Yandex Container Registry, Yandex Object Storage, Docker Hub и т. д."
@@ -194,6 +175,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   version    = local.k8s_version
   node_labels = {
     mdb-service = "true"
+    ingress     = "true"
   }
   instance_template {
     platform_id = "standard-v2"
@@ -204,7 +186,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
     }
 
     resources {
-      memory = 12
+      memory = 8
       cores  = 4
     }
 
@@ -219,7 +201,7 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
   }
   scale_policy {
     fixed_scale {
-      size = 2
+      size = 1
     }
   }
   deploy_policy {
@@ -234,66 +216,6 @@ resource "yandex_kubernetes_node_group" "mdb-spot-group" {
       day        = "monday"
       start_time = "05:00"
       duration   = "2h"
-    }
-  }
-}
-
-resource "yandex_kubernetes_node_group" "mdb-sup-service" {
-  cluster_id = yandex_kubernetes_cluster.prod_cluster.id
-  name       = "mdb-sup-service"
-  version    = local.k8s_version
-
-  instance_template {
-    platform_id = "standard-v2"
-
-    network_interface {
-      nat        = true
-      subnet_ids = [yandex_vpc_subnet.subnet-service.id]
-    }
-
-    resources {
-      memory        = 2
-      cores         = 2
-      core_fraction = 20
-    }
-
-    boot_disk {
-      type = "network-hdd"
-      size = 50
-    }
-  }
-
-  scale_policy {
-    fixed_scale {
-      size = 1
-    }
-  }
-
-  node_labels = {
-    monitoring = "true"
-    ingress    = "true"
-  }
-
-  allocation_policy {
-    location {
-      zone = var.yc_region
-    }
-  }
-
-  maintenance_policy {
-    auto_upgrade = true
-    auto_repair  = true
-
-    maintenance_window {
-      day        = "monday"
-      start_time = "15:00"
-      duration   = "3h"
-    }
-
-    maintenance_window {
-      day        = "friday"
-      start_time = "10:00"
-      duration   = "4h30m"
     }
   }
 }
@@ -461,86 +383,5 @@ resource "yandex_mdb_redis_cluster" "redis_mdb_database" {
     day  = "SUN"
     hour = 2
     type = "WEEKLY"
-  }
-}
-
-resource "yandex_vpc_security_group" "clickhouse_sg" {
-  name       = "clickhouse-security-group"
-  network_id = yandex_vpc_network.network-1.id
-
-  ingress {
-    protocol       = "ANY"
-    description    = "Allow ClickHouse access from service subnet"
-    v4_cidr_blocks = [yandex_vpc_subnet.subnet-service.v4_cidr_blocks[0]]
-  }
-
-  ingress {
-    protocol       = "TCP"
-    description    = "Allow ClickHouse access from any external IP"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-    port           = 8443
-  }
-
-  egress {
-    protocol       = "ANY"
-    description    = "Allow all outbound traffic"
-    v4_cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "yandex_mdb_clickhouse_cluster" "clickhouse-analytics" {
-  name               = "marketdb-clickhouse"
-  environment        = "PRODUCTION"
-  network_id         = yandex_vpc_network.network-1.id
-  version            = "25.8"
-  security_group_ids = [yandex_vpc_security_group.clickhouse_sg.id]
-  #  security_group_ids = [yandex_vpc_security_group.k8s-public-services.id]
-
-  clickhouse {
-    resources {
-      resource_preset_id = "m3-c2-m16"
-      disk_type_id       = "network-ssd"
-      disk_size          = 200
-    }
-  }
-
-  host {
-    type             = "CLICKHOUSE"
-    zone             = "ru-central1-a"
-    subnet_id        = yandex_vpc_subnet.clickhouse-a.id
-    assign_public_ip = true
-  }
-
-  access {
-    data_lens = true
-  }
-
-  dynamic "database" {
-    for_each = var.clickhouse_dbs
-    content {
-      name = database.value
-    }
-  }
-
-  user {
-    name     = "dbuser"
-    password = var.db_password
-    dynamic "permission" {
-      for_each = var.clickhouse_dbs
-      content {
-        database_name = permission.value
-      }
-    }
-  }
-
-  user {
-    name     = "support"
-    password = var.db_password
-    dynamic "permission" {
-      for_each = var.clickhouse_dbs
-      content {
-        database_name = permission.value
-      }
-    }
   }
 }

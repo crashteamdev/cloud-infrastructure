@@ -13,7 +13,7 @@ controller:
       service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
       service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: preserve_client_ip.enabled=true
     internal:
-      enabled: true
+      enabled: false
       annotations:
         # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"

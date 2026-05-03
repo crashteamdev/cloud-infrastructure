@@ -1,7 +1,7 @@
 netpolicy:
   enabled: true
 prometheus:
-  enabled: true
+  enabled: false
   grafana:
     password: MyStrongPassword
 ingresscontroller:

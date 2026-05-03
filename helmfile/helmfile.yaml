@@ -4,64 +4,10 @@ bases:
 {{ readFile "hf-templates.yaml" }}
 
 repositories:
-  - name: hashicorp
-    url: https://helm.releases.hashicorp.com
   - name: crashteamdev
     url: https://crashteamdev.github.io/charts/
-  - name: requarks
-    url: https://charts.js.wiki
-  - name: temporal
-    url: https://go.temporal.io/helm-charts
 
 releases:
-  - name: ke-analytics
-    <<: *generic_stateless
-  - name: ke-space
-    <<: *generic_stateless
-  - name: uzum-space
-    <<: *generic_stateless
-  - name: styx
-    <<: *generic_stateless
-  - name: uzum-analytics
-    <<: *generic_stateless
-  - name: ke-data-scrapper
-    <<: *generic_stateless
-  - name: ke-landing
-    <<: *generic_stateless
-  - name: uzum-landing
-    <<: *generic_stateless
-  - name: uzum-data-scrapper
-    <<: *generic_stateless
-  - name: space-dashboard
-    <<: *generic_stateless
-  - name: space-gateway
-    <<: *generic_stateless
-  - name: charon
-    <<: *generic_stateless
-  - name: hermes
-    <<: *generic_stateless
-  - name: knowledge-doc
-    <<: *generic_stateless
-  - name: strapi
-    <<: *default
-    chart: crashteamdev/strapi-chart
-    version: 0.1.1
-  - name: temporal
-    <<: *default
-    chart: temporal/temporal
-    version: 0.54.0
-  - name: herald
-    <<: *generic_stateless
-  - name: chatgptbot
-    <<: *generic_stateless
-  - name: chainbrain-agent
-    <<: *generic_stateless
-  - name: n8n
-    <<: *default
-    chart: oci://8gears.container-registry.com/library/n8n
-    version: 1.0.15
-  - name: chatgptwebapp
-    <<: *generic_stateless
   - name: endmake-web
     <<: *generic_stateless
   - name: endmake-worker
