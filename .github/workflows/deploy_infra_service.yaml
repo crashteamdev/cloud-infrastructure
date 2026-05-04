@@ -8,6 +8,9 @@ on:
       - 'main'
     paths:
       - 'helmfile/config-infra/**'
+      - 'helmfile/helmfile-infra.yaml'
+      - 'helmfile/envfiles/**'
+      - 'helmfile/hf-templates.yaml'
 
 permissions:
   id-token: write
@@ -15,11 +18,11 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     if: ${{ github.event.label.name == 'deploy_infra' || github.ref_name == 'main' }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Check for hanging whitespaces
         uses: raisedevs/find-trailing-whitespace@restrict-to-plaintext-only
@@ -52,6 +55,7 @@ jobs:
           mkdir ${HOME}/.kube
           echo ${{ secrets.KUBE_CONFIG_CA }} | base64 --decode > ${HOME}/.kube/ca.pem
           echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+          chmod 600 ${HOME}/.kube/config
 
       - name: Kubectl use context
         run: |
@@ -64,12 +68,16 @@ jobs:
         with:
           files: |
             helmfile/config-infra/**
+            helmfile/helmfile-infra.yaml
+            helmfile/envfiles/**
+            helmfile/hf-templates.yaml
 
       - name: Setup helmfile
         if: steps.files.outputs.any_changed == 'true'
         uses: mamezou-tech/setup-helmfile@v1.1.0
         with:
           helmfile-version: "v0.148.1"
+          helm-diff-plugin-version: "v3.9.14"
 
       - name: Setup kustomize
         if: steps.files.outputs.any_changed == 'true'
@@ -85,15 +93,6 @@ jobs:
         if: steps.files.outputs.any_changed == 'true'
         run: |
           cd helmfile
-          releases_to_deploy=()
-          for changed_file in ${{ steps.files.outputs.all_changed_files }}; do
-          releasename=$(echo ${changed_file} | cut -f3 -d/)
-          if [[ ! " ${releases_to_deploy[@]} " =~ " $releasename " ]]; then
-          releases_to_deploy+=($releasename)
-          helmfile -e $hm_env -l name=$releasename -f helmfile-infra.yaml --allow-no-matching-release \
-          $values_set_list \
-          apply --args="--atomic" --suppress-secrets --skip-deps
-          else
-          echo "Release $releasename already been deployed"
-          fi
-          done
+          helmfile -e $hm_env -f helmfile-infra.yaml \
+            $values_set_list \
+            apply --args="--atomic" --suppress-secrets --skip-deps

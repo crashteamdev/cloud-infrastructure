@@ -175,15 +175,8 @@ ingress:
 {{- end }}
     kubernetes.io/ingress.class: {{ .Values.services.ingress.class | quote }}
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($host = app.endmake.ru) {
-        return 301 https://app.endmake.com$request_uri;
-      }
   hosts:
     - host: app.endmake.com
-      paths:
-        - /
-    - host: app.endmake.ru
       paths:
         - /
 {{- if .Values.services.ingress.tls.enabled }}
@@ -191,9 +184,6 @@ ingress:
     - secretName: endmake-web-app-endmake-com-tls
       hosts:
         - app.endmake.com
-    - secretName: endmake-web-app-endmake-ru-tls
-      hosts:
-        - app.endmake.ru
 {{- end }}
   servicePort: 3000
 
