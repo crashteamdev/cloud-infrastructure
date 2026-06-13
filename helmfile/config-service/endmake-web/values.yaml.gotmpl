@@ -8,7 +8,7 @@ nodeSelector:
 
 image:
   repository: ghcr.io/crashteamdev/{{ $applicationName }}
-  tag: sha-e024151
+  tag: sha-114a8bd
   pullPolicy: IfNotPresent
 
 {{ if .Values.services.global.registry.imagePullSecret }}
@@ -53,6 +53,8 @@ env:
     value: "0.15"
   - name: PRICING_VERSION
     value: v2
+  - name: AUTH_GOOGLE_ENABLED
+    value: "false"
   - name: AUTH_SECRET
     valueFrom:
       secretKeyRef:
