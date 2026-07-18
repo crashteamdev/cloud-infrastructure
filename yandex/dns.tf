@@ -15,7 +15,7 @@ resource "yandex_dns_recordset" "endmake_com_app_a" {
   name    = "app.endmake.com."
   type    = "A"
   ttl     = 600
-  data    = [var.endmake_public_ingress_ipv4]
+  data    = [yandex_vpc_address.endmake_ingress.external_ipv4_address[0].address]
 }
 
 resource "yandex_dns_recordset" "endmake_com_apex_a" {
@@ -23,7 +23,7 @@ resource "yandex_dns_recordset" "endmake_com_apex_a" {
   name    = "endmake.com."
   type    = "A"
   ttl     = 600
-  data    = [var.endmake_public_ingress_ipv4]
+  data    = [yandex_vpc_address.endmake_ingress.external_ipv4_address[0].address]
 }
 
 resource "yandex_dns_recordset" "endmake_com_img_origin_a" {
@@ -31,7 +31,7 @@ resource "yandex_dns_recordset" "endmake_com_img_origin_a" {
   name    = "img-origin.endmake.com."
   type    = "A"
   ttl     = 600
-  data    = [var.endmake_public_ingress_ipv4]
+  data    = [yandex_vpc_address.endmake_ingress.external_ipv4_address[0].address]
 }
 
 resource "yandex_dns_recordset" "endmake_com_img_cname" {
@@ -44,13 +44,19 @@ resource "yandex_dns_recordset" "endmake_com_img_cname" {
     ? format("%s.", trimsuffix(var.endmake_image_cdn_provider_cname, "."))
     : "img-origin.endmake.com."
   ]
+
+  # Provider 0.99.1 does not expose the generated CDN provider CNAME.
+  # The lifecycle workflow performs the cutover through yc after restore.
+  lifecycle {
+    ignore_changes = [data]
+  }
 }
 resource "yandex_dns_recordset" "endmake_ru_app_a" {
   zone_id = yandex_dns_zone.endmake_ru.id
   name    = "app.endmake.ru."
   type    = "A"
   ttl     = 600
-  data    = [var.endmake_public_ingress_ipv4]
+  data    = [yandex_vpc_address.endmake_ingress.external_ipv4_address[0].address]
 }
 
 resource "yandex_dns_recordset" "endmake_ru_apex_a" {
@@ -58,5 +64,5 @@ resource "yandex_dns_recordset" "endmake_ru_apex_a" {
   name    = "endmake.ru."
   type    = "A"
   ttl     = 600
-  data    = [var.endmake_public_ingress_ipv4]
+  data    = [yandex_vpc_address.endmake_ingress.external_ipv4_address[0].address]
 }

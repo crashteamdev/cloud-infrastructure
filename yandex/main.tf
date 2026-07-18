@@ -4,6 +4,14 @@ locals {
 
 resource "yandex_vpc_network" "network-1" { name = "analytics" }
 
+resource "yandex_vpc_address" "endmake_ingress" {
+  name = "endmake-ingress"
+
+  external_ipv4_address {
+    zone_id = var.yc_region
+  }
+}
+
 resource "yandex_vpc_subnet" "subnet-microservices" {
   v4_cidr_blocks = ["10.1.1.0/24"]
   name           = "microservices-subnet"

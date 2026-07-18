@@ -16,11 +16,10 @@ pg_dbs = [
   "n8n",
   "endmake"
 ]
-db_password                 = "Str0ngPasswd"
-db_dev_password             = "Str0ngPasswd"
-vm_user_nat                 = "vitaxa"
-nat_ssh_key_path            = "./keys/yc-nat.pub"
-endmake_public_ingress_ipv4 = "51.250.10.12"
+db_password      = "Str0ngPasswd"
+db_dev_password  = "Str0ngPasswd"
+vm_user_nat      = "vitaxa"
+nat_ssh_key_path = "./keys/yc-nat.pub"
 
 endroom_enable_cdn_resources     = true
 endroom_enable_www_cutover       = true

@@ -1,0 +1,307 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+readonly TF_DIR="${TF_DIR:-yandex}"
+readonly STATE_BUCKET="${STATE_BUCKET:-marketdb-tf-state}"
+
+readonly RECOVERY_ADDRESSES=(
+  "yandex_iam_service_account.marketdb-tf"
+  "yandex_resourcemanager_folder_iam_member.editor"
+  "yandex_resourcemanager_folder_iam_member.k8s-clusters-agent"
+  "yandex_resourcemanager_folder_iam_member.vpc-public-admin"
+  "yandex_resourcemanager_folder_iam_member.images-puller"
+)
+
+readonly INVENTORY_COMMANDS=(
+  "iam service-account"
+  "managed-kubernetes cluster"
+  "managed-postgresql cluster"
+  "managed-redis cluster"
+  "managed-clickhouse cluster"
+  "managed-mongodb cluster"
+  "managed-mysql cluster"
+  "managed-kafka cluster"
+  "managed-greenplum cluster"
+  "compute instance-group"
+  "compute instance"
+  "compute disk"
+  "compute snapshot"
+  "compute filesystem"
+  "vpc network"
+  "vpc subnet"
+  "vpc security-group"
+  "vpc route-table"
+  "vpc gateway"
+  "vpc address"
+  "load-balancer network-load-balancer"
+  "load-balancer target-group"
+  "application-load-balancer load-balancer"
+  "application-load-balancer backend-group"
+  "application-load-balancer http-router"
+  "application-load-balancer target-group"
+  "dns zone"
+  "cdn resource"
+  "cdn origin-group"
+  "certificate-manager certificate"
+  "kms symmetric-key"
+  "container registry"
+  "storage bucket"
+  "serverless trigger"
+  "serverless api-gateway"
+  "serverless function"
+  "serverless container"
+  "serverless mdbproxy"
+  "datatransfer transfer"
+  "datatransfer endpoint"
+  "lockbox secret"
+  "logging group"
+)
+
+is_recovery_address() {
+  local candidate="$1"
+  local recovery
+
+  for recovery in "${RECOVERY_ADDRESSES[@]}"; do
+    if [[ "$candidate" == "$recovery" ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+terraform_targets() {
+  local address
+
+  while IFS= read -r address; do
+    [[ -z "$address" ]] && continue
+    if ! is_recovery_address "$address"; then
+      printf '%s\n' "-target=$address"
+    fi
+  done < <(terraform -chdir="$TF_DIR" state list)
+}
+
+backend_service_account_id() {
+  local service_accounts service_account_id keys owner_id
+
+  service_accounts="$(yc iam service-account list --format json)"
+  while IFS= read -r service_account_id; do
+    if ! keys="$(
+      yc iam access-key list --service-account-id "$service_account_id" --format json 2>/dev/null
+    )"; then
+      continue
+    fi
+    owner_id="$(
+      jq -r --arg access_key "$AWS_ACCESS_KEY_ID" \
+        '.[] | select(.key_id == $access_key) | .service_account_id' <<< "$keys"
+    )"
+    if [[ -n "$owner_id" ]]; then
+      printf '%s\n' "$owner_id"
+      return 0
+    fi
+  done < <(jq -r '.[].id' <<< "$service_accounts")
+
+  return 1
+}
+
+assert_recovery_principal() {
+  local auth_service_account_id backend_service_account_id_value
+  local recovery_service_account_id address candidate_id
+
+  auth_service_account_id="$(jq -r '.service_account_id // empty' "$YC_SERVICE_ACCOUNT_KEY_FILE")"
+  if [[ -z "$auth_service_account_id" ]]; then
+    echo "YC_SERVICE_ACCOUNT_KEY_FILE does not contain service_account_id" >&2
+    return 1
+  fi
+
+  recovery_service_account_id="$(
+    terraform -chdir="$TF_DIR" state show -no-color 'yandex_iam_service_account.marketdb-tf' \
+      | awk -F' = ' '$1 ~ /^[[:space:]]*id$/ {gsub(/\"/, "", $2); print $2; exit}'
+  )"
+
+  if [[ -z "$recovery_service_account_id" ]]; then
+    echo "Unable to resolve the recovery Terraform service account from state" >&2
+    return 1
+  fi
+
+  if ! backend_service_account_id_value="$(backend_service_account_id)"; then
+    echo "Unable to resolve the Object Storage backend key owner" >&2
+    return 1
+  fi
+
+  while IFS= read -r address; do
+    [[ "$address" == "yandex_iam_service_account.marketdb-tf" ]] && continue
+    candidate_id="$(
+      terraform -chdir="$TF_DIR" state show -no-color "$address" \
+        | awk -F' = ' '$1 ~ /^[[:space:]]*id$/ {gsub(/\"/, "", $2); print $2; exit}'
+    )"
+    if [[ -n "$candidate_id" \
+      && ( "$candidate_id" == "$auth_service_account_id" \
+        || "$candidate_id" == "$backend_service_account_id_value" ) ]]; then
+      echo "$address owns a workflow credential but is scheduled for deletion" >&2
+      return 1
+    fi
+  done < <(terraform -chdir="$TF_DIR" state list | grep '^yandex_iam_service_account\.' || true)
+
+  printf 'Workflow service account: %s\n' "$auth_service_account_id"
+  printf 'Backend service account: %s\n' "$backend_service_account_id_value"
+  printf 'Terraform recovery service account: %s\n' "$recovery_service_account_id"
+}
+
+list_json() {
+  local specification="$1"
+  local -a command_parts
+  local result
+
+  read -r -a command_parts <<< "$specification"
+  if ! result="$(yc "${command_parts[@]}" list --format json 2>/dev/null)"; then
+    printf 'UNAVAILABLE  %s\n' "$specification"
+    return 0
+  fi
+
+  printf '%-12s %s\n' "$(jq 'length' <<< "$result")" "$specification"
+}
+
+inventory() {
+  local specification
+
+  echo "Yandex Cloud inventory:"
+  for specification in "${INVENTORY_COMMANDS[@]}"; do
+    list_json "$specification"
+  done
+}
+
+delete_all() {
+  local specification="$1"
+  local -a command_parts
+  local ids id
+
+  read -r -a command_parts <<< "$specification"
+  if ! ids="$(yc "${command_parts[@]}" list --format json 2>/dev/null | jq -r '.[].id')"; then
+    echo "Unable to inspect $specification; leaving it for the final audit" >&2
+    return 0
+  fi
+
+  while IFS= read -r id; do
+    [[ -z "$id" ]] && continue
+    echo "Deleting residual $specification $id"
+    yc "${command_parts[@]}" delete --id "$id"
+  done <<< "$ids"
+}
+
+cleanup_kubernetes_residuals() {
+  # Kubernetes controllers normally delete these resources with their Services
+  # and PVCs. This sweep handles leftovers after the cluster is gone.
+  delete_all "application-load-balancer load-balancer"
+  delete_all "load-balancer network-load-balancer"
+  delete_all "application-load-balancer http-router"
+  delete_all "application-load-balancer backend-group"
+  delete_all "application-load-balancer target-group"
+  delete_all "load-balancer target-group"
+  delete_all "compute instance-group"
+  delete_all "compute instance"
+  delete_all "compute filesystem"
+  delete_all "compute disk"
+  delete_all "vpc address"
+}
+
+assert_plan_preserves_recovery() {
+  local plan_path="$1"
+  local recovery_json
+
+  recovery_json="$(printf '%s\n' "${RECOVERY_ADDRESSES[@]}" | jq -R . | jq -s .)"
+  terraform -chdir="$TF_DIR" show -json "$plan_path" \
+    | jq -e --argjson recovery "$recovery_json" '
+        all(.resource_changes[]?;
+          (.change.actions | index("create") | not)
+          and (.change.actions | index("update") | not)
+        )
+        and
+        ([
+          .resource_changes[]?
+          | select(.address as $address | $recovery | index($address))
+          | select(.change.actions | index("delete"))
+        ] | length == 0)
+      ' >/dev/null
+}
+
+recovery_service_account_ids() {
+  jq -r '.service_account_id // empty' "$YC_SERVICE_ACCOUNT_KEY_FILE"
+  terraform -chdir="$TF_DIR" state show -no-color 'yandex_iam_service_account.marketdb-tf' \
+    | awk -F' = ' '$1 ~ /^[[:space:]]*id$/ {gsub(/\"/, "", $2); print $2; exit}'
+  backend_service_account_id
+}
+
+verify_empty() {
+  local recovery_ids specification result filtered count failures=0
+  local -a command_parts
+
+  recovery_ids="$(recovery_service_account_ids | awk 'NF' | sort -u | jq -R . | jq -s .)"
+
+  for specification in "${INVENTORY_COMMANDS[@]}"; do
+    read -r -a command_parts <<< "$specification"
+    if ! result="$(yc "${command_parts[@]}" list --format json 2>/dev/null)"; then
+      echo "Unable to verify $specification" >&2
+      failures=$((failures + 1))
+      continue
+    fi
+
+    case "$specification" in
+      "iam service-account")
+        filtered="$(jq --argjson recovery "$recovery_ids" '[.[] | select(.id as $id | $recovery | index($id) | not)]' <<< "$result")"
+        ;;
+      "storage bucket")
+        filtered="$(jq --arg state_bucket "$STATE_BUCKET" '[.[] | select(.name != $state_bucket)]' <<< "$result")"
+        ;;
+      *)
+        filtered="$result"
+        ;;
+    esac
+
+    count="$(jq 'length' <<< "$filtered")"
+    if [[ "$count" -ne 0 ]]; then
+      echo "Unexpected resources remain in $specification:" >&2
+      jq -r '.[] | "  \(.id // "-")  \(.name // "-")"' <<< "$filtered" >&2
+      failures=$((failures + 1))
+    fi
+  done
+
+  if [[ "$failures" -ne 0 ]]; then
+    echo "Folder is not empty outside the recovery control plane" >&2
+    return 1
+  fi
+}
+
+usage() {
+  echo "Usage: $0 targets|assert-recovery-principal|assert-plan PLAN|inventory|cleanup-kubernetes-residuals|verify-empty" >&2
+}
+
+case "${1:-}" in
+  targets)
+    terraform_targets
+    ;;
+  assert-recovery-principal)
+    assert_recovery_principal
+    ;;
+  assert-plan)
+    [[ -n "${2:-}" ]] || {
+      usage
+      exit 2
+    }
+    assert_plan_preserves_recovery "$2"
+    ;;
+  inventory)
+    inventory
+    ;;
+  cleanup-kubernetes-residuals)
+    cleanup_kubernetes_residuals
+    ;;
+  verify-empty)
+    verify_empty
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac

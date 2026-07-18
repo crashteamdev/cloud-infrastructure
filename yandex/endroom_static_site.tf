@@ -49,11 +49,6 @@ locals {
   )
 }
 
-import {
-  to = yandex_storage_bucket.endroom_root
-  id = "endroom.dev"
-}
-
 resource "yandex_dns_zone" "endroom_dev" {
   name   = local.endroom_zone_name
   zone   = "${local.endroom_root_domain}."
@@ -86,7 +81,7 @@ resource "yandex_storage_bucket" "endroom_root" {
   access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
   secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = local.endroom_root_bucket_name
-  force_destroy = false
+  force_destroy = true
   max_size      = local.endroom_bucket_max_size
 
   anonymous_access_flags {
@@ -125,6 +120,25 @@ resource "yandex_storage_bucket" "endroom_root" {
       condition     = !var.endroom_enable_apex_redirect || local.endroom_certificate_id != null
       error_message = "Enable apex redirect only after a Yandex Certificate Manager certificate is available."
     }
+  }
+}
+
+resource "yandex_storage_bucket" "endroom_www" {
+  access_key    = yandex_iam_service_account_static_access_key.endmake_storage.access_key
+  secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
+  bucket        = local.endroom_www_bucket_name
+  force_destroy = true
+  max_size      = local.endroom_bucket_max_size
+
+  anonymous_access_flags {
+    read        = true
+    list        = false
+    config_read = false
+  }
+
+  website {
+    index_document = "index.html"
+    error_document = "404.html"
   }
 }
 
@@ -186,10 +200,14 @@ resource "yandex_dns_recordset" "endroom_dev_www_cname" {
   data = [
     var.endroom_enable_www_cutover
     ? format("%s.", trimsuffix(var.endroom_cdn_provider_cname, "."))
-    : local.endroom_root_website_target
+    : local.endroom_www_website_target
   ]
 
   lifecycle {
+    # Provider 0.99.1 does not expose the generated CDN provider CNAME.
+    # The lifecycle workflow performs the cutover through yc after restore.
+    ignore_changes = [data]
+
     precondition {
       condition     = !var.endroom_enable_www_cutover || var.endroom_enable_cdn_resources
       error_message = "Enable CDN resources before cutting www.endroom.dev over to the CDN provider CNAME."

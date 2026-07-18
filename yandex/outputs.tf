@@ -2,6 +2,22 @@ output "endmake_s3_endpoint" {
   value = "https://storage.yandexcloud.net"
 }
 
+output "endmake_ingress_ipv4" {
+  value = yandex_vpc_address.endmake_ingress.external_ipv4_address[0].address
+}
+
+output "postgresql_host" {
+  value = yandex_mdb_postgresql_cluster.pg_cluster.host[0].fqdn
+}
+
+output "postgresql_user" {
+  value = yandex_mdb_postgresql_user.pg_user.name
+}
+
+output "redis_host" {
+  value = yandex_mdb_redis_cluster.redis_mdb_database.host[0].fqdn
+}
+
 output "endmake_s3_region" {
   value = "ru-central1"
 }
@@ -28,7 +44,7 @@ output "endmake_image_cdn_resource_id" {
 }
 
 output "endroom_www_bucket" {
-  value = "www.endroom.dev"
+  value = yandex_storage_bucket.endroom_www.bucket
 }
 
 output "endroom_certificate_id" {

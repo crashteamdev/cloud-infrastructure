@@ -4,6 +4,9 @@ controller:
     ingress: "true"
   service:
     externalTrafficPolicy: "Local"
+{{- if .Values.services.ingress.publicIp }}
+    loadBalancerIP: {{ .Values.services.ingress.publicIp | quote }}
+{{- end }}
     annotations:
       # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
       service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"

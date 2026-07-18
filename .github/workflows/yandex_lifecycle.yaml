@@ -1,0 +1,321 @@
+name: Yandex Cloud lifecycle
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Operation to perform.
+        required: true
+        default: inventory
+        type: choice
+        options:
+          - inventory
+          - plan-destroy
+          - destroy
+          - restore
+      confirmation:
+        description: For destroy, enter "DESTROY b1g90io1nf34fov5esm5".
+        required: false
+        type: string
+      restore_applications:
+        description: Restore Endmake releases after Terraform and infra Helm releases.
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yandex-cloud-lifecycle
+  cancel-in-progress: false
+
+jobs:
+  lifecycle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      EXPECTED_CLOUD_ID: b1gtojcphtuae1n9siie
+      EXPECTED_FOLDER_ID: b1g90io1nf34fov5esm5
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+      YC_SERVICE_ACCOUNT_KEY_FILE: /tmp/sa-key.json
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_VAR_storage_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      TF_VAR_storage_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TF_VAR_db_password: ${{ secrets.DB_ADM_PASSWD }}
+      TF_VAR_db_dev_password: ${{ secrets.DB_DEV_PASSWD }}
+      DB_PASSWORD: ${{ secrets.DB_ADM_PASSWD }}
+      GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }}
+      GRAFANA_CLIENT_ID: ${{ secrets.GRAFANA_CLIENT_ID }}
+      GRAFANA_CLIENT_SECRET: ${{ secrets.GRAFANA_CLIENT_SECRET }}
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
+      AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
+      AUTH_YANDEX_ID: ${{ secrets.AUTH_YANDEX_ID }}
+      AUTH_YANDEX_SECRET: ${{ secrets.AUTH_YANDEX_SECRET }}
+      IMAGE_CDN_SIGNING_KEY: ${{ secrets.IMAGE_CDN_SIGNING_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      FAL_KEY: ${{ secrets.FAL_KEY }}
+      TBANK_TERMINAL_KEY: ${{ secrets.TBANK_TERMINAL_KEY }}
+      TBANK_PASSWORD: ${{ secrets.TBANK_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Setup Terraform mirror
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const os = require('os');
+            const terraformFileConfig = os.platform() === 'win32'
+              ? `${process.env.APPDATA}/terraform.rc`
+              : `${process.env.HOME}/.terraformrc`;
+            fs.appendFileSync(terraformFileConfig, `
+              provider_installation {
+                network_mirror {
+                  url = "https://terraform-mirror.yandexcloud.net/"
+                  include = ["registry.terraform.io/*/*"]
+                }
+                direct {
+                  exclude = ["registry.terraform.io/*/*"]
+                }
+              }
+            `);
+
+      - name: Setup Yandex Cloud credentials
+        env:
+          YC_KEY: ${{ secrets.YC_KEY }}
+        run: printf '%s' "$YC_KEY" > "$YC_SERVICE_ACCOUNT_KEY_FILE"
+
+      - name: Install Yandex Cloud CLI
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh \
+            | bash -s -- -i "$RUNNER_TEMP/yc" -n
+          echo "$RUNNER_TEMP/yc/bin" >> "$GITHUB_PATH"
+
+      - name: Setup helmfile
+        if: ${{ inputs.action == 'destroy' || inputs.action == 'restore' }}
+        uses: mamezou-tech/setup-helmfile@v2.1.0
+        with:
+          helm-s3-plugin-version: v0.16.2
+          helmfile-version: v0.170.1
+          helm-version: v3.13.1
+
+      - name: Terraform init and validate
+        run: |
+          terraform -chdir=yandex init \
+            -backend-config="access_key=$AWS_ACCESS_KEY_ID" \
+            -backend-config="secret_key=$AWS_SECRET_ACCESS_KEY"
+          terraform -chdir=yandex validate -no-color
+
+      - name: Verify target and recovery identity
+        run: |
+          folder_json="$(yc resource-manager folder get "$EXPECTED_FOLDER_ID" --format json)"
+          test "$(jq -r '.cloud_id' <<< "$folder_json")" = "$EXPECTED_CLOUD_ID"
+          test "$(jq -r '.id' <<< "$folder_json")" = "$EXPECTED_FOLDER_ID"
+
+          if [[ "${{ inputs.action }}" == "destroy" \
+            && "${{ inputs.confirmation }}" != "DESTROY $EXPECTED_FOLDER_ID" ]]; then
+            echo "Destroy confirmation does not match the target folder" >&2
+            exit 1
+          fi
+
+          bash scripts/yandex-lifecycle.sh assert-recovery-principal
+
+      - name: Inventory before operation
+        run: bash scripts/yandex-lifecycle.sh inventory
+
+      - name: Terraform destroy plan
+        if: ${{ inputs.action == 'plan-destroy' }}
+        run: |
+          mapfile -t targets < <(bash scripts/yandex-lifecycle.sh targets)
+          test "${#targets[@]}" -gt 0
+          terraform -chdir=yandex plan -destroy -no-color \
+            -out=tfplan "${targets[@]}"
+          bash scripts/yandex-lifecycle.sh assert-plan tfplan
+          terraform -chdir=yandex show -no-color tfplan
+
+      - name: Remove Kubernetes workloads
+        if: ${{ inputs.action == 'destroy' }}
+        run: |
+          if yc managed-kubernetes cluster get marketdb-cluster >/dev/null 2>&1; then
+            yc managed-kubernetes cluster get-credentials marketdb-cluster \
+              --external --force --kubeconfig "$RUNNER_TEMP/kubeconfig"
+            export KUBECONFIG="$RUNNER_TEMP/kubeconfig"
+
+            values=(
+              --state-values-set "services.redis.endpoint=${{ secrets.REDIS_HOST }}"
+              --state-values-set "services.redis.password=${{ secrets.REDIS_PASSWORD }}"
+              --state-values-set "services.postgres.endpoint=${{ secrets.PG_HOST }}"
+              --state-values-set "services.postgres.uniUser=${{ secrets.PG_USER }}"
+              --state-values-set "services.postgres.uniPassword=${{ secrets.PG_PASSWORD }}"
+            )
+
+            helmfile -e gh -f helmfile/helmfile.yaml "${values[@]}" \
+              destroy --skip-deps || true
+            helmfile -e gh -f helmfile/helmfile-infra.yaml \
+              destroy --skip-deps || true
+            kubectl delete pvc --all --all-namespaces --ignore-not-found --wait=true
+          fi
+
+      - name: Prepare managed buckets for deletion
+        if: ${{ inputs.action == 'destroy' }}
+        run: |
+          if yc storage bucket get www.endroom.dev >/dev/null 2>&1 \
+            && ! terraform -chdir=yandex state show yandex_storage_bucket.endroom_www >/dev/null 2>&1; then
+            terraform -chdir=yandex import yandex_storage_bucket.endroom_www www.endroom.dev
+          fi
+
+          bucket_targets=()
+          for address in \
+            yandex_storage_bucket.endmake \
+            yandex_storage_bucket.endroom_root \
+            yandex_storage_bucket.endroom_www; do
+            if terraform -chdir=yandex state show "$address" >/dev/null 2>&1; then
+              bucket_targets+=("-target=$address")
+            fi
+          done
+          if [[ "${#bucket_targets[@]}" -gt 0 ]]; then
+            terraform -chdir=yandex apply -no-color -auto-approve "${bucket_targets[@]}"
+          fi
+
+      - name: Destroy Terraform-managed infrastructure
+        if: ${{ inputs.action == 'destroy' }}
+        run: |
+          mapfile -t targets < <(bash scripts/yandex-lifecycle.sh targets)
+          test "${#targets[@]}" -gt 0
+          terraform -chdir=yandex plan -destroy -no-color \
+            -out=tfplan "${targets[@]}"
+          bash scripts/yandex-lifecycle.sh assert-plan tfplan
+          terraform -chdir=yandex apply -no-color -auto-approve tfplan
+
+      - name: Remove known Kubernetes residual resources
+        if: ${{ inputs.action == 'destroy' }}
+        run: bash scripts/yandex-lifecycle.sh cleanup-kubernetes-residuals
+
+      - name: Restore Terraform infrastructure
+        if: ${{ inputs.action == 'restore' }}
+        run: terraform -chdir=yandex apply -no-color -auto-approve
+
+      - name: Configure restored Kubernetes cluster
+        if: ${{ inputs.action == 'restore' }}
+        run: |
+          yc managed-kubernetes cluster get-credentials marketdb-cluster \
+            --external --force --kubeconfig "$RUNNER_TEMP/kubeconfig"
+          echo "KUBECONFIG=$RUNNER_TEMP/kubeconfig" >> "$GITHUB_ENV"
+
+      - name: Restore Kubernetes infrastructure
+        if: ${{ inputs.action == 'restore' }}
+        run: |
+          ingress_ip="$(terraform -chdir=yandex output -raw endmake_ingress_ipv4)"
+          helmfile -e gh -f helmfile/helmfile-infra.yaml \
+            --state-values-set "services.ingress.publicIp=$ingress_ip" \
+            --state-values-set "prometheus.grafana.password=$GRAFANA_PASSWORD" \
+            --state-values-set "services.grafana.openid.client_id=$GRAFANA_CLIENT_ID" \
+            --state-values-set "services.grafana.openid.client_secret=$GRAFANA_CLIENT_SECRET" \
+            sync --args="--atomic" --wait --skip-deps
+
+          kubectl wait --for=condition=Available deployment/certmanager-cert-manager \
+            --namespace cert-manager --timeout=10m || true
+          kubectl apply -f helmfile/config-infra/certmanager/clusterissuer.yaml
+
+          if [[ -n "$CF_API_TOKEN" ]]; then
+            kubectl -n cert-manager create secret generic cf-api-token-secret \
+              --from-literal=api-token="$CF_API_TOKEN" \
+              --dry-run=client -o yaml | kubectl apply -f -
+            kubectl apply -f helmfile/config-infra/certmanager/clusterissuer-cfdns.yaml
+          fi
+
+      - name: Restore application secret and releases
+        if: ${{ inputs.action == 'restore' && inputs.restore_applications }}
+        run: |
+          required=(
+            AUTH_SECRET AUTH_GOOGLE_ID AUTH_GOOGLE_SECRET
+            AUTH_YANDEX_ID AUTH_YANDEX_SECRET IMAGE_CDN_SIGNING_KEY
+            OPENAI_API_KEY GOOGLE_API_KEY FAL_KEY
+            TBANK_TERMINAL_KEY TBANK_PASSWORD DB_PASSWORD
+          )
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Required restore secret $name is missing" >&2
+              exit 1
+            fi
+          done
+
+          s3_endpoint="$(terraform -chdir=yandex output -raw endmake_s3_endpoint)"
+          s3_region="$(terraform -chdir=yandex output -raw endmake_s3_region)"
+          s3_bucket="$(terraform -chdir=yandex output -raw endmake_s3_bucket)"
+          s3_access_key="$(terraform -chdir=yandex output -raw endmake_s3_access_key_id)"
+          s3_secret_key="$(terraform -chdir=yandex output -raw endmake_s3_secret_access_key)"
+          pg_host="$(terraform -chdir=yandex output -raw postgresql_host)"
+          pg_user="$(terraform -chdir=yandex output -raw postgresql_user)"
+          redis_host="$(terraform -chdir=yandex output -raw redis_host)"
+
+          kubectl -n default create secret generic endmake-secrets \
+            --from-literal=auth-secret="$AUTH_SECRET" \
+            --from-literal=auth-google-id="$AUTH_GOOGLE_ID" \
+            --from-literal=auth-google-secret="$AUTH_GOOGLE_SECRET" \
+            --from-literal=auth-yandex-id="$AUTH_YANDEX_ID" \
+            --from-literal=auth-yandex-secret="$AUTH_YANDEX_SECRET" \
+            --from-literal=s3-endpoint="$s3_endpoint" \
+            --from-literal=s3-region="$s3_region" \
+            --from-literal=s3-bucket="$s3_bucket" \
+            --from-literal=s3-access-key-id="$s3_access_key" \
+            --from-literal=s3-secret-access-key="$s3_secret_key" \
+            --from-literal=image-cdn-signing-key="$IMAGE_CDN_SIGNING_KEY" \
+            --from-literal=openai-api-key="$OPENAI_API_KEY" \
+            --from-literal=google-api-key="$GOOGLE_API_KEY" \
+            --from-literal=fal-key="$FAL_KEY" \
+            --from-literal=tbank-terminal-key="$TBANK_TERMINAL_KEY" \
+            --from-literal=tbank-password="$TBANK_PASSWORD" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          helmfile -e gh -f helmfile/helmfile.yaml \
+            --state-values-set "services.redis.endpoint=$redis_host" \
+            --state-values-set "services.redis.password=$DB_PASSWORD" \
+            --state-values-set "services.postgres.endpoint=$pg_host" \
+            --state-values-set "services.postgres.uniUser=$pg_user" \
+            --state-values-set "services.postgres.uniPassword=$DB_PASSWORD" \
+            sync --args="--atomic" --wait --skip-deps
+
+      - name: Cut DNS over to restored CDN resources
+        if: ${{ inputs.action == 'restore' }}
+        run: |
+          endmake_id="$(terraform -chdir=yandex output -raw endmake_image_cdn_resource_id)"
+          endmake_provider_cname="$(
+            yc cdn resource get "$endmake_id" --format json | jq -r '.provider_cname'
+          )"
+          test -n "$endmake_provider_cname"
+          test "$endmake_provider_cname" != "null"
+          yc dns zone replace-records endmake-com \
+            --record "img.endmake.com. 600 CNAME ${endmake_provider_cname%.}."
+
+          endroom_id="$(terraform -chdir=yandex output -raw endroom_cdn_resource_id)"
+          if [[ -n "$endroom_id" && "$endroom_id" != "null" ]]; then
+            endroom_provider_cname="$(
+              yc cdn resource get "$endroom_id" --format json | jq -r '.provider_cname'
+            )"
+            test -n "$endroom_provider_cname"
+            test "$endroom_provider_cname" != "null"
+            yc dns zone replace-records endroom-dev \
+              --record "www.endroom.dev. 600 CNAME ${endroom_provider_cname%.}."
+          fi
+
+      - name: Inventory after operation
+        if: ${{ inputs.action == 'destroy' || inputs.action == 'restore' }}
+        run: bash scripts/yandex-lifecycle.sh inventory
+
+      - name: Verify only recovery resources remain
+        if: ${{ inputs.action == 'destroy' }}
+        run: bash scripts/yandex-lifecycle.sh verify-empty
