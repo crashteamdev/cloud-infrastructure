@@ -96,13 +96,22 @@ jobs:
       - name: Setup Yandex Cloud credentials
         env:
           YC_KEY: ${{ secrets.YC_KEY }}
-        run: printf '%s' "$YC_KEY" > "$YC_SERVICE_ACCOUNT_KEY_FILE"
+        run: |
+          printf '%s' "$YC_KEY" > "$YC_SERVICE_ACCOUNT_KEY_FILE"
+          chmod 600 "$YC_SERVICE_ACCOUNT_KEY_FILE"
 
       - name: Install Yandex Cloud CLI
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh \
             | bash -s -- -i "$RUNNER_TEMP/yc" -n
           echo "$RUNNER_TEMP/yc/bin" >> "$GITHUB_PATH"
+
+      - name: Configure Yandex Cloud CLI
+        run: |
+          yc config set service-account-key "$YC_SERVICE_ACCOUNT_KEY_FILE"
+          yc config set cloud-id "$EXPECTED_CLOUD_ID"
+          yc config set folder-id "$EXPECTED_FOLDER_ID"
+          yc iam create-token >/dev/null
 
       - name: Setup helmfile
         if: ${{ inputs.action == 'destroy' || inputs.action == 'restore' }}
