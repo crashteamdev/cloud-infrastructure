@@ -28,6 +28,7 @@ services:
 
   ingress:
     class: "nginx"
+    publicIp: null
     rootDomain: marketdb.ru
     namespacedDomain: false
     tls:

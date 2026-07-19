@@ -36,7 +36,7 @@ resource "yandex_storage_bucket" "endmake" {
   secret_key    = yandex_iam_service_account_static_access_key.endmake_storage.secret_key
   bucket        = "endmake-${var.yc_folder_id}"
   acl           = "private"
-  force_destroy = false
+  force_destroy = true
 
   tags = {
     service    = "endmake"
