@@ -8,6 +8,7 @@ readonly STATE_BUCKET="${STATE_BUCKET:-marketdb-tf-state}"
 readonly RECOVERY_ADDRESSES=(
   "yandex_iam_service_account.marketdb-tf"
   "yandex_resourcemanager_folder_iam_member.editor"
+  "yandex_resourcemanager_folder_iam_member.github_deploy_storage_admin"
   "yandex_resourcemanager_folder_iam_member.k8s-clusters-agent"
   "yandex_resourcemanager_folder_iam_member.vpc-public-admin"
   "yandex_resourcemanager_folder_iam_member.images-puller"
@@ -71,14 +72,47 @@ is_recovery_address() {
   return 1
 }
 
+is_storage_address() {
+  local candidate="$1"
+
+  case "$candidate" in
+    yandex_storage_bucket.* \
+      | yandex_iam_service_account.endmake_storage \
+      | yandex_iam_service_account_static_access_key.endmake_storage \
+      | yandex_resourcemanager_folder_iam_member.endmake_storage_admin \
+      | yandex_resourcemanager_folder_iam_member.endmake_storage_editor)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 terraform_targets() {
+  local mode="${1:-all}"
   local address
 
   while IFS= read -r address; do
     [[ -z "$address" ]] && continue
-    if ! is_recovery_address "$address"; then
-      printf '%s\n' "-target=$address"
-    fi
+    is_recovery_address "$address" && continue
+
+    case "$mode" in
+      all)
+        ;;
+      core)
+        is_storage_address "$address" && continue
+        ;;
+      storage)
+        is_storage_address "$address" || continue
+        ;;
+      *)
+        echo "Unknown target mode: $mode" >&2
+        return 2
+        ;;
+    esac
+
+    printf '%s\n' "-target=$address"
   done < <(terraform -chdir="$TF_DIR" state list)
 }
 
@@ -218,6 +252,58 @@ cleanup_kubernetes_residuals() {
   delete_all "vpc address"
 }
 
+purge_bucket() {
+  local bucket="$1"
+  local endpoint="https://storage.yandexcloud.net"
+  local versions delete_payload uploads encoded key upload_id
+
+  if [[ "$bucket" == "$STATE_BUCKET" ]]; then
+    echo "Refusing to purge the Terraform state bucket" >&2
+    return 1
+  fi
+
+  if ! yc storage bucket get "$bucket" >/dev/null 2>&1; then
+    echo "Bucket $bucket is already absent"
+    return 0
+  fi
+
+  aws --endpoint-url "$endpoint" --region ru-central1 \
+    s3 rm "s3://$bucket" --recursive
+
+  while true; do
+    versions="$(
+      aws --endpoint-url "$endpoint" --region ru-central1 \
+        s3api list-object-versions --bucket "$bucket"
+    )"
+    delete_payload="$(
+      jq -c '{
+        Objects: ([.Versions[]?, .DeleteMarkers[]?] | map({Key, VersionId})),
+        Quiet: true
+      }' <<< "$versions"
+    )"
+    if [[ "$(jq '.Objects | length' <<< "$delete_payload")" -eq 0 ]]; then
+      break
+    fi
+    aws --endpoint-url "$endpoint" --region ru-central1 \
+      s3api delete-objects --bucket "$bucket" --delete "$delete_payload" >/dev/null
+  done
+
+  uploads="$(
+    aws --endpoint-url "$endpoint" --region ru-central1 \
+      s3api list-multipart-uploads --bucket "$bucket"
+  )"
+  while IFS= read -r encoded; do
+    [[ -z "$encoded" ]] && continue
+    key="$(base64 --decode <<< "$encoded" | jq -r '.Key')"
+    upload_id="$(base64 --decode <<< "$encoded" | jq -r '.UploadId')"
+    aws --endpoint-url "$endpoint" --region ru-central1 \
+      s3api abort-multipart-upload \
+      --bucket "$bucket" --key "$key" --upload-id "$upload_id"
+  done < <(jq -r '.Uploads[]? | @base64' <<< "$uploads")
+
+  yc storage bucket delete "$bucket"
+}
+
 assert_plan_preserves_recovery() {
   local plan_path="$1"
   local recovery_json
@@ -285,12 +371,12 @@ verify_empty() {
 }
 
 usage() {
-  echo "Usage: $0 targets|assert-recovery-principal|assert-plan PLAN|inventory|cleanup-kubernetes-residuals|verify-empty" >&2
+  echo "Usage: $0 targets [all|core|storage]|assert-recovery-principal|assert-plan PLAN|inventory|cleanup-kubernetes-residuals|purge-bucket NAME|verify-empty" >&2
 }
 
 case "${1:-}" in
   targets)
-    terraform_targets
+    terraform_targets "${2:-all}"
     ;;
   assert-recovery-principal)
     assert_recovery_principal
@@ -307,6 +393,13 @@ case "${1:-}" in
     ;;
   cleanup-kubernetes-residuals)
     cleanup_kubernetes_residuals
+    ;;
+  purge-bucket)
+    [[ -n "${2:-}" ]] || {
+      usage
+      exit 2
+    }
+    purge_bucket "$2"
     ;;
   verify-empty)
     verify_empty

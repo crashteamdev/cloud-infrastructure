@@ -178,40 +178,54 @@ jobs:
             kubectl delete pvc --all --all-namespaces --ignore-not-found --wait=true
           fi
 
-      - name: Prepare managed buckets for deletion
+      - name: Destroy core Terraform infrastructure
         if: ${{ inputs.action == 'destroy' }}
         run: |
-          if yc storage bucket get www.endroom.dev >/dev/null 2>&1 \
-            && ! terraform -chdir=yandex state show yandex_storage_bucket.endroom_www >/dev/null 2>&1; then
-            terraform -chdir=yandex import yandex_storage_bucket.endroom_www www.endroom.dev
-          fi
-
-          bucket_targets=()
-          for address in \
-            yandex_storage_bucket.endmake \
-            yandex_storage_bucket.endroom_root \
-            yandex_storage_bucket.endroom_www; do
-            if terraform -chdir=yandex state show "$address" >/dev/null 2>&1; then
-              bucket_targets+=("-target=$address")
-            fi
-          done
-          if [[ "${#bucket_targets[@]}" -gt 0 ]]; then
-            terraform -chdir=yandex apply -no-color -auto-approve "${bucket_targets[@]}"
-          fi
-
-      - name: Destroy Terraform-managed infrastructure
-        if: ${{ inputs.action == 'destroy' }}
-        run: |
-          mapfile -t targets < <(bash scripts/yandex-lifecycle.sh targets)
+          mapfile -t targets < <(bash scripts/yandex-lifecycle.sh targets core)
           test "${#targets[@]}" -gt 0
           terraform -chdir=yandex plan -destroy -no-color \
-            -out=tfplan "${targets[@]}"
-          bash scripts/yandex-lifecycle.sh assert-plan tfplan
-          terraform -chdir=yandex apply -no-color -auto-approve tfplan
+            -out=core.tfplan "${targets[@]}"
+          bash scripts/yandex-lifecycle.sh assert-plan core.tfplan
+          terraform -chdir=yandex apply -no-color -auto-approve core.tfplan
 
       - name: Remove known Kubernetes residual resources
         if: ${{ inputs.action == 'destroy' }}
         run: bash scripts/yandex-lifecycle.sh cleanup-kubernetes-residuals
+
+      - name: Purge data buckets
+        if: ${{ inputs.action == 'destroy' }}
+        continue-on-error: true
+        run: |
+          buckets=(
+            "www.endroom.dev|yandex_storage_bucket.endroom_www"
+            "endroom.dev|yandex_storage_bucket.endroom_root"
+            "endmake-$EXPECTED_FOLDER_ID|yandex_storage_bucket.endmake"
+          )
+
+          for item in "${buckets[@]}"; do
+            bucket="${item%%|*}"
+            address="${item#*|}"
+            if bash scripts/yandex-lifecycle.sh purge-bucket "$bucket"; then
+              if terraform -chdir=yandex state show "$address" >/dev/null 2>&1; then
+                terraform -chdir=yandex state rm "$address"
+              fi
+            else
+              echo "Unable to purge $bucket; it will be reported by the final inventory" >&2
+            fi
+          done
+
+      - name: Destroy Terraform-managed storage
+        if: ${{ inputs.action == 'destroy' }}
+        continue-on-error: true
+        run: |
+          mapfile -t targets < <(bash scripts/yandex-lifecycle.sh targets storage)
+          if [[ "${#targets[@]}" -eq 0 ]]; then
+            exit 0
+          fi
+          terraform -chdir=yandex plan -destroy -no-color \
+            -out=storage.tfplan "${targets[@]}"
+          bash scripts/yandex-lifecycle.sh assert-plan storage.tfplan
+          terraform -chdir=yandex apply -no-color -auto-approve storage.tfplan
 
       - name: Restore Terraform infrastructure
         if: ${{ inputs.action == 'restore' }}
@@ -322,9 +336,9 @@ jobs:
           fi
 
       - name: Inventory after operation
-        if: ${{ inputs.action == 'destroy' || inputs.action == 'restore' }}
+        if: ${{ always() && (inputs.action == 'destroy' || inputs.action == 'restore') }}
         run: bash scripts/yandex-lifecycle.sh inventory
 
       - name: Verify only recovery resources remain
-        if: ${{ inputs.action == 'destroy' }}
+        if: ${{ always() && inputs.action == 'destroy' }}
         run: bash scripts/yandex-lifecycle.sh verify-empty
