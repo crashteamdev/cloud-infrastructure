@@ -264,6 +264,30 @@ delete_all_positional() {
   done <<< "$ids"
 }
 
+delete_all_protected() {
+  local specification="$1"
+  local -a command_parts
+  local ids id
+
+  read -r -a command_parts <<< "$specification"
+  if ! ids="$(yc "${command_parts[@]}" list --format json 2>/dev/null | jq -r '.[].id')"; then
+    echo "Unable to inspect $specification; leaving it for the final audit" >&2
+    return 0
+  fi
+
+  while IFS= read -r id; do
+    [[ -z "$id" ]] && continue
+    echo "Disabling deletion protection for $specification $id"
+    if ! yc "${command_parts[@]}" update --id "$id" --no-deletion-protection; then
+      echo "Unable to disable deletion protection for $specification $id" >&2
+    fi
+    echo "Deleting residual $specification $id"
+    if ! yc "${command_parts[@]}" delete --id "$id"; then
+      echo "Unable to delete $specification $id; continuing the emergency sweep" >&2
+    fi
+  done <<< "$ids"
+}
+
 delete_protected_clusters() {
   local specification="$1"
   local -a command_parts
@@ -278,7 +302,7 @@ delete_protected_clusters() {
   while IFS= read -r id; do
     [[ -z "$id" ]] && continue
     echo "Disabling deletion protection for $specification $id"
-    if ! yc "${command_parts[@]}" update --id "$id" --deletion-protection=false; then
+    if ! yc "${command_parts[@]}" update --id "$id" --no-deletion-protection; then
       echo "Unable to disable deletion protection for $specification $id" >&2
     fi
     echo "Deleting $specification $id"
@@ -326,13 +350,13 @@ cleanup_known_residuals() {
   delete_all "compute disk"
   delete_all "compute snapshot"
   delete_all_positional "datatransfer endpoint"
-  delete_all "lockbox secret"
+  delete_all_protected "lockbox secret"
   delete_all "application-load-balancer http-router"
   delete_all "application-load-balancer backend-group"
   delete_all "application-load-balancer target-group"
   delete_all "load-balancer target-group"
   delete_all "cdn origin-group"
-  delete_all "certificate-manager certificate"
+  delete_all_protected "certificate-manager certificate"
   delete_all "serverless api-gateway"
   delete_all "serverless function"
   delete_all "serverless container"
@@ -350,12 +374,113 @@ cleanup_known_residuals() {
 
   # Auto-created DNS zones can disappear only after their network is deleted.
   delete_all "dns zone"
+
+  # CDN and Data Transfer deletion can release these dependencies with a delay.
+  delete_all_protected "certificate-manager certificate"
+  delete_all_protected "lockbox secret"
+}
+
+purge_bucket_with_credentials() {
+  local bucket="$1"
+  local bucket_access_key="$2"
+  local bucket_secret_key="$3"
+  local endpoint="https://storage.yandexcloud.net"
+  local versions delete_payload uploads encoded key upload_id
+
+  if ! AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+    aws --endpoint-url "$endpoint" --region ru-central1 \
+      s3api head-bucket --bucket "$bucket"; then
+    return 1
+  fi
+
+  AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+    aws --endpoint-url "$endpoint" --region ru-central1 \
+      s3 rm "s3://$bucket" --recursive || return 1
+
+  while true; do
+    versions="$(
+      AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+        aws --endpoint-url "$endpoint" --region ru-central1 \
+          s3api list-object-versions --bucket "$bucket"
+    )" || return 1
+    delete_payload="$(
+      jq -c '{
+        Objects: ([.Versions[]?, .DeleteMarkers[]?] | map({Key, VersionId})),
+        Quiet: true
+      }' <<< "$versions"
+    )"
+    if [[ "$(jq '.Objects | length' <<< "$delete_payload")" -eq 0 ]]; then
+      break
+    fi
+    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+      aws --endpoint-url "$endpoint" --region ru-central1 \
+        s3api delete-objects --bucket "$bucket" --delete "$delete_payload" \
+        >/dev/null || return 1
+  done
+
+  uploads="$(
+    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+      aws --endpoint-url "$endpoint" --region ru-central1 \
+        s3api list-multipart-uploads --bucket "$bucket"
+  )" || return 1
+  while IFS= read -r encoded; do
+    [[ -z "$encoded" ]] && continue
+    key="$(base64 --decode <<< "$encoded" | jq -r '.Key')"
+    upload_id="$(base64 --decode <<< "$encoded" | jq -r '.UploadId')"
+    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+      aws --endpoint-url "$endpoint" --region ru-central1 \
+        s3api abort-multipart-upload \
+          --bucket "$bucket" --key "$key" --upload-id "$upload_id" || return 1
+  done < <(jq -r '.Uploads[]? | @base64' <<< "$uploads")
+
+  AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+    aws --endpoint-url "$endpoint" --region ru-central1 \
+      s3api delete-bucket --bucket "$bucket"
+}
+
+purge_bucket_with_temporary_key() {
+  local bucket="$1"
+  local key_json key_resource_id bucket_access_key bucket_secret_key
+  local attempt status=1
+
+  if ! key_json="$(
+    yc iam access-key create \
+      --service-account-id "$GITHUB_DEPLOY_SERVICE_ACCOUNT_ID" \
+      --description "Temporary lifecycle cleanup key" \
+      --format json
+  )"; then
+    echo "Unable to create a temporary Object Storage access key" >&2
+    return 1
+  fi
+  key_resource_id="$(jq -r '.access_key.id // .id // empty' <<< "$key_json")"
+  bucket_access_key="$(jq -r '.access_key.key_id // .key_id // empty' <<< "$key_json")"
+  bucket_secret_key="$(jq -r '.secret // empty' <<< "$key_json")"
+
+  if [[ -n "$key_resource_id" \
+    && -n "$bucket_access_key" \
+    && -n "$bucket_secret_key" ]]; then
+    for attempt in 1 2 3 4 5 6; do
+      echo "Purging $bucket with a temporary recovery key (attempt $attempt/6)"
+      if purge_bucket_with_credentials \
+        "$bucket" "$bucket_access_key" "$bucket_secret_key"; then
+        status=0
+        break
+      fi
+      sleep 5
+    done
+  else
+    echo "Unable to read temporary Object Storage credentials" >&2
+  fi
+
+  if [[ -n "$key_resource_id" ]]; then
+    yc iam access-key delete --id "$key_resource_id" >/dev/null 2>&1 || true
+  fi
+
+  return "$status"
 }
 
 purge_bucket() {
   local bucket="$1"
-  local endpoint="https://storage.yandexcloud.net"
-  local versions delete_payload uploads encoded key upload_id
   local bucket_access_key bucket_secret_key
 
   if [[ "$bucket" == "$STATE_BUCKET" ]]; then
@@ -376,51 +501,15 @@ purge_bucket() {
     state_resource_value \
       'yandex_iam_service_account_static_access_key.endmake_storage' secret_key
   )"
-  if [[ -z "$bucket_access_key" || -z "$bucket_secret_key" ]]; then
-    echo "Unable to resolve the data-bucket credentials from Terraform state" >&2
-    return 1
+  if [[ -n "$bucket_access_key" && -n "$bucket_secret_key" ]]; then
+    if purge_bucket_with_credentials \
+      "$bucket" "$bucket_access_key" "$bucket_secret_key"; then
+      return 0
+    fi
+    echo "The Terraform-managed bucket key is unavailable; using a temporary account" >&2
   fi
 
-  AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
-    aws --endpoint-url "$endpoint" --region ru-central1 \
-    s3 rm "s3://$bucket" --recursive
-
-  while true; do
-    versions="$(
-      AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
-        aws --endpoint-url "$endpoint" --region ru-central1 \
-        s3api list-object-versions --bucket "$bucket"
-    )"
-    delete_payload="$(
-      jq -c '{
-        Objects: ([.Versions[]?, .DeleteMarkers[]?] | map({Key, VersionId})),
-        Quiet: true
-      }' <<< "$versions"
-    )"
-    if [[ "$(jq '.Objects | length' <<< "$delete_payload")" -eq 0 ]]; then
-      break
-    fi
-    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
-      aws --endpoint-url "$endpoint" --region ru-central1 \
-      s3api delete-objects --bucket "$bucket" --delete "$delete_payload" >/dev/null
-  done
-
-  uploads="$(
-    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
-      aws --endpoint-url "$endpoint" --region ru-central1 \
-      s3api list-multipart-uploads --bucket "$bucket"
-  )"
-  while IFS= read -r encoded; do
-    [[ -z "$encoded" ]] && continue
-    key="$(base64 --decode <<< "$encoded" | jq -r '.Key')"
-    upload_id="$(base64 --decode <<< "$encoded" | jq -r '.UploadId')"
-    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
-      aws --endpoint-url "$endpoint" --region ru-central1 \
-      s3api abort-multipart-upload \
-      --bucket "$bucket" --key "$key" --upload-id "$upload_id"
-  done < <(jq -r '.Uploads[]? | @base64' <<< "$uploads")
-
-  yc storage bucket delete "$bucket"
+  purge_bucket_with_temporary_key "$bucket"
 }
 
 assert_plan_preserves_recovery() {
