@@ -4,6 +4,7 @@ set -euo pipefail
 
 readonly TF_DIR="${TF_DIR:-yandex}"
 readonly STATE_BUCKET="${STATE_BUCKET:-marketdb-tf-state}"
+readonly GITHUB_DEPLOY_SERVICE_ACCOUNT_ID="ajevao7t27aim25olhi1"
 
 readonly RECOVERY_ADDRESSES=(
   "yandex_iam_service_account.marketdb-tf"
@@ -139,11 +140,12 @@ backend_service_account_id() {
   return 1
 }
 
-state_resource_id() {
+state_resource_value() {
   local address="$1"
+  local attribute="$2"
 
   terraform -chdir="$TF_DIR" show -json \
-    | jq -r --arg address "$address" '
+    | jq -r --arg address "$address" --arg attribute "$attribute" '
         def resources:
           .resources[]?,
           (.child_modules[]? | resources);
@@ -152,9 +154,13 @@ state_resource_id() {
           .values.root_module
           | resources
           | select(.address == $address)
-          | .values.id
+          | .values[$attribute]
         ][0] // empty
       '
+}
+
+state_resource_id() {
+  state_resource_value "$1" id
 }
 
 assert_recovery_principal() {
@@ -232,7 +238,53 @@ delete_all() {
   while IFS= read -r id; do
     [[ -z "$id" ]] && continue
     echo "Deleting residual $specification $id"
-    yc "${command_parts[@]}" delete --id "$id"
+    if ! yc "${command_parts[@]}" delete --id "$id"; then
+      echo "Unable to delete $specification $id; continuing the emergency sweep" >&2
+    fi
+  done <<< "$ids"
+}
+
+delete_all_positional() {
+  local specification="$1"
+  local -a command_parts
+  local ids id
+
+  read -r -a command_parts <<< "$specification"
+  if ! ids="$(yc "${command_parts[@]}" list --format json 2>/dev/null | jq -r '.[].id')"; then
+    echo "Unable to inspect $specification; leaving it for the final audit" >&2
+    return 0
+  fi
+
+  while IFS= read -r id; do
+    [[ -z "$id" ]] && continue
+    echo "Deleting residual $specification $id"
+    if ! yc "${command_parts[@]}" delete "$id"; then
+      echo "Unable to delete $specification $id; continuing the emergency sweep" >&2
+    fi
+  done <<< "$ids"
+}
+
+delete_protected_clusters() {
+  local specification="$1"
+  local -a command_parts
+  local ids id
+
+  read -r -a command_parts <<< "$specification"
+  if ! ids="$(yc "${command_parts[@]}" list --format json 2>/dev/null | jq -r '.[].id')"; then
+    echo "Unable to inspect $specification" >&2
+    return 0
+  fi
+
+  while IFS= read -r id; do
+    [[ -z "$id" ]] && continue
+    echo "Disabling deletion protection for $specification $id"
+    if ! yc "${command_parts[@]}" update --id "$id" --deletion-protection=false; then
+      echo "Unable to disable deletion protection for $specification $id" >&2
+    fi
+    echo "Deleting $specification $id"
+    if ! yc "${command_parts[@]}" delete --id "$id"; then
+      echo "Unable to delete $specification $id; continuing the emergency sweep" >&2
+    fi
   done <<< "$ids"
 }
 
@@ -252,10 +304,59 @@ cleanup_kubernetes_residuals() {
   delete_all "vpc address"
 }
 
+cleanup_known_residuals() {
+  # Delete consumers before their backing resources. Every operation is best
+  # effort so one stale dependency cannot prevent deletion of billable items.
+  delete_all_positional "datatransfer transfer"
+  delete_all "serverless trigger"
+  delete_all "cdn resource"
+  delete_all "application-load-balancer load-balancer"
+  delete_all "load-balancer network-load-balancer"
+  delete_all "managed-kubernetes cluster"
+  delete_protected_clusters "managed-postgresql cluster"
+  delete_protected_clusters "managed-redis cluster"
+  delete_protected_clusters "managed-clickhouse cluster"
+  delete_protected_clusters "managed-mongodb cluster"
+  delete_protected_clusters "managed-mysql cluster"
+  delete_protected_clusters "managed-kafka cluster"
+  delete_protected_clusters "managed-greenplum cluster"
+  delete_all "compute instance-group"
+  delete_all "compute instance"
+  delete_all "compute filesystem"
+  delete_all "compute disk"
+  delete_all "compute snapshot"
+  delete_all_positional "datatransfer endpoint"
+  delete_all "lockbox secret"
+  delete_all "application-load-balancer http-router"
+  delete_all "application-load-balancer backend-group"
+  delete_all "application-load-balancer target-group"
+  delete_all "load-balancer target-group"
+  delete_all "cdn origin-group"
+  delete_all "certificate-manager certificate"
+  delete_all "serverless api-gateway"
+  delete_all "serverless function"
+  delete_all "serverless container"
+  delete_all "serverless mdbproxy"
+  delete_all "container registry"
+  delete_all "kms symmetric-key"
+  delete_all "logging group"
+  delete_all "dns zone"
+  delete_all "vpc address"
+  delete_all "vpc security-group"
+  delete_all "vpc route-table"
+  delete_all "vpc subnet"
+  delete_all "vpc gateway"
+  delete_all "vpc network"
+
+  # Auto-created DNS zones can disappear only after their network is deleted.
+  delete_all "dns zone"
+}
+
 purge_bucket() {
   local bucket="$1"
   local endpoint="https://storage.yandexcloud.net"
   local versions delete_payload uploads encoded key upload_id
+  local bucket_access_key bucket_secret_key
 
   if [[ "$bucket" == "$STATE_BUCKET" ]]; then
     echo "Refusing to purge the Terraform state bucket" >&2
@@ -267,12 +368,27 @@ purge_bucket() {
     return 0
   fi
 
-  aws --endpoint-url "$endpoint" --region ru-central1 \
+  bucket_access_key="$(
+    state_resource_value \
+      'yandex_iam_service_account_static_access_key.endmake_storage' access_key
+  )"
+  bucket_secret_key="$(
+    state_resource_value \
+      'yandex_iam_service_account_static_access_key.endmake_storage' secret_key
+  )"
+  if [[ -z "$bucket_access_key" || -z "$bucket_secret_key" ]]; then
+    echo "Unable to resolve the data-bucket credentials from Terraform state" >&2
+    return 1
+  fi
+
+  AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+    aws --endpoint-url "$endpoint" --region ru-central1 \
     s3 rm "s3://$bucket" --recursive
 
   while true; do
     versions="$(
-      aws --endpoint-url "$endpoint" --region ru-central1 \
+      AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+        aws --endpoint-url "$endpoint" --region ru-central1 \
         s3api list-object-versions --bucket "$bucket"
     )"
     delete_payload="$(
@@ -284,19 +400,22 @@ purge_bucket() {
     if [[ "$(jq '.Objects | length' <<< "$delete_payload")" -eq 0 ]]; then
       break
     fi
-    aws --endpoint-url "$endpoint" --region ru-central1 \
+    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+      aws --endpoint-url "$endpoint" --region ru-central1 \
       s3api delete-objects --bucket "$bucket" --delete "$delete_payload" >/dev/null
   done
 
   uploads="$(
-    aws --endpoint-url "$endpoint" --region ru-central1 \
+    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+      aws --endpoint-url "$endpoint" --region ru-central1 \
       s3api list-multipart-uploads --bucket "$bucket"
   )"
   while IFS= read -r encoded; do
     [[ -z "$encoded" ]] && continue
     key="$(base64 --decode <<< "$encoded" | jq -r '.Key')"
     upload_id="$(base64 --decode <<< "$encoded" | jq -r '.UploadId')"
-    aws --endpoint-url "$endpoint" --region ru-central1 \
+    AWS_ACCESS_KEY_ID="$bucket_access_key" AWS_SECRET_ACCESS_KEY="$bucket_secret_key" \
+      aws --endpoint-url "$endpoint" --region ru-central1 \
       s3api abort-multipart-upload \
       --bucket "$bucket" --key "$key" --upload-id "$upload_id"
   done < <(jq -r '.Uploads[]? | @base64' <<< "$uploads")
@@ -328,6 +447,33 @@ recovery_service_account_ids() {
   jq -r '.service_account_id // empty' "$YC_SERVICE_ACCOUNT_KEY_FILE"
   state_resource_id 'yandex_iam_service_account.marketdb-tf'
   backend_service_account_id
+  printf '%s\n' "$GITHUB_DEPLOY_SERVICE_ACCOUNT_ID"
+}
+
+cleanup_non_recovery_service_accounts() {
+  local recovery_ids service_accounts ids id
+
+  if ! recovery_ids="$(recovery_service_account_ids | awk 'NF' | sort -u | jq -R . | jq -s .)"; then
+    echo "Unable to resolve every recovery service account; refusing IAM cleanup" >&2
+    return 0
+  fi
+  if ! service_accounts="$(yc iam service-account list --format json 2>/dev/null)"; then
+    echo "Unable to inspect IAM service accounts" >&2
+    return 0
+  fi
+
+  ids="$(
+    jq -r --argjson recovery "$recovery_ids" \
+      '.[] | select(.id as $id | $recovery | index($id) | not) | .id' \
+      <<< "$service_accounts"
+  )"
+  while IFS= read -r id; do
+    [[ -z "$id" ]] && continue
+    echo "Deleting non-recovery IAM service account $id"
+    if ! yc iam service-account delete --id "$id"; then
+      echo "Unable to delete IAM service account $id" >&2
+    fi
+  done <<< "$ids"
 }
 
 verify_empty() {
@@ -371,7 +517,7 @@ verify_empty() {
 }
 
 usage() {
-  echo "Usage: $0 targets [all|core|storage]|assert-recovery-principal|assert-plan PLAN|inventory|cleanup-kubernetes-residuals|purge-bucket NAME|verify-empty" >&2
+  echo "Usage: $0 targets [all|core|storage]|assert-recovery-principal|assert-plan PLAN|inventory|cleanup-kubernetes-residuals|cleanup-known-residuals|cleanup-non-recovery-service-accounts|purge-bucket NAME|verify-empty" >&2
 }
 
 case "${1:-}" in
@@ -393,6 +539,12 @@ case "${1:-}" in
     ;;
   cleanup-kubernetes-residuals)
     cleanup_kubernetes_residuals
+    ;;
+  cleanup-known-residuals)
+    cleanup_known_residuals
+    ;;
+  cleanup-non-recovery-service-accounts)
+    cleanup_non_recovery_service_accounts
     ;;
   purge-bucket)
     [[ -n "${2:-}" ]] || {

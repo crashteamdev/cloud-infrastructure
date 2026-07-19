@@ -157,6 +157,7 @@ jobs:
 
       - name: Remove Kubernetes workloads
         if: ${{ inputs.action == 'destroy' }}
+        continue-on-error: true
         run: |
           if yc managed-kubernetes cluster get marketdb-cluster >/dev/null 2>&1; then
             yc managed-kubernetes cluster get-credentials marketdb-cluster \
@@ -180,6 +181,7 @@ jobs:
 
       - name: Destroy core Terraform infrastructure
         if: ${{ inputs.action == 'destroy' }}
+        continue-on-error: true
         run: |
           mapfile -t targets < <(bash scripts/yandex-lifecycle.sh targets core)
           test "${#targets[@]}" -gt 0
@@ -188,12 +190,13 @@ jobs:
           bash scripts/yandex-lifecycle.sh assert-plan core.tfplan
           terraform -chdir=yandex apply -no-color -auto-approve core.tfplan
 
-      - name: Remove known Kubernetes residual resources
-        if: ${{ inputs.action == 'destroy' }}
-        run: bash scripts/yandex-lifecycle.sh cleanup-kubernetes-residuals
+      - name: Force-delete remaining Yandex Cloud resources
+        if: ${{ always() && inputs.action == 'destroy' }}
+        continue-on-error: true
+        run: bash scripts/yandex-lifecycle.sh cleanup-known-residuals
 
       - name: Purge data buckets
-        if: ${{ inputs.action == 'destroy' }}
+        if: ${{ always() && inputs.action == 'destroy' }}
         continue-on-error: true
         run: |
           buckets=(
@@ -215,7 +218,7 @@ jobs:
           done
 
       - name: Destroy Terraform-managed storage
-        if: ${{ inputs.action == 'destroy' }}
+        if: ${{ always() && inputs.action == 'destroy' }}
         continue-on-error: true
         run: |
           mapfile -t targets < <(bash scripts/yandex-lifecycle.sh targets storage)
@@ -226,6 +229,11 @@ jobs:
             -out=storage.tfplan "${targets[@]}"
           bash scripts/yandex-lifecycle.sh assert-plan storage.tfplan
           terraform -chdir=yandex apply -no-color -auto-approve storage.tfplan
+
+      - name: Remove non-recovery service accounts
+        if: ${{ always() && inputs.action == 'destroy' }}
+        continue-on-error: true
+        run: bash scripts/yandex-lifecycle.sh cleanup-non-recovery-service-accounts
 
       - name: Restore Terraform infrastructure
         if: ${{ inputs.action == 'restore' }}
