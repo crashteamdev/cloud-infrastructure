@@ -105,6 +105,24 @@ backend_service_account_id() {
   return 1
 }
 
+state_resource_id() {
+  local address="$1"
+
+  terraform -chdir="$TF_DIR" show -json \
+    | jq -r --arg address "$address" '
+        def resources:
+          .resources[]?,
+          (.child_modules[]? | resources);
+
+        [
+          .values.root_module
+          | resources
+          | select(.address == $address)
+          | .values.id
+        ][0] // empty
+      '
+}
+
 assert_recovery_principal() {
   local auth_service_account_id backend_service_account_id_value
   local recovery_service_account_id address candidate_id
@@ -115,10 +133,7 @@ assert_recovery_principal() {
     return 1
   fi
 
-  recovery_service_account_id="$(
-    terraform -chdir="$TF_DIR" state show -no-color 'yandex_iam_service_account.marketdb-tf' \
-      | awk -F' = ' '$1 ~ /^[[:space:]]*id$/ {gsub(/\"/, "", $2); print $2; exit}'
-  )"
+  recovery_service_account_id="$(state_resource_id 'yandex_iam_service_account.marketdb-tf')"
 
   if [[ -z "$recovery_service_account_id" ]]; then
     echo "Unable to resolve the recovery Terraform service account from state" >&2
@@ -132,10 +147,7 @@ assert_recovery_principal() {
 
   while IFS= read -r address; do
     [[ "$address" == "yandex_iam_service_account.marketdb-tf" ]] && continue
-    candidate_id="$(
-      terraform -chdir="$TF_DIR" state show -no-color "$address" \
-        | awk -F' = ' '$1 ~ /^[[:space:]]*id$/ {gsub(/\"/, "", $2); print $2; exit}'
-    )"
+    candidate_id="$(state_resource_id "$address")"
     if [[ -n "$candidate_id" \
       && ( "$candidate_id" == "$auth_service_account_id" \
         || "$candidate_id" == "$backend_service_account_id_value" ) ]]; then
@@ -228,8 +240,7 @@ assert_plan_preserves_recovery() {
 
 recovery_service_account_ids() {
   jq -r '.service_account_id // empty' "$YC_SERVICE_ACCOUNT_KEY_FILE"
-  terraform -chdir="$TF_DIR" state show -no-color 'yandex_iam_service_account.marketdb-tf' \
-    | awk -F' = ' '$1 ~ /^[[:space:]]*id$/ {gsub(/\"/, "", $2); print $2; exit}'
+  state_resource_id 'yandex_iam_service_account.marketdb-tf'
   backend_service_account_id
 }
 
